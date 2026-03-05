@@ -30,3 +30,5 @@ export const SERVICE_DESPACHO_URL = "https://files.manuscdn.com/user_upload_by_m
 export const SERVICE_AEREO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663215721079/jdryhbFThLpMiVjn.png";
 export const SERVICE_PECAS_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/service-pecas-v2-FFoeKajY7wG2Ghj7V994uf.webp";
 export const SERVICE_ADMISSAO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/service-admissao-v2-oSaGkwhHnyJ5vmiLnaov3u.webp";
+export const CLUB_AACA_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/club-logo-1_6e4469b8.jpeg";
+export const CLUB_ACB_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/club-logo-2_0e2fdba1.png";

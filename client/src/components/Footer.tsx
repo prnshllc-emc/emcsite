@@ -2,7 +2,7 @@
 import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LOGO_URL, openContact } from "@/lib/contact";
+import { LOGO_URL, openContact, CLUB_AACA_URL, CLUB_ACB_URL } from "@/lib/contact";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -219,6 +219,50 @@ export default function Footer() {
               </a>
               , acreditamos no impacto das boas ações e inspiramos outros a também transformar vidas.
             </span>
+          </div>
+        </div>
+
+        {/* Membro Afiliado */}
+        <div className="border-t border-white/10 mt-8 pt-8">
+          <div className="flex flex-col items-center gap-4">
+            <h4 className="text-white font-display font-bold text-lg tracking-widest uppercase">Membro Afiliado</h4>
+            <div className="flex items-center gap-8">
+              <a
+                href="https://www.aaca.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+                aria-label="Antique Automobile Club of America"
+              >
+                <img
+                  src={CLUB_AACA_URL}
+                  alt="Antique Automobile Club of America - AACA - Fundado em 1935"
+                  className="h-16 md:h-20 w-auto brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
+                  loading="lazy"
+                  width="108"
+                  height="80"
+                />
+              </a>
+              <a
+                href="https://www.automovelclube.com.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+                aria-label="Automóvel Clube do Brasil"
+              >
+                <img
+                  src={CLUB_ACB_URL}
+                  alt="Automóvel Clube do Brasil - ACB - Fundado em 1907"
+                  className="h-16 md:h-20 w-auto opacity-70 group-hover:opacity-100 transition-opacity"
+                  loading="lazy"
+                  width="80"
+                  height="80"
+                />
+              </a>
+            </div>
+            <p className="text-muted-foreground text-xs font-body text-center max-w-md">
+              Orgulhosamente afiliados aos mais tradicionais clubes de automóveis clássicos do Brasil e dos Estados Unidos.
+            </p>
           </div>
         </div>
 
