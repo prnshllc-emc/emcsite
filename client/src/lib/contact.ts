@@ -28,3 +28,5 @@ export const SERVICE_IMPORT_URL = "https://files.manuscdn.com/user_upload_by_mod
 export const SERVICE_EXPORT_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663215721079/RzhoLwRorzlGzyGN.png";
 export const SERVICE_DESPACHO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663215721079/KzbyvIXUBqNIRghh.png";
 export const SERVICE_AEREO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663215721079/jdryhbFThLpMiVjn.png";
+export const SERVICE_PECAS_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/service-pecas-Jwugy6kdaYQiaDnXpsSJtL.webp";
+export const SERVICE_ADMISSAO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/service-admissao-5iqgj84UvKH6b2oXstRZPz.webp";

@@ -1,7 +1,7 @@
 /* ServicesSection — 6 service cards covering all company services */
 import { Ship, Globe, FileText, Plane, Cog, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { openContact, SERVICE_IMPORT_URL, SERVICE_EXPORT_URL, SERVICE_DESPACHO_URL, SERVICE_AEREO_URL } from "@/lib/contact";
+import { openContact, SERVICE_IMPORT_URL, SERVICE_EXPORT_URL, SERVICE_DESPACHO_URL, SERVICE_AEREO_URL, SERVICE_PECAS_URL, SERVICE_ADMISSAO_URL } from "@/lib/contact";
 
 const SERVICES = [
   {
@@ -29,7 +29,7 @@ const SERVICES = [
     icon: Cog,
     title: "Peças e Acessórios",
     desc: "Importação de peças originais e acessórios dos EUA. Economize tempo e dinheiro com quem entende de logística automotiva internacional.",
-    image: null,
+    image: SERVICE_PECAS_URL,
     message: "Olá! Gostaria de importar peças e acessórios dos EUA.",
   },
   {
@@ -43,7 +43,7 @@ const SERVICES = [
     icon: Clock,
     title: "Admissão Temporária",
     desc: "Para veículos de corrida, exposição e eventos. Importação temporária com toda a documentação e logística necessária.",
-    image: null,
+    image: SERVICE_ADMISSAO_URL,
     message: "Olá! Preciso de admissão temporária para veículo.",
   },
 ];
