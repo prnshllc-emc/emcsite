@@ -1,4 +1,4 @@
-/* TestimonialsSection — Video testimonial + 3 review cards with staggered animations */
+/* TestimonialsSection — Video testimonial + 3 review cards with real client data */
 import { useState } from "react";
 import { Star, Quote, Play, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,21 +6,18 @@ import { TESTIMONIAL_POSTER_URL, TESTIMONIAL_VIDEO_URL } from "@/lib/contact";
 
 const TESTIMONIALS = [
   {
-    vehicle: "Porsche 911 GT3",
-    city: "São Paulo/SP",
-    text: "Aquisição realizada diretamente na feira de Carlisle (EUA). Processo completo de inspeção, compra e logística porta a porta. O veículo chegou em estado de concurso.",
+    name: "Marcelo Matheus",
+    text: "Fiz a importação do meu carro com a empresa Enviando Meu Carro e o processo foi impecável. Transparência total em cada etapa, sem surpresas.",
     delay: "0ms",
   },
   {
-    vehicle: "Ford Mustang Fastback 1967",
-    city: "Curitiba/PR",
-    text: "Projeto de restauração iniciado nos EUA e finalizado com a entrega no Brasil. Gestão completa da documentação de veículo histórico e desembaraço aduaneiro ágil.",
+    name: "Maykon Siqueira",
+    text: "Já é o sexto trabalho que faço com o Fred. Atenção, cuidado e profissionalismo em cada detalhe. Recomendo de olhos fechados para importação e exportação.",
     delay: "150ms",
   },
   {
-    vehicle: "Corvette Stingray",
-    city: "Rio de Janeiro/RJ",
-    text: "Logística complexa de transporte fechado para garantir integridade total. Cliente acompanhou o rastreamento em tempo real desde a saída de Miami até a garagem.",
+    name: "Rafael Marinho",
+    text: "Processo de exportação do meu veículo foi muito mais simples do que eu imaginava. A equipe cuidou de toda a burocracia e documentação. Excelente!",
     delay: "300ms",
   },
 ];
@@ -38,17 +35,17 @@ export default function TestimonialsSection() {
         {/* Badge */}
         <div className="text-center mb-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase">
-            Cases de Sucesso
+            Depoimentos
           </div>
         </div>
 
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-bold text-white">
-            Excelência Comprovada
+            Veja o que Nossos Clientes Dizem
           </h2>
-          <p className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-400 text-xl font-bold">
-            Em Cada Entrega
+          <p className="text-muted-foreground text-lg font-body">
+            5.0 estrelas no Google com 18+ avaliações. Excelência comprovada em cada entrega.
           </p>
         </div>
 
@@ -80,7 +77,7 @@ export default function TestimonialsSection() {
                   <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
                     <p className="text-white font-bold font-display text-lg">Depoimento Real</p>
                     <p className="text-gray-300 text-sm font-body">
-                      Veja a experiência de quem já importou conosco
+                      Veja a experiência de quem já confiou na EMC
                     </p>
                   </div>
                 </div>
@@ -97,9 +94,9 @@ export default function TestimonialsSection() {
 
           {/* Right — Testimonial Cards */}
           <div className="space-y-6">
-            {TESTIMONIALS.map((t, i) => (
+            {TESTIMONIALS.map((t) => (
               <div
-                key={t.vehicle}
+                key={t.name}
                 className="group p-6 rounded-xl bg-card border border-white/5 hover:border-primary/20 transition-colors relative animate-in slide-in-from-right-4 duration-500"
                 style={{ animationDelay: t.delay }}
               >
@@ -118,10 +115,10 @@ export default function TestimonialsSection() {
                   "{t.text}"
                 </p>
 
-                {/* Vehicle & City */}
-                <p className="text-white font-bold font-display">{t.vehicle}</p>
+                {/* Name */}
+                <p className="text-white font-bold font-display">{t.name}</p>
                 <p className="text-xs uppercase tracking-wider text-primary">
-                  Entregue em {t.city}
+                  Cliente Enviando Meu Carro
                 </p>
               </div>
             ))}

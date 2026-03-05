@@ -1,4 +1,4 @@
-/* FAQSection — Accordion with 5 questions and WhatsApp CTA */
+/* FAQSection — Accordion with institutional FAQs covering all services */
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,29 +11,44 @@ import { openContact } from "@/lib/contact";
 
 const FAQS = [
   {
-    question: "Qual o valor mínimo para importar um carro?",
+    question: "Quais tipos de veículos vocês transportam?",
     answer:
-      "Não existe valor mínimo nem máximo. Trabalhamos com veículos de todas as faixas de preço, desde clássicos acessíveis até supercarros exclusivos. Cada operação é personalizada de acordo com o perfil do veículo e as necessidades do cliente.",
+      "Trabalhamos com todos os tipos: carros clássicos (+30 anos), veículos 0km, motos, camionetas, utilitários e até Motor Homes. Tanto na importação (EUA → Brasil) quanto na exportação (Brasil → EUA), independente do tipo de combustível ou direção.",
+  },
+  {
+    question: "Vocês também exportam veículos do Brasil para os EUA?",
+    answer:
+      "Sim! Oferecemos serviço completo de exportação Brasil → EUA pelo hub Santos–Miami, com prazo de 4 a 5 semanas. O serviço inclui recebimento, transporte rodoviário, despachante, estufagem, frete e seguro marítimos, desembaraço nos EUA e entrega em Miami/FL.",
   },
   {
     question: "Posso importar carros usados?",
     answer:
-      "No Brasil, a importação de carros usados é permitida apenas para veículos com mais de 30 anos (considerados antiguidade). Para veículos mais novos, trabalhamos com importação de zero km. Nossa equipe pode orientar sobre as melhores opções para o seu caso.",
+      "No Brasil, a importação de veículos usados é permitida apenas para veículos com mais de 30 anos (considerados antiguidade). Para veículos mais novos, trabalhamos com importação de 0km. Veículos usados podem entrar via admissão temporária para corrida ou exposição.",
   },
   {
-    question: "Quanto tempo demora o processo todo?",
+    question: "Qual o prazo do processo completo?",
     answer:
-      "O processo completo leva em média de 60 a 90 dias, dependendo da complexidade da operação, documentação e modal de transporte escolhido. Operações via modal aéreo podem ser significativamente mais rápidas.",
+      "Para importação de veículos 0km, o prazo é de 50 a 80 dias. Para clássicos (+30 anos), de 67 a 115 dias (inclui laudo ACB). Para exportação Brasil → EUA, de 4 a 5 semanas. Esses são prazos estimados que podem variar conforme documentação e condições logísticas.",
   },
   {
-    question: "Quais impostos eu preciso pagar?",
+    question: "Quais impostos eu preciso pagar na importação?",
     answer:
-      "Os principais impostos são: II (Imposto de Importação), IPI (Imposto sobre Produtos Industrializados), PIS, COFINS e ICMS. Nossa consultoria tributária especializada ajuda a planejar e otimizar esses custos, garantindo compliance total.",
+      "Os principais tributos são: II (Imposto de Importação - 35%), IPI (6,2% a 6,5% para carros), PIS, COFINS, ICMS (varia por estado) e AFRMM (25% sobre frete marítimo). Oferecemos uma calculadora online em calculadora.enviandomeucarro.com para simular todos os custos.",
   },
   {
     question: "O transporte tem seguro?",
     answer:
-      "Sim! Oferecemos seguro internacional total (All Risks) que cobre seu veículo durante todo o trajeto, desde a origem até a entrega final no Brasil. Isso inclui cobertura contra danos, avarias, roubo e sinistros durante o transporte marítimo ou aéreo.",
+      "Sim! Oferecemos seguro internacional obrigatório (All Risks) em todas as operações, cobrindo seu veículo durante todo o trajeto. Isso inclui cobertura contra danos, avarias, roubo e sinistros durante o transporte marítimo ou aéreo.",
+  },
+  {
+    question: "Vocês importam peças e acessórios?",
+    answer:
+      "Sim! Importamos peças originais e acessórios dos EUA para seu clássico ou importado. É uma forma de economizar tempo e dinheiro, com a mesma segurança e transparência dos nossos serviços de transporte de veículos.",
+  },
+  {
+    question: "Preciso contratar todos os serviços ou posso escolher?",
+    answer:
+      "Você que manda! Nossa filosofia é oferecer flexibilidade total. Você pode contratar o serviço completo porta a porta ou escolher apenas os serviços que precisa. Sem pegadinhas e sabendo exatamente o quanto vai pagar por cada etapa.",
   },
 ];
 
@@ -48,7 +63,7 @@ export default function FAQSection() {
               Dúvidas Frequentes
             </h2>
             <p className="text-muted-foreground text-lg font-body">
-              Tudo o que você precisa saber antes de importar seu veículo.
+              Tudo o que você precisa saber sobre importação, exportação e logística automotiva.
             </p>
           </div>
 
@@ -76,7 +91,7 @@ export default function FAQSection() {
               Ainda tem dúvidas? Nossa equipe está pronta para te ajudar.
             </p>
             <Button
-              onClick={() => openContact("Olá! Tenho algumas dúvidas sobre importação de veículos. Pode me ajudar?")}
+              onClick={() => openContact("Olá! Tenho algumas dúvidas sobre os serviços da Enviando Meu Carro. Pode me ajudar?")}
               className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-[#25D366] text-white hover:bg-[#128C7E]"
             >
               <MessageCircle className="mr-2 w-5 h-5" />

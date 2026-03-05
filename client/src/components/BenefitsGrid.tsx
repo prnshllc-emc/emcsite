@@ -1,58 +1,59 @@
-/* BenefitsGrid — 4 benefit cards with icons and hover lift effect */
-import { ShieldCheck, TrendingUp, Smartphone, Clock } from "lucide-react";
+/* BenefitsGrid — "Sobre Nós" section with 3 pillars matching original site: Missão, Serviços, Liberdade */
+import { Target, Wrench, Unlock } from "lucide-react";
 
-const BENEFITS = [
+const PILLARS = [
   {
-    icon: ShieldCheck,
-    title: "Importação em Seu Nome",
-    desc: "Mais segurança para seu patrimônio. O veículo é importado diretamente no seu CPF/CNPJ, com total transparência e controle.",
+    icon: Target,
+    title: "Nossa Missão",
+    desc: "Facilitar a importação e exportação de veículos entre Brasil e Estados Unidos com transparência total, excelência operacional e compromisso inabalável com a satisfação do cliente, tornando o processo acessível, seguro e confiável.",
   },
   {
-    icon: TrendingUp,
-    title: "Eficiência Fiscal",
-    desc: "Planejamento tributário estratégico para viabilizar seu investimento com inteligência e compliance absoluto.",
+    icon: Wrench,
+    title: "Nossos Serviços",
+    desc: "Oferecemos todos os serviços que seu carro pode precisar em cada etapa do processo. Da importação de clássicos e 0km à exportação, despacho aduaneiro, peças e envios aéreos — cuidamos de tudo de ponta a ponta, para que seu veículo receba o cuidado que merece.",
   },
   {
-    icon: Smartphone,
-    title: "Controle Total",
-    desc: "Você no comando em todas as etapas. Acompanhe o status do seu veículo 24/7 com nosso sistema de rastreamento em tempo real.",
-  },
-  {
-    icon: Clock,
-    title: "Logística de Precisão",
-    desc: "Gestão de rotas otimizadas e cronogramas assertivos. Sua importação tratada com a prioridade que merece.",
+    icon: Unlock,
+    title: "VC que Manda",
+    desc: "Sua liberdade é nossa prioridade. Utilizamos tecnologia e serviços de ponta para oferecer somente os serviços que você precisa. Sem pegadinhas, sabendo o quanto vai pagar por cada etapa. Você escolhe, você decide, você que manda.",
   },
 ];
 
 export default function BenefitsGrid() {
   return (
-    <section id="benefits" className="py-24 bg-background relative overflow-hidden">
+    <section id="about" className="py-24 bg-background relative overflow-hidden">
       <div className="container">
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mx-auto">
+            Sobre Nós
+          </div>
           <h2 className="text-3xl md:text-5xl font-bold text-white">
-            Com a Enviando Meu Carro, você garante:
+            Conheça a{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-400">
+              Enviando Meu Carro
+            </span>
           </h2>
           <p className="text-muted-foreground text-lg font-body">
-            Elevamos o padrão da logística automotiva para que sua única preocupação seja escolher o próximo destino.
+            Há mais de 10 anos conectando sonhos automotivos entre Brasil e Estados Unidos, com a segurança e transparência que você merece.
           </p>
         </div>
 
-        {/* Benefits Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {BENEFITS.map((benefit) => (
+        {/* 3 Pillars Grid */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {PILLARS.map((pillar) => (
             <div
-              key={benefit.title}
-              className="group p-6 rounded-xl bg-card border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
+              key={pillar.title}
+              className="group p-8 rounded-xl bg-card border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors">
-                <benefit.icon className="w-6 h-6 text-primary" />
+              <div className="w-14 h-14 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-6 transition-colors">
+                <pillar.icon className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="text-xl font-display font-bold text-white mb-2">
-                {benefit.title}
+              <h3 className="text-2xl font-display font-bold text-white mb-4">
+                {pillar.title}
               </h3>
               <p className="text-muted-foreground text-sm leading-relaxed font-body">
-                {benefit.desc}
+                {pillar.desc}
               </p>
             </div>
           ))}

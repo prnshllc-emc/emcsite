@@ -1,10 +1,10 @@
-/* StatsSection — Company numbers with grid background pattern and decorative corners */
+/* StatsSection — Company numbers reflecting real data from SOP and site */
 
 const STATS = [
-  { value: "+500", label: "Carros Importados" },
-  { value: "10", label: "Anos de Experiência" },
-  { value: "100%", label: "Clientes Satisfeitos" },
-  { value: "+15", label: "Países Atendidos" },
+  { value: "+1.000", label: "Veículos Transportados" },
+  { value: "10+", label: "Anos de Experiência" },
+  { value: "5.0 ★", label: "Avaliação Google" },
+  { value: "3", label: "Escritórios Internacionais" },
 ];
 
 export default function StatsSection() {
@@ -26,11 +26,11 @@ export default function StatsSection() {
           <h2 className="text-3xl md:text-5xl font-bold text-white">
             Quem entende de carros, escolhe a{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-400">
-              Enviando Meu Carro
+              EMC
             </span>
           </h2>
           <p className="text-muted-foreground text-lg font-body">
-            Nossos números refletem o compromisso inegociável com a excelência e a satisfação de quem não aceita menos que o melhor.
+            Nossos números refletem uma década de compromisso com transparência, segurança e excelência em logística automotiva internacional.
           </p>
         </div>
 

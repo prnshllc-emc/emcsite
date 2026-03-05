@@ -1,5 +1,5 @@
-/* Footer — 4-column layout with brand, links, contact, newsletter */
-import { Instagram, Facebook, MapPin, Phone, Mail } from "lucide-react";
+/* Footer — 4-column layout with brand, links, contact, newsletter + Ayrton Senna */
+import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LOGO_URL, openContact } from "@/lib/contact";
@@ -7,18 +7,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const QUICK_LINKS = [
-  { label: "Página Inicial", href: "#" },
-  { label: "Sobre Nós", href: "#stats" },
+  { label: "Início", href: "#" },
+  { label: "Sobre Nós", href: "#about" },
   { label: "Serviços", href: "#services" },
-  { label: "Galeria", href: "#testimonials" },
-  { label: "Blog", href: "#" },
-  { label: "Contato", href: "#faq" },
+  { label: "Depoimentos", href: "#testimonials" },
+  { label: "Escritórios", href: "#offices" },
+  { label: "FAQ", href: "#faq" },
 ];
 
-const ADDRESSES = [
-  "1221 Brickell Ave, Suite 900, Miami, FL 33131, EUA",
-  "Av. Coronel Marcos Konder, 1313, sala 607, Itajaí, SC",
-  "Rua Gomes de Carvalho, 911, 1° andar, Vila Olímpia, São Paulo, SP",
+const OFFICES = [
+  { flag: "🇺🇸", name: "Miami, FL (Sede)", addr: "1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126" },
+  { flag: "🇧🇷", name: "São Paulo, SP", addr: "Vila Olímpia, São Paulo - SP" },
+  { flag: "🇧🇷", name: "Itajaí, SC (Base Op.)", addr: "Próximo ao Porto de Itajaí, SC" },
 ];
 
 export default function Footer() {
@@ -27,11 +27,7 @@ export default function Footer() {
   function handleNewsletter(e: React.FormEvent) {
     e.preventDefault();
     if (email) {
-      window.open(
-        `https://calculadora.enviandomeucarro.com?utm_source=newsletter&email=${encodeURIComponent(email)}`,
-        "_blank"
-      );
-      toast.success("Redirecionando para nosso simulador!");
+      toast.success("Obrigado! Você receberá nossas novidades em breve.");
       setEmail("");
     }
   }
@@ -51,9 +47,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <img src={LOGO_URL} alt="Enviando Meu Carro" className="h-10 w-auto" />
+            <img src={LOGO_URL} alt="EMC - Enviando Meu Carro" className="h-10 w-auto" />
             <p className="text-muted-foreground text-sm font-body leading-relaxed">
-              O jeito mais Rápido, Seguro e Barato de importar seu veículo dos EUA para o Brasil.
+              O jeito mais Rápido, Seguro e Barato de transportar seu veículo entre Brasil e Estados Unidos. Importação, exportação e logística automotiva internacional.
             </p>
             <div className="flex gap-3">
               <a
@@ -92,7 +88,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact & Offices */}
           <div>
             <h4 className="text-white font-display font-bold text-lg mb-6">Contato</h4>
             <div className="space-y-4">
@@ -104,18 +100,24 @@ export default function Footer() {
                 +55 (11) 99244-8920
               </button>
               <a
-                href="mailto:info@enviandomeucarro.com"
+                href="mailto:atendimento@enviandomeucarro.com"
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
               >
                 <Mail className="w-4 h-4 flex-shrink-0" />
-                info@enviandomeucarro.com
+                atendimento@enviandomeucarro.com
               </a>
-              {ADDRESSES.map((addr) => (
-                <div key={addr} className="flex items-start gap-3 text-muted-foreground text-sm font-body">
-                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <span>{addr}</span>
-                </div>
-              ))}
+              <div className="pt-2 space-y-3">
+                {OFFICES.map((office) => (
+                  <div key={office.name} className="flex items-start gap-3 text-muted-foreground text-sm font-body">
+                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-white font-medium">{office.flag} {office.name}</span>
+                      <br />
+                      <span className="text-xs">{office.addr}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -123,7 +125,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-display font-bold text-lg mb-6">Newsletter</h4>
             <p className="text-muted-foreground text-sm font-body mb-4">
-              Receba condições exclusivas e informações relevantes sobre importação de veículos.
+              Receba condições exclusivas e informações relevantes sobre importação e exportação de veículos.
             </p>
             <form onSubmit={handleNewsletter} className="space-y-3">
               <Input
@@ -138,16 +140,35 @@ export default function Footer() {
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 font-bold tracking-wider uppercase text-sm"
               >
-                Quero Receber Ofertas
+                Inscrever-se
               </Button>
             </form>
           </div>
         </div>
 
+        {/* Instituto Ayrton Senna */}
+        <div className="border-t border-white/10 mt-12 pt-8">
+          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm font-body">
+            <Heart className="w-4 h-4 text-primary" />
+            <span>
+              Na Enviando Meu Carro apoiamos o{" "}
+              <a
+                href="https://www.institutoayrtonsenna.org.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium"
+              >
+                Instituto Ayrton Senna
+              </a>
+              , acreditamos no impacto das boas ações e inspiramos outros a também transformar vidas.
+            </span>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t border-white/10 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm font-body">
-            © {new Date().getFullYear()} Enviando Meu Carro — Todos os direitos reservados.
+            © {new Date().getFullYear()} VC que Manda! — Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
             <button className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">

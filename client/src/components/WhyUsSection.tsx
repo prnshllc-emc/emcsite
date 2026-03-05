@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { openContact, WHYUS_IMAGE_URL } from "@/lib/contact";
 
 const CHECKLIST = [
-  "Assessoria completa na documentação",
-  "Inspeção detalhada do veículo na origem",
-  "Seguro internacional total (All Risks)",
-  "Rastreamento em tempo real",
-  "Armazenagem segura em pátios próprios",
-  "Desembaraço aduaneiro ágil",
-  "Transporte interno (EUA e Brasil)",
-  "Consultoria tributária especializada",
+  "Transparência total sobre custos e prazos",
+  "Seguro internacional obrigatório (All Risks)",
+  "Rastreamento em tempo real de cada etapa",
+  "Armazenagem gratuita por 60 dias",
+  "Dossiê completo de documentação",
+  "Assessoria em feiras e leilões nos EUA",
+  "Suporte pós-entrega contínuo",
+  "Você escolhe apenas os serviços que precisa",
 ];
 
 const FLOATING_STATS = [
@@ -35,11 +35,11 @@ export default function WhyUsSection() {
             {/* Title */}
             <h2 className="text-3xl md:text-5xl font-bold text-white">
               Inteligência Logística para{" "}
-              <span className="text-primary">Otimizar seu Investimento</span>
+              <span className="text-primary">Seu Veículo Cruzar Fronteiras</span>
             </h2>
 
             <p className="text-muted-foreground text-lg font-body leading-relaxed">
-              Na "Enviando Meu Carro", transformamos a complexidade da importação em uma experiência fluida. Nossa expertise garante a viabilidade estratégica do seu projeto, eliminando riscos e maximizando resultados.
+              Na EMC, transformamos a complexidade da logística automotiva internacional em uma experiência fluida. Seja importando ou exportando, nossa expertise garante segurança, agilidade e o melhor custo-benefício.
             </p>
 
             {/* Checklist */}
@@ -54,7 +54,7 @@ export default function WhyUsSection() {
 
             {/* CTA Button */}
             <Button
-              onClick={() => openContact("Olá! Gostaria de falar com um consultor sobre importação de veículos.")}
+              onClick={() => openContact("Olá! Gostaria de falar com um consultor sobre os serviços da EMC.")}
               className="h-14 px-8 text-lg font-display font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Falar com um Consultor
@@ -71,7 +71,7 @@ export default function WhyUsSection() {
             <div className="relative rounded-2xl border border-white/10 bg-background/50 backdrop-blur-sm p-2">
               <img
                 src={WHYUS_IMAGE_URL}
-                alt="Inspeção de veículo de luxo"
+                alt="Veículo sendo preparado para transporte internacional"
                 className="w-full aspect-video object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-700"
               />
             </div>

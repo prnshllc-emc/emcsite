@@ -6,11 +6,11 @@ import { LOGO_URL } from "@/lib/contact";
 import TrackingLoginModal from "./TrackingLoginModal";
 
 const NAV_ITEMS = [
-  { label: "Para quem é?", anchor: "#benefits" },
+  { label: "Início", anchor: "#" },
+  { label: "Sobre Nós", anchor: "#about" },
   { label: "Serviços", anchor: "#services" },
-  { label: "Benefícios", anchor: "#whyus" },
   { label: "Depoimentos", anchor: "#testimonials" },
-  { label: "Sobre Nós", anchor: "#stats" },
+  { label: "Escritórios", anchor: "#offices" },
   { label: "FAQ", anchor: "#faq" },
 ];
 
@@ -19,6 +19,11 @@ export default function Header() {
   const [trackingOpen, setTrackingOpen] = useState(false);
 
   function scrollTo(anchor: string) {
+    if (anchor === "#") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setMobileOpen(false);
+      return;
+    }
     const el = document.querySelector(anchor);
     if (el) el.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
@@ -32,7 +37,7 @@ export default function Header() {
           <a href="/" className="flex-shrink-0">
             <img
               src={LOGO_URL}
-              alt="Enviando Meu Carro"
+              alt="EMC - Enviando Meu Carro"
               className="h-14 w-auto hover:scale-105 transition-transform duration-300"
             />
           </a>
