@@ -14,7 +14,7 @@ export default function HeroSection() {
     <section
       id="inicio"
       aria-label="Importação e exportação de veículos - Enviando Meu Carro"
-      className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden"
+      className="relative min-h-[90vh] flex items-center pt-28 overflow-hidden"
     >
       {/* Background Image with SEO alt */}
       <div className="absolute inset-0 z-0">

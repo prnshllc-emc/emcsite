@@ -31,7 +31,7 @@ export default function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/10" role="banner">
-        <div className="container flex items-center justify-between h-20">
+        <div className="container flex items-center justify-between h-28">
           {/* Logo — proper anchor with title */}
           <a
             href="https://enviandomeucarro.com/"
@@ -45,7 +45,7 @@ export default function Header() {
             <img
               src={LOGO_URL}
               alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-              className="h-14 w-auto hover:scale-105 transition-transform duration-300"
+              className="h-[6.3rem] w-auto hover:scale-105 transition-transform duration-300"
               width="120"
               height="56"
             />
@@ -89,7 +89,7 @@ export default function Header() {
 
         {/* Mobile Drawer */}
         {mobileOpen && (
-          <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-20 left-0 right-0 z-40">
+          <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-28 left-0 right-0 z-40">
             <nav className="container py-6 flex flex-col gap-4" aria-label="Navegação mobile">
               {NAV_ITEMS.map((item) => (
                 <a
