@@ -224,9 +224,9 @@ export default function Footer() {
 
         {/* Membro Afiliado */}
         <div className="border-t border-white/10 mt-8 pt-8">
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-5">
             <h4 className="text-white font-display font-bold text-lg tracking-widest uppercase">Membro Afiliado</h4>
-            <div className="flex items-center gap-8">
+            <div className="bg-white rounded-lg px-10 py-5 flex items-center gap-10">
               <a
                 href="https://www.aaca.org"
                 target="_blank"
@@ -237,12 +237,13 @@ export default function Footer() {
                 <img
                   src={CLUB_AACA_URL}
                   alt="Antique Automobile Club of America - AACA - Fundado em 1935"
-                  className="h-16 md:h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
+                  className="h-14 md:h-18 w-auto group-hover:scale-105 transition-transform"
                   loading="lazy"
                   width="108"
                   height="80"
                 />
               </a>
+              <div className="w-px h-12 bg-gray-300" />
               <a
                 href="https://www.automovelclube.com.br"
                 target="_blank"
@@ -253,7 +254,7 @@ export default function Footer() {
                 <img
                   src={CLUB_ACB_URL}
                   alt="Automóvel Clube do Brasil - ACB - Fundado em 1907"
-                  className="h-16 md:h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
+                  className="h-14 md:h-18 w-auto group-hover:scale-105 transition-transform"
                   loading="lazy"
                   width="80"
                   height="80"
