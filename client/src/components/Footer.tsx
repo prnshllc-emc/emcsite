@@ -237,7 +237,7 @@ export default function Footer() {
                 <img
                   src={CLUB_AACA_URL}
                   alt="Antique Automobile Club of America - AACA - Fundado em 1935"
-                  className="h-16 md:h-20 w-auto brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
+                  className="h-16 md:h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
                   loading="lazy"
                   width="108"
                   height="80"
@@ -253,7 +253,7 @@ export default function Footer() {
                 <img
                   src={CLUB_ACB_URL}
                   alt="Automóvel Clube do Brasil - ACB - Fundado em 1907"
-                  className="h-16 md:h-20 w-auto opacity-70 group-hover:opacity-100 transition-opacity"
+                  className="h-16 md:h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
                   loading="lazy"
                   width="80"
                   height="80"
