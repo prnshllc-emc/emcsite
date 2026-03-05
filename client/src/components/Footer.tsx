@@ -51,7 +51,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <img src={LOGO_URL} alt="Enviando Meu Carro" className="h-16 w-auto" />
+            <img src={LOGO_URL} alt="Enviando Meu Carro" className="h-10 w-auto" />
             <p className="text-muted-foreground text-sm font-body leading-relaxed">
               O jeito mais Rápido, Seguro e Barato de importar seu veículo dos EUA para o Brasil.
             </p>

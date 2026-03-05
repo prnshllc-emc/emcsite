@@ -19,7 +19,7 @@ export function openContact(message?: string) {
   }
 }
 
-export const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/logo_5e21ffb9.webp";
+export const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/logo-emc_335975b5.png";
 export const HERO_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/hero-bg-iguX4vEEPsn2MVYBbBBz7c.webp";
 export const WHYUS_IMAGE_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/whyus-image-DJ6ECkTJkRKXpkEkp8tFkg.webp";
 export const TESTIMONIAL_POSTER_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/testimonial-poster-hwCTKZTa8UZbVibYmGcVeH.webp";

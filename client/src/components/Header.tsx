@@ -27,13 +27,13 @@ export default function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/10">
-        <div className="container flex items-center justify-between h-28">
+        <div className="container flex items-center justify-between h-20">
           {/* Logo */}
           <a href="/" className="flex-shrink-0">
             <img
               src={LOGO_URL}
               alt="Enviando Meu Carro"
-              className="h-24 w-auto hover:scale-105 transition-transform duration-300"
+              className="h-14 w-auto hover:scale-105 transition-transform duration-300"
             />
           </a>
 
@@ -68,7 +68,7 @@ export default function Header() {
 
         {/* Mobile Drawer */}
         {mobileOpen && (
-          <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-28 left-0 right-0 z-40">
+          <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-20 left-0 right-0 z-40">
             <nav className="container py-6 flex flex-col gap-4">
               {NAV_ITEMS.map((item) => (
                 <button

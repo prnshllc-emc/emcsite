@@ -12,7 +12,7 @@ const MINI_FEATURES = [
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-28 overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
