@@ -1,0 +1,39 @@
+/* CTASection — Reusable call-to-action banner with primary/secondary variants */
+import { MessageCircle, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { openContact } from "@/lib/contact";
+
+interface Props {
+  title: string;
+  description: string;
+  buttonText: string;
+  variant: "primary" | "secondary";
+}
+
+export default function CTASection({ title, description, buttonText, variant }: Props) {
+  return (
+    <section
+      className={`py-16 ${
+        variant === "primary"
+          ? "bg-zinc-900/50 border-y border-white/5"
+          : "bg-zinc-900"
+      }`}
+    >
+      <div className="container">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="text-center md:text-left">
+            <h2 className="text-3xl md:text-4xl font-bold text-white">{title}</h2>
+            <p className="text-lg text-gray-400 mt-2 font-body">{description}</p>
+          </div>
+          <Button
+            onClick={() => openContact(`Olá! Vi o site e gostaria de saber mais. ${buttonText}`)}
+            className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0"
+          >
+            <MessageCircle className="mr-2 w-5 h-5" />
+            {buttonText}
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
