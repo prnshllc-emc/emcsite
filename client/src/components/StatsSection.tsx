@@ -1,7 +1,7 @@
 /* StatsSection — Company numbers reflecting real data from SOP and site */
 
 const STATS = [
-  { value: "+1.000", label: "Veículos Transportados" },
+  { value: "+1.500", label: "Veículos Transportados" },
   { value: "10+", label: "Anos de Experiência" },
   { value: "5.0 ★", label: "Avaliação Google" },
   { value: "3", label: "Escritórios Internacionais" },
