@@ -1,4 +1,4 @@
-/* FAQSection — Accordion with institutional FAQs covering all services */
+/* FAQSection — SEO-optimized expanded FAQ targeting featured snippets, long-tail keywords, and "People Also Ask" */
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,63 +11,88 @@ import { openContact } from "@/lib/contact";
 
 const FAQS = [
   {
-    question: "Quais tipos de veículos vocês transportam?",
+    question: "Como funciona a importação de veículos dos EUA para o Brasil?",
     answer:
-      "Trabalhamos com todos os tipos: carros clássicos (+30 anos), veículos 0km, motos, camionetas, utilitários e até Motor Homes. Tanto na importação quanto na exportação, para e de qualquer lugar do mundo, independente do tipo de combustível ou direção.",
+      "O processo de importação de veículos envolve 5 etapas principais: (1) Escolha do veículo com assessoria da EMC em feiras, leilões e concessionárias internacionais; (2) Compra, inspeção e preparação para embarque; (3) Frete marítimo ou aéreo com seguro All Risks incluso; (4) Despacho aduaneiro completo no Brasil (DI, licenças LI, CAT, LCVM, conferência aduaneira); (5) Entrega do veículo na sua porta. A EMC cuida de todo o processo ou apenas das etapas que você escolher.",
   },
   {
-    question: "Vocês também exportam veículos do Brasil?",
+    question: "Quanto custa importar um carro dos Estados Unidos?",
     answer:
-      "Sim! Oferecemos serviço completo de exportação do Brasil para qualquer destino no mundo. O serviço inclui recebimento, transporte rodoviário, despachante, estufagem, frete e seguro marítimos, desembaraço no destino e entrega final.",
+      "O custo de importação varia conforme o valor do veículo, tipo e estado de destino no Brasil. Os principais tributos são: II (Imposto de Importação - 35%), IPI (6,2% a 6,5% para carros), PIS, COFINS, ICMS (varia por estado) e AFRMM (25% sobre frete marítimo). Além dos impostos, há custos de frete, seguro, despacho aduaneiro e transporte interno. Use nossa calculadora online em calculadora.enviandomeucarro.com para simular todos os custos detalhadamente e sem compromisso.",
   },
   {
-    question: "Posso importar carros usados?",
+    question: "Quais tipos de veículos vocês importam e exportam?",
     answer:
-      "No Brasil, a importação de veículos usados é permitida apenas para veículos com mais de 30 anos (considerados antiguidade). Para veículos mais novos, trabalhamos com importação de 0km. Veículos usados podem entrar via admissão temporária para corrida ou exposição.",
+      "Trabalhamos com todos os tipos de veículos: carros clássicos (+30 anos), veículos 0km, motos, camionetas, utilitários, Motor Homes e até veículos de corrida. Tanto na importação quanto na exportação, para e de qualquer lugar do mundo, independente do tipo de combustível, direção ou porte do veículo.",
   },
   {
-    question: "Qual o prazo do processo completo?",
+    question: "Posso importar carro usado dos EUA para o Brasil?",
     answer:
-      "Para importação de veículos 0km, o prazo é de 50 a 80 dias. Para clássicos (+30 anos), de 67 a 115 dias (inclui laudo ACB). Para exportação, a partir de 4 semanas dependendo do destino. Esses são prazos estimados que podem variar conforme documentação, destino e condições logísticas.",
+      "No Brasil, a legislação permite a importação de veículos usados apenas para aqueles com mais de 30 anos de fabricação, classificados como antiguidade ou clássicos. Para veículos mais novos, trabalhamos exclusivamente com importação de 0km (zero quilômetro). Veículos usados de qualquer idade podem entrar no Brasil via regime de admissão temporária para fins de corrida, exposição ou eventos internacionais.",
   },
   {
-    question: "Quais impostos eu preciso pagar na importação?",
+    question: "Qual o prazo para importar um carro?",
     answer:
-      "Os principais tributos são: II (Imposto de Importação - 35%), IPI (6,2% a 6,5% para carros), PIS, COFINS, ICMS (varia por estado) e AFRMM (25% sobre frete marítimo). Oferecemos uma calculadora online em calculadora.enviandomeucarro.com para simular todos os custos.",
+      "Os prazos variam conforme o tipo de veículo: para importação de veículos 0km, o prazo é de 50 a 80 dias; para clássicos (+30 anos), de 67 a 115 dias (inclui laudo ACB obrigatório). Para exportação do Brasil, a partir de 4 semanas dependendo do destino. Esses são prazos estimados que podem variar conforme documentação, destino e condições logísticas. A EMC oferece rastreamento em tempo real para você acompanhar cada etapa.",
   },
   {
-    question: "O transporte tem seguro?",
+    question: "Vocês exportam veículos do Brasil para outros países?",
     answer:
-      "Sim! Oferecemos seguro internacional obrigatório (All Risks) em todas as operações, cobrindo seu veículo durante todo o trajeto. Isso inclui cobertura contra danos, avarias, roubo e sinistros durante o transporte marítimo ou aéreo.",
+      "Sim! A EMC oferece serviço completo de exportação de veículos do Brasil para qualquer destino no mundo. O serviço inclui recebimento do veículo, transporte rodoviário até o porto, despachante de exportação, estufagem em container, frete e seguro marítimos, desembaraço no país de destino e entrega final. Todo o processo é acompanhado com rastreamento em tempo real.",
   },
   {
-    question: "Vocês importam peças e acessórios?",
+    question: "O transporte internacional de veículos tem seguro?",
     answer:
-      "Sim! Importamos peças originais e acessórios do mundo inteiro para seu clássico ou importado. É uma forma de economizar tempo e dinheiro, com a mesma segurança e transparência dos nossos serviços de transporte de veículos.",
+      "Sim! Todas as operações da EMC incluem seguro internacional obrigatório do tipo All Risks, que cobre seu veículo durante todo o trajeto. A cobertura inclui proteção contra danos, avarias, roubo e sinistros durante o transporte marítimo ou aéreo, desde a origem até a entrega final no destino.",
+  },
+  {
+    question: "Vocês importam peças e acessórios automotivos?",
+    answer:
+      "Sim! A EMC importa peças originais e acessórios automotivos do mundo inteiro para seu clássico ou importado. É uma forma de economizar tempo e dinheiro na manutenção do seu veículo, com a mesma segurança, transparência e rastreamento dos nossos serviços de transporte de veículos completos.",
+  },
+  {
+    question: "O que é admissão temporária de veículos?",
+    answer:
+      "A admissão temporária é um regime aduaneiro que permite a entrada de veículos estrangeiros no Brasil por tempo determinado, sem o pagamento integral dos tributos de importação. É utilizada para veículos de corrida, exposição, feiras e eventos internacionais. A EMC cuida de toda a documentação e logística necessária para a admissão temporária do seu veículo.",
   },
   {
     question: "Preciso contratar todos os serviços ou posso escolher?",
     answer:
-      "Você que manda! Nossa filosofia é oferecer flexibilidade total. Você pode contratar o serviço completo porta a porta ou escolher apenas os serviços que precisa. Sem pegadinhas e sabendo exatamente o quanto vai pagar por cada etapa.",
+      "Você que manda! A filosofia da EMC é oferecer flexibilidade total ao cliente. Você pode contratar o serviço completo porta a porta (importação ou exportação integral) ou escolher apenas os serviços específicos que precisa, como despacho aduaneiro, frete, seguro ou transporte interno. Sem pegadinhas e sabendo exatamente o quanto vai pagar por cada etapa.",
+  },
+  {
+    question: "Como importar um carro clássico americano para o Brasil?",
+    answer:
+      "Para importar um carro clássico (com mais de 30 anos), o processo inclui: assessoria na escolha do veículo em feiras e leilões nos EUA, compra e inspeção, preparação e embarque, frete marítimo com seguro All Risks, chegada ao Brasil, laudo ACB (Automóvel Clube do Brasil) obrigatório para clássicos, despacho aduaneiro completo e entrega. O prazo médio é de 67 a 115 dias. A EMC tem mais de 10 anos de experiência nesse tipo de operação.",
+  },
+  {
+    question: "Qual a diferença entre envio marítimo e aéreo de veículos?",
+    answer:
+      "O envio marítimo é o mais comum e econômico, ideal para veículos de todos os portes, com prazo de 3 a 6 semanas de travessia. O envio aéreo é mais rápido (dias ao invés de semanas), porém com custo mais elevado, sendo ideal para peças, acessórios e veículos de menor porte com urgência. A EMC oferece ambas as modalidades com seguro All Risks incluso em todas as operações.",
   },
 ];
 
 export default function FAQSection() {
   return (
-    <section id="faq" className="py-24 bg-background relative overflow-hidden">
+    <section
+      id="faq"
+      aria-label="Perguntas frequentes sobre importação e exportação de veículos"
+      className="py-24 bg-background relative overflow-hidden"
+    >
       <div className="container">
         <div className="max-w-4xl mx-auto">
-          {/* Section Title */}
-          <div className="text-center mb-16 space-y-4">
+          {/* Section Header */}
+          <header className="text-center mb-16 space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold text-white">
-              Dúvidas Frequentes
+              Dúvidas Frequentes sobre <span className="text-primary">Importação de Veículos</span>
             </h2>
             <p className="text-muted-foreground text-lg font-body">
-              Tudo o que você precisa saber sobre importação, exportação e logística automotiva.
+              Tudo o que você precisa saber sobre <strong>como importar carro</strong>, exportação de veículos,
+              custos, prazos, impostos e logística automotiva internacional.
             </p>
-          </div>
+          </header>
 
-          {/* Accordion */}
+          {/* Accordion — semantic dl structure */}
           <Accordion type="single" collapsible className="space-y-4">
             {FAQS.map((faq, i) => (
               <AccordionItem
@@ -88,13 +113,14 @@ export default function FAQSection() {
           {/* CTA */}
           <div className="text-center mt-12 space-y-3">
             <p className="text-muted-foreground font-body">
-              Ainda tem dúvidas? Nossa equipe está pronta para te ajudar.
+              Ainda tem dúvidas sobre importação ou exportação de veículos? Nossa equipe está pronta para te ajudar.
             </p>
             <Button
               onClick={() => openContact("Olá! Tenho algumas dúvidas sobre os serviços da Enviando Meu Carro. Pode me ajudar?")}
               className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-[#25D366] text-white hover:bg-[#128C7E]"
+              aria-label="Tirar dúvidas sobre importação de veículos no WhatsApp"
             >
-              <MessageCircle className="mr-2 w-5 h-5" />
+              <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
               Tirar Dúvidas no WhatsApp
             </Button>
           </div>

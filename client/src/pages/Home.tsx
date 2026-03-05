@@ -1,4 +1,4 @@
-/* Home — Landing page assembling all institutional sections */
+/* Home — SEO-optimized landing page assembling all institutional sections */
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
@@ -17,7 +17,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header />
 
-      <main>
+      <main id="main-content" role="main">
         {/* 1. Hero — Institutional CTA + services card */}
         <HeroSection />
 
@@ -27,11 +27,11 @@ export default function Home() {
         {/* 3. About — Missão, Serviços, VC que Manda */}
         <BenefitsGrid />
 
-        {/* 4. CTA 1 — Institutional */}
+        {/* 4. CTA 1 — Calculator */}
         <CTASection
-          title="Quer saber quanto custa transportar seu veículo?"
-          description="Use nossa calculadora online e simule todos os custos em minutos."
-          buttonText="Simular Agora"
+          title="Quer saber quanto custa importar seu veículo?"
+          description="Use nossa calculadora de importação online e simule todos os custos, impostos e taxas em minutos."
+          buttonText="Simular Custos de Importação"
           variant="primary"
         />
 
@@ -46,8 +46,8 @@ export default function Home() {
 
         {/* 8. CTA 2 — WhatsApp */}
         <CTASection
-          title="Pronto para dar o próximo passo?"
-          description="Fale com nossa equipe e receba uma assessoria personalizada para seu projeto."
+          title="Pronto para importar ou exportar seu veículo?"
+          description="Fale com nossa equipe de especialistas e receba uma assessoria personalizada para seu projeto de logística automotiva."
           buttonText="Falar com Especialista"
           variant="secondary"
         />

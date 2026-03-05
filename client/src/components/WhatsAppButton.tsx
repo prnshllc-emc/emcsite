@@ -23,7 +23,7 @@ export default function WhatsAppButton() {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           className="w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg shadow-[#25D366]/20"
-          aria-label="Falar no WhatsApp"
+          aria-label="Falar com especialista em importação de veículos no WhatsApp"
         >
           <MessageCircle className="w-7 h-7 text-white" fill="white" />
         </button>

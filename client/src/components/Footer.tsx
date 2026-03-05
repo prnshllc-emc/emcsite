@@ -1,4 +1,4 @@
-/* Footer — 4-column layout with brand, links, contact, newsletter + Ayrton Senna */
+/* Footer — SEO-optimized with semantic HTML (nav, address), proper link structure, and keyword-rich content */
 import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,22 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const QUICK_LINKS = [
-  { label: "Início", href: "#" },
+  { label: "Início", href: "#inicio" },
   { label: "Sobre Nós", href: "#about" },
   { label: "Serviços", href: "#services" },
   { label: "Depoimentos", href: "#testimonials" },
   { label: "Escritórios", href: "#offices" },
   { label: "FAQ", href: "#faq" },
+  { label: "Calculadora de Importação", href: "https://calculadora.enviandomeucarro.com", external: true },
+];
+
+const SERVICE_LINKS = [
+  { label: "Importação de Veículos", href: "#services" },
+  { label: "Exportação de Veículos", href: "#services" },
+  { label: "Despacho Aduaneiro", href: "#services" },
+  { label: "Peças e Acessórios", href: "#services" },
+  { label: "Envios Aéreos", href: "#services" },
+  { label: "Admissão Temporária", href: "#services" },
 ];
 
 const OFFICES = [
@@ -33,7 +43,7 @@ export default function Footer() {
   }
 
   function scrollTo(anchor: string) {
-    if (anchor === "#") {
+    if (anchor === "#inicio") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -42,14 +52,22 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-card border-t border-white/10 pt-20 pb-10">
+    <footer className="bg-card border-t border-white/10 pt-20 pb-10" role="contentinfo">
       <div className="container">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <img src={LOGO_URL} alt="EMC - Enviando Meu Carro" className="h-10 w-auto" />
+            <img
+              src={LOGO_URL}
+              alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
+              className="h-10 w-auto"
+              loading="lazy"
+              width="120"
+              height="40"
+            />
             <p className="text-muted-foreground text-sm font-body leading-relaxed">
-              O jeito mais Rápido, Seguro e Barato de transportar seu veículo para qualquer lugar do mundo. Importação, exportação e logística automotiva internacional.
+              O jeito mais Rápido, Seguro e Barato de <strong>importar e exportar veículos</strong> para qualquer lugar do mundo.
+              Logística automotiva internacional com transparência total há mais de 10 anos.
             </p>
             <div className="flex gap-3">
               <a
@@ -57,59 +75,96 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                aria-label="Siga a Enviando Meu Carro no Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-5 h-5" aria-hidden="true" />
               </a>
               <a
                 href="https://www.facebook.com/enviandomeucarro"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                aria-label="Siga a Enviando Meu Carro no Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-5 h-5" aria-hidden="true" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white font-display font-bold text-lg mb-6">Links Rápidos</h4>
-            <ul className="space-y-3">
+          {/* Navigation Links */}
+          <nav aria-label="Links de navegação do rodapé">
+            <h4 className="text-white font-display font-bold text-lg mb-6">Navegação</h4>
+            <ul className="space-y-3 list-none">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
-                  <button
-                    onClick={() => scrollTo(link.href)}
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
-                  >
-                    {link.label}
-                  </button>
+                  {"external" in link && link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <a
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollTo(link.href);
+                      }}
+                      className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
-          </div>
+
+            <h4 className="text-white font-display font-bold text-lg mt-8 mb-4">Serviços</h4>
+            <ul className="space-y-2 list-none">
+              {SERVICE_LINKS.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollTo(link.href);
+                    }}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
           {/* Contact & Offices */}
           <div>
             <h4 className="text-white font-display font-bold text-lg mb-6">Contato</h4>
-            <div className="space-y-4">
+            <address className="not-italic space-y-4">
               <button
                 onClick={() => openContact()}
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                aria-label="Entrar em contato via WhatsApp"
               >
-                <Phone className="w-4 h-4 flex-shrink-0" />
+                <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 +55 (11) 99244-8920
               </button>
               <a
                 href="mailto:atendimento@enviandomeucarro.com"
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                aria-label="Enviar email para atendimento da Enviando Meu Carro"
               >
-                <Mail className="w-4 h-4 flex-shrink-0" />
+                <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 atendimento@enviandomeucarro.com
               </a>
               <div className="pt-2 space-y-3">
                 {OFFICES.map((office) => (
                   <div key={office.name} className="flex items-start gap-3 text-muted-foreground text-sm font-body">
-                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
                       <span className="text-white font-medium">{office.flag} {office.name}</span>
                       <br />
@@ -118,16 +173,17 @@ export default function Footer() {
                   </div>
                 ))}
               </div>
-            </div>
+            </address>
           </div>
 
           {/* Newsletter */}
           <div>
             <h4 className="text-white font-display font-bold text-lg mb-6">Newsletter</h4>
             <p className="text-muted-foreground text-sm font-body mb-4">
-              Receba condições exclusivas e informações relevantes sobre importação e exportação de veículos.
+              Receba condições exclusivas e informações sobre <strong>importação e exportação de veículos</strong>,
+              novidades do mercado automotivo e dicas de logística internacional.
             </p>
-            <form onSubmit={handleNewsletter} className="space-y-3">
+            <form onSubmit={handleNewsletter} className="space-y-3" aria-label="Formulário de inscrição na newsletter">
               <Input
                 type="email"
                 placeholder="Digite seu e-mail"
@@ -135,6 +191,7 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-background/50 border-white/10 focus:border-primary"
                 required
+                aria-label="Endereço de e-mail para newsletter"
               />
               <Button
                 type="submit"
@@ -149,7 +206,7 @@ export default function Footer() {
         {/* Instituto Ayrton Senna */}
         <div className="border-t border-white/10 mt-12 pt-8">
           <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm font-body">
-            <Heart className="w-4 h-4 text-primary" />
+            <Heart className="w-4 h-4 text-primary" aria-hidden="true" />
             <span>
               Na Enviando Meu Carro apoiamos o{" "}
               <a
@@ -168,15 +225,15 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm font-body">
-            © {new Date().getFullYear()} VC que Manda! — Todos os direitos reservados.
+            © {new Date().getFullYear()} Enviando Meu Carro (EMC) — Importação e Exportação de Veículos — Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
-            <button className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
               Política de Privacidade
-            </button>
-            <button className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
               Termos de Uso
-            </button>
+            </a>
           </div>
         </div>
       </div>
