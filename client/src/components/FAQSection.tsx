@@ -13,12 +13,12 @@ const FAQS = [
   {
     question: "Quais tipos de veículos vocês transportam?",
     answer:
-      "Trabalhamos com todos os tipos: carros clássicos (+30 anos), veículos 0km, motos, camionetas, utilitários e até Motor Homes. Tanto na importação (EUA → Brasil) quanto na exportação (Brasil → EUA), independente do tipo de combustível ou direção.",
+      "Trabalhamos com todos os tipos: carros clássicos (+30 anos), veículos 0km, motos, camionetas, utilitários e até Motor Homes. Tanto na importação quanto na exportação, para e de qualquer lugar do mundo, independente do tipo de combustível ou direção.",
   },
   {
-    question: "Vocês também exportam veículos do Brasil para os EUA?",
+    question: "Vocês também exportam veículos do Brasil?",
     answer:
-      "Sim! Oferecemos serviço completo de exportação Brasil → EUA pelo hub Santos–Miami, com prazo de 4 a 5 semanas. O serviço inclui recebimento, transporte rodoviário, despachante, estufagem, frete e seguro marítimos, desembaraço nos EUA e entrega em Miami/FL.",
+      "Sim! Oferecemos serviço completo de exportação do Brasil para qualquer destino no mundo. O serviço inclui recebimento, transporte rodoviário, despachante, estufagem, frete e seguro marítimos, desembaraço no destino e entrega final.",
   },
   {
     question: "Posso importar carros usados?",
@@ -28,7 +28,7 @@ const FAQS = [
   {
     question: "Qual o prazo do processo completo?",
     answer:
-      "Para importação de veículos 0km, o prazo é de 50 a 80 dias. Para clássicos (+30 anos), de 67 a 115 dias (inclui laudo ACB). Para exportação Brasil → EUA, de 4 a 5 semanas. Esses são prazos estimados que podem variar conforme documentação e condições logísticas.",
+      "Para importação de veículos 0km, o prazo é de 50 a 80 dias. Para clássicos (+30 anos), de 67 a 115 dias (inclui laudo ACB). Para exportação, a partir de 4 semanas dependendo do destino. Esses são prazos estimados que podem variar conforme documentação, destino e condições logísticas.",
   },
   {
     question: "Quais impostos eu preciso pagar na importação?",
@@ -43,7 +43,7 @@ const FAQS = [
   {
     question: "Vocês importam peças e acessórios?",
     answer:
-      "Sim! Importamos peças originais e acessórios dos EUA para seu clássico ou importado. É uma forma de economizar tempo e dinheiro, com a mesma segurança e transparência dos nossos serviços de transporte de veículos.",
+      "Sim! Importamos peças originais e acessórios do mundo inteiro para seu clássico ou importado. É uma forma de economizar tempo e dinheiro, com a mesma segurança e transparência dos nossos serviços de transporte de veículos.",
   },
   {
     question: "Preciso contratar todos os serviços ou posso escolher?",

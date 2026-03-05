@@ -9,7 +9,7 @@ const CHECKLIST = [
   "Rastreamento em tempo real de cada etapa",
   "Armazenagem gratuita por 60 dias",
   "Dossiê completo de documentação",
-  "Assessoria em feiras e leilões nos EUA",
+  "Assessoria em feiras e leilões internacionais",
   "Suporte pós-entrega contínuo",
   "Você escolhe apenas os serviços que precisa",
 ];

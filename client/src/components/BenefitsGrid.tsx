@@ -5,7 +5,7 @@ const PILLARS = [
   {
     icon: Target,
     title: "Nossa Missão",
-    desc: "Facilitar a importação e exportação de veículos entre Brasil e Estados Unidos com transparência total, excelência operacional e compromisso inabalável com a satisfação do cliente, tornando o processo acessível, seguro e confiável.",
+    desc: "Facilitar a importação e exportação de veículos para e de qualquer lugar do mundo com transparência total, excelência operacional e compromisso inabalável com a satisfação do cliente, tornando o processo acessível, seguro e confiável.",
   },
   {
     icon: Wrench,
@@ -35,7 +35,7 @@ export default function BenefitsGrid() {
             </span>
           </h2>
           <p className="text-muted-foreground text-lg font-body">
-            Há mais de 10 anos conectando sonhos automotivos entre Brasil e Estados Unidos, com a segurança e transparência que você merece.
+            Há mais de 10 anos conectando sonhos automotivos ao redor do mundo, com a segurança e transparência que você merece.
           </p>
         </div>
 

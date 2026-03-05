@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { HERO_BG_URL, openContact } from "@/lib/contact";
 
 const MINI_FEATURES = [
-  { title: "Importação & Exportação", desc: "EUA ↔ Brasil porta a porta" },
+  { title: "Importação & Exportação", desc: "Logística global porta a porta" },
   { title: "Seguro Total", desc: "All Risks incluso em toda operação" },
   { title: "Transparência", desc: "Sem surpresas, VC que Manda" },
 ];
@@ -95,8 +95,8 @@ export default function HeroSection() {
 
               <div className="space-y-3">
                 {[
-                  { label: "Importação de Veículos", desc: "EUA → Brasil (0km e Clássicos)", anchor: "#services" },
-                  { label: "Exportação de Veículos", desc: "Brasil → EUA (Hub Santos–Miami)", anchor: "#services" },
+                  { label: "Importação de Veículos", desc: "Do mundo inteiro para o Brasil", anchor: "#services" },
+                  { label: "Exportação de Veículos", desc: "Do Brasil para qualquer destino", anchor: "#services" },
                   { label: "Despacho Aduaneiro", desc: "Desembaraço completo e ágil", anchor: "#services" },
                   { label: "Peças e Acessórios", desc: "Importação de peças originais", anchor: "#services" },
                   { label: "Envios Aéreos", desc: "Transporte expresso via modal aéreo", anchor: "#services" },

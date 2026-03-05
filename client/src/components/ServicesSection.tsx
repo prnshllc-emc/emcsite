@@ -7,16 +7,16 @@ const SERVICES = [
   {
     icon: Ship,
     title: "Importação de Veículos",
-    desc: "EUA → Brasil. Clássicos (+30 anos), 0km, motos e utilitários. Processo completo porta a porta com assessoria em feiras e leilões nos EUA.",
+    desc: "Do mundo inteiro para o Brasil. Clássicos (+30 anos), 0km, motos e utilitários. Processo completo porta a porta com assessoria em feiras e leilões internacionais.",
     image: SERVICE_IMPORT_URL,
     message: "Olá! Gostaria de saber mais sobre importação de veículos.",
   },
   {
     icon: Globe,
     title: "Exportação de Veículos",
-    desc: "Brasil → EUA. Hub Santos–Miami com serviço all-inclusive. Prazo de 4 a 5 semanas, incluindo frete, seguro e desembaraço nos EUA.",
+    desc: "Do Brasil para qualquer destino. Serviço all-inclusive com logística global, incluindo frete, seguro e desembaraço no país de destino.",
     image: SERVICE_EXPORT_URL,
-    message: "Olá! Gostaria de saber mais sobre exportação de veículos para os EUA.",
+    message: "Olá! Gostaria de saber mais sobre exportação de veículos.",
   },
   {
     icon: FileText,
@@ -28,9 +28,9 @@ const SERVICES = [
   {
     icon: Cog,
     title: "Peças e Acessórios",
-    desc: "Importação de peças originais e acessórios dos EUA. Economize tempo e dinheiro com quem entende de logística automotiva internacional.",
+    desc: "Importação de peças originais e acessórios do mundo inteiro. Economize tempo e dinheiro com quem entende de logística automotiva internacional.",
     image: SERVICE_PECAS_URL,
-    message: "Olá! Gostaria de importar peças e acessórios dos EUA.",
+    message: "Olá! Gostaria de importar peças e acessórios.",
   },
   {
     icon: Plane,

@@ -42,7 +42,7 @@ export default function OfficesSection() {
             Nossos Escritórios
           </h2>
           <p className="text-muted-foreground text-lg font-body">
-            Presença estratégica nos dois países para garantir agilidade e proximidade em cada etapa do processo.
+            Presença estratégica em pontos-chave para garantir agilidade e proximidade em cada etapa do processo, onde quer que seu veículo esteja.
           </p>
         </div>
 

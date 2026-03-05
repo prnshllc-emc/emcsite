@@ -49,7 +49,7 @@ export default function Footer() {
           <div className="space-y-4">
             <img src={LOGO_URL} alt="EMC - Enviando Meu Carro" className="h-10 w-auto" />
             <p className="text-muted-foreground text-sm font-body leading-relaxed">
-              O jeito mais Rápido, Seguro e Barato de transportar seu veículo entre Brasil e Estados Unidos. Importação, exportação e logística automotiva internacional.
+              O jeito mais Rápido, Seguro e Barato de transportar seu veículo para qualquer lugar do mundo. Importação, exportação e logística automotiva internacional.
             </p>
             <div className="flex gap-3">
               <a
