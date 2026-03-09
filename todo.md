@@ -102,3 +102,12 @@
 - [x] Update sitemap.xml with new page
 - [x] Add cross-references between Privacy Policy and Terms of Use
 - [x] Run tests to verify no regressions
+
+## Phase 8: Premium Calculator CTA Button
+- [x] Audit all instances of "Simule Seus Custos" / calculator CTA across the site
+- [x] Design premium standout treatment (glow, animation, gradient, pulse, etc.)
+- [x] Apply enhanced styling to Hero section calculator button
+- [x] Apply enhanced styling to CTA section calculator button
+- [x] Apply enhanced styling to any other calculator references
+- [x] Visual verification across all sections
+- [x] Run tests to verify no regressions

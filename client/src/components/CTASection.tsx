@@ -1,8 +1,8 @@
 /* CTASection — SEO-optimized reusable CTA with consistent design */
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContactWithNumber } from "@/lib/contact";
-import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
+import { trackCTAClick, trackWhatsAppClick, trackCalculatorInteraction } from "@/lib/analytics";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 interface Props {
@@ -15,12 +15,21 @@ interface Props {
 export default function CTASection({ title, description, buttonText, variant }: Props) {
   const { get } = useSiteSettings();
   const whatsappNumber = get("whatsapp_number");
+  const calculatorUrl = get("calculator_url");
+
+  const isCalculator = variant === "primary";
 
   function handleClick() {
-    const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
-    trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
-    trackWhatsAppClick(`cta_section_${variant}`, msg);
-    openContactWithNumber(whatsappNumber, msg);
+    if (isCalculator) {
+      trackCTAClick(buttonText, `cta_section_${variant}`, "calculadora", buttonText);
+      trackCalculatorInteraction("abrir_calculadora", { origin: "cta_section" });
+      window.open(`${calculatorUrl}?utm_source=site&utm_medium=cta_section`, "_blank");
+    } else {
+      const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
+      trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
+      trackWhatsAppClick(`cta_section_${variant}`, msg);
+      openContactWithNumber(whatsappNumber, msg);
+    }
   }
 
   return (
@@ -38,14 +47,28 @@ export default function CTASection({ title, description, buttonText, variant }: 
             <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">{title}</h2>
             <p className="text-base text-gray-300 mt-2 font-body">{description}</p>
           </header>
-          <Button
-            onClick={handleClick}
-            className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0"
-            aria-label={`${buttonText} - Entrar em contato via WhatsApp`}
-          >
-            <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
-            {buttonText}
-          </Button>
+
+          {isCalculator ? (
+            <div className="cta-calculator-wrapper flex-shrink-0">
+              <Button
+                onClick={handleClick}
+                className="cta-calculator"
+                aria-label={`${buttonText} - Abrir calculadora de importação`}
+              >
+                <Calculator className="mr-2 w-5 h-5 relative z-10" aria-hidden="true" />
+                <span className="relative z-10">{buttonText}</span>
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleClick}
+              className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0"
+              aria-label={`${buttonText} - Entrar em contato via WhatsApp`}
+            >
+              <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
+              {buttonText}
+            </Button>
+          )}
         </div>
       </div>
     </section>

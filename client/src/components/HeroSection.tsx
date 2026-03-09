@@ -95,15 +95,16 @@ export default function HeroSection() {
                 <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
                 Fale com um Especialista
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleCalculator}
-                className="cta-secondary border-white/15 text-gray-200 hover:bg-white/5 hover:border-white/25 hover:text-white transition-all"
-                aria-label="Simular custos de importação de veículos com a calculadora online"
-              >
-                <Calculator className="mr-2 w-5 h-5" aria-hidden="true" />
-                Simule seus Custos
-              </Button>
+              <div className="cta-calculator-wrapper">
+                <Button
+                  onClick={handleCalculator}
+                  className="cta-calculator"
+                  aria-label="Simular custos de importação de veículos com a calculadora online"
+                >
+                  <Calculator className="mr-2 w-5 h-5 relative z-10" aria-hidden="true" />
+                  <span className="relative z-10">Simule seus Custos</span>
+                </Button>
+              </div>
             </div>
           </div>
 
