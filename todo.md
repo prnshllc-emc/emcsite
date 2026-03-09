@@ -111,3 +111,14 @@
 - [x] Apply enhanced styling to any other calculator references
 - [x] Visual verification across all sections
 - [x] Run tests to verify no regressions
+
+## Phase 9: WhatsApp Button Green + Calculator Button Red
+- [x] Add WhatsApp green color variable to CSS theme
+- [x] Update Hero section "Fale com um Especialista" button to green
+- [x] Update CTA section WhatsApp buttons to green
+- [x] Update WhyUsSection "Falar com um Consultor" button to green
+- [x] Update FAQSection WhatsApp button to green (already was green)
+- [x] Update any other WhatsApp-related buttons to green (ServicesSection Assessoria + Testimonials CTA)
+- [x] Keep calculator buttons in red EMC (verified)
+- [x] Visual verification across all sections
+- [x] Run tests to verify no regressions

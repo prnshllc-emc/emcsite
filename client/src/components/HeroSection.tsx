@@ -88,8 +88,9 @@ export default function HeroSection() {
             {/* CTAs — consistent sizing */}
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Button
+                variant="ghost"
                 onClick={handleWhatsApp}
-                className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+                className="cta-whatsapp"
                 aria-label="Fale com um especialista em importação de veículos via WhatsApp"
               >
                 <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
@@ -97,6 +98,7 @@ export default function HeroSection() {
               </Button>
               <div className="cta-calculator-wrapper">
                 <Button
+                  variant="ghost"
                   onClick={handleCalculator}
                   className="cta-calculator"
                   aria-label="Simular custos de importação de veículos com a calculadora online"

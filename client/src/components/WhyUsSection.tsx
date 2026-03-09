@@ -61,13 +61,14 @@ export default function WhyUsSection() {
 
             {/* CTA Button */}
             <Button
+              variant="ghost"
               onClick={() => {
                 const msg = "Olá! Gostaria de falar com um consultor sobre os serviços da EMC.";
                 trackCTAClick("Falar com Consultor", "whyus_section", "whatsapp", "Falar com Consultor");
                 trackWhatsAppClick("whyus_cta", msg);
                 openContact(msg);
               }}
-              className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+              className="cta-whatsapp"
               aria-label="Falar com um consultor especialista em importação de veículos"
             >
               Falar com um Consultor

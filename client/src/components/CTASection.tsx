@@ -51,6 +51,7 @@ export default function CTASection({ title, description, buttonText, variant }: 
           {isCalculator ? (
             <div className="cta-calculator-wrapper flex-shrink-0">
               <Button
+                variant="ghost"
                 onClick={handleClick}
                 className="cta-calculator"
                 aria-label={`${buttonText} - Abrir calculadora de importação`}
@@ -61,8 +62,9 @@ export default function CTASection({ title, description, buttonText, variant }: 
             </div>
           ) : (
             <Button
+              variant="ghost"
               onClick={handleClick}
-              className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0"
+              className="cta-whatsapp flex-shrink-0"
               aria-label={`${buttonText} - Entrar em contato via WhatsApp`}
             >
               <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />

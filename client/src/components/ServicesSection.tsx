@@ -133,8 +133,9 @@ export default function ServicesSection() {
         {/* Central CTA */}
         <div className="text-center mt-12">
           <Button
+            variant="ghost"
             onClick={() => openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.")}
-            className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+            className="cta-whatsapp"
             aria-label="Solicitar assessoria completa de importação e exportação de veículos"
           >
             Quero uma Assessoria Completa
