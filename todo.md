@@ -39,3 +39,6 @@
 - [x] Connect Footer newsletter form to backend
 - [x] Write vitest tests for admin routes (13 tests passing)
 - [x] Final verification and checkpoint
+
+## UI Changes
+- [x] Disable "Rastrear Meu Carro" button and show "Em Breve" badge
