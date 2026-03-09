@@ -65,7 +65,7 @@ export default function HeroSection() {
             {/* H1 */}
             <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-display font-extrabold leading-[1.08] text-white">
               O Jeito Mais Rápido, Seguro e{" "}
-              <span className="text-primary">Barato</span>
+              <span className="text-primary">Simples</span>
             </h1>
 
             {/* Subtitle */}

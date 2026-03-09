@@ -106,7 +106,7 @@ export default function Footer() {
               height="40"
             />
             <p className="text-gray-400 text-sm font-body leading-relaxed">
-              O jeito mais Rápido, Seguro e Barato de <strong className="text-gray-300">importar e exportar veículos</strong> para qualquer lugar do mundo.
+              O jeito mais Rápido, Seguro e Inteligente de <strong className="text-gray-300">importar e exportar veículos</strong> para qualquer lugar do mundo.
             </p>
             <div className="flex gap-2.5">
               {instagramUrl && (

@@ -134,3 +134,7 @@
 
 ## Phase 12: Reduce Nossos Serviços Card Horizontal Width
 - [x] Reduce horizontal width of the card while keeping vertical proportion
+
+## Phase 13: Replace "Barato" with Simples/Prático/Inteligente
+- [x] Hero: "Barato" → "Simples"
+- [x] Footer: "Barato" → "Inteligente"
