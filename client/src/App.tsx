@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { SiteSettingsProvider } from "./contexts/SiteSettingsContext";
 import { lazy, Suspense } from "react";
 import Home from "./pages/Home";
+import CookieConsentBanner from "./components/CookieConsent";
 
 const Admin = lazy(() => import("./pages/Admin"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
@@ -36,6 +37,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            <CookieConsentBanner />
           </TooltipProvider>
         </SiteSettingsProvider>
       </ThemeProvider>
