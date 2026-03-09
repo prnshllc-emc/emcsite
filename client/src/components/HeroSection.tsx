@@ -53,7 +53,7 @@ export default function HeroSection() {
       </div>
 
       <div className="container relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-10 items-center">
           {/* Left — Copy */}
           <div className="space-y-6">
             {/* Badge — consistent with section-badge class */}
@@ -111,7 +111,7 @@ export default function HeroSection() {
           </div>
 
           {/* Right — Services Card */}
-          <aside className="hidden lg:block" aria-label="Resumo dos serviços de logística automotiva">
+          <aside className="hidden lg:block max-w-xs" aria-label="Resumo dos serviços de logística automotiva">
             <div className="bg-card/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl shadow-black/30">
               <h2 className="text-base font-display font-bold text-white text-center mb-1">Nossos Serviços</h2>
               <p className="text-xs text-gray-400 text-center font-body mb-3">
