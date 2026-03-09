@@ -2,6 +2,7 @@
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContact, WHYUS_IMAGE_URL } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 const CHECKLIST = [
   "Transparência total sobre custos e prazos de importação",
@@ -59,7 +60,12 @@ export default function WhyUsSection() {
 
             {/* CTA Button */}
             <Button
-              onClick={() => openContact("Olá! Gostaria de falar com um consultor sobre os serviços da EMC.")}
+              onClick={() => {
+                const msg = "Olá! Gostaria de falar com um consultor sobre os serviços da EMC.";
+                trackCTAClick("Falar com Consultor", "whyus_section", "whatsapp", "Falar com Consultor");
+                trackWhatsAppClick("whyus_cta", msg);
+                openContact(msg);
+              }}
               className="h-14 px-8 text-lg font-display font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90"
               aria-label="Falar com um consultor especialista em importação de veículos"
             >

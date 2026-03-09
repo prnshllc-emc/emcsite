@@ -1,6 +1,7 @@
 /* TestimonialsSection — SEO-optimized review cards with semantic HTML and accessibility (no video) */
 import { Star, Quote, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackCTAClick } from "@/lib/analytics";
 
 const TESTIMONIALS = [
   {
@@ -91,7 +92,10 @@ export default function TestimonialsSection() {
         <div className="text-center mt-10">
           <Button
             variant="outline"
-            onClick={() => window.open("https://www.google.com/search?q=Enviando+Meu+Carro+avalia%C3%A7%C3%B5es", "_blank")}
+            onClick={() => {
+              trackCTAClick("Ver Avaliações Google", "testimonials_section", "https://www.google.com/search?q=Enviando+Meu+Carro+avaliacoes", "Google Reviews");
+              window.open("https://www.google.com/search?q=Enviando+Meu+Carro+avalia%C3%A7%C3%B5es", "_blank");
+            }}
             className="border-white/10 hover:border-primary/50 text-muted-foreground hover:text-primary"
             aria-label="Ver todas as avaliações da Enviando Meu Carro no Google"
           >

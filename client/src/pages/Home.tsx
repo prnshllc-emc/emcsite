@@ -1,4 +1,5 @@
 /* Home — SEO-optimized landing page assembling all institutional sections */
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
@@ -11,8 +12,13 @@ import OfficesSection from "@/components/OfficesSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { initAllTracking } from "@/lib/analytics";
 
 export default function Home() {
+  useEffect(() => {
+    initAllTracking();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header />

@@ -1,7 +1,8 @@
-/* Header — SEO-optimized with semantic nav, proper anchor links, and accessibility */
+/* Header — SEO-optimized with semantic nav, tracking events, and accessibility */
 import { useState } from "react";
 import { Menu, Truck, X } from "lucide-react";
 import { LOGO_URL } from "@/lib/contact";
+import { trackNavClick, trackModalOpen } from "@/lib/analytics";
 import TrackingLoginModal from "./TrackingLoginModal";
 
 const NAV_ITEMS = [
@@ -17,7 +18,8 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
 
-  function scrollTo(anchor: string) {
+  function scrollTo(anchor: string, label: string) {
+    trackNavClick(label, anchor);
     if (anchor === "#inicio") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setMobileOpen(false);
@@ -26,6 +28,11 @@ export default function Header() {
     const el = document.querySelector(anchor);
     if (el) el.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
+  }
+
+  function openTracking() {
+    trackModalOpen("rastreamento_veiculo");
+    setTrackingOpen(true);
   }
 
   return (
@@ -39,6 +46,7 @@ export default function Header() {
             className="flex-shrink-0"
             onClick={(e) => {
               e.preventDefault();
+              trackNavClick("Logo", "#inicio");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
@@ -59,7 +67,7 @@ export default function Header() {
                 href={item.anchor}
                 onClick={(e) => {
                   e.preventDefault();
-                  scrollTo(item.anchor);
+                  scrollTo(item.anchor, item.label);
                 }}
                 className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
               >
@@ -67,7 +75,7 @@ export default function Header() {
               </a>
             ))}
             <button
-              onClick={() => setTrackingOpen(true)}
+              onClick={openTracking}
               className="text-sm font-bold text-primary hover:text-primary/80 uppercase tracking-wider flex items-center gap-2 border border-primary/20 px-3 py-1 rounded-full bg-primary/5 transition-colors"
               aria-label="Rastrear meu veículo importado"
             >
@@ -97,7 +105,7 @@ export default function Header() {
                   href={item.anchor}
                   onClick={(e) => {
                     e.preventDefault();
-                    scrollTo(item.anchor);
+                    scrollTo(item.anchor, item.label);
                   }}
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider text-left py-2"
                 >
@@ -106,7 +114,7 @@ export default function Header() {
               ))}
               <button
                 onClick={() => {
-                  setTrackingOpen(true);
+                  openTracking();
                   setMobileOpen(false);
                 }}
                 className="text-sm font-bold text-primary uppercase tracking-wider flex items-center gap-2 border border-primary/20 px-3 py-2 rounded-full bg-primary/5 w-fit transition-colors"

@@ -1,7 +1,8 @@
-/* CTASection — SEO-optimized reusable CTA with semantic HTML and accessibility */
+/* CTASection — SEO-optimized reusable CTA with tracking */
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContact } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 interface Props {
   title: string;
@@ -11,9 +12,17 @@ interface Props {
 }
 
 export default function CTASection({ title, description, buttonText, variant }: Props) {
+  function handleClick() {
+    const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
+    trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
+    trackWhatsAppClick(`cta_section_${variant}`, msg);
+    openContact(msg);
+  }
+
   return (
     <section
       aria-label={title}
+      data-section={`cta-${variant}`}
       className={`py-16 ${
         variant === "primary"
           ? "bg-zinc-900/50 border-y border-white/5"
@@ -27,7 +36,7 @@ export default function CTASection({ title, description, buttonText, variant }: 
             <p className="text-lg text-gray-400 mt-2 font-body">{description}</p>
           </header>
           <Button
-            onClick={() => openContact(`Olá! Vi o site e gostaria de saber mais. ${buttonText}`)}
+            onClick={handleClick}
             className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0"
             aria-label={`${buttonText} - Entrar em contato via WhatsApp`}
           >

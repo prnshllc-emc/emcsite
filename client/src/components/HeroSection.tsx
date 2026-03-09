@@ -1,7 +1,8 @@
-/* HeroSection — SEO-optimized institutional hero with semantic HTML, keyword-rich headings, and internal linking */
+/* HeroSection — SEO-optimized institutional hero with tracking on all CTAs */
 import { CheckCircle2, MessageCircle, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HERO_BG_URL, openContact } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick, trackCalculatorInteraction, trackNavClick } from "@/lib/analytics";
 
 const MINI_FEATURES = [
   { title: "Importação & Exportação", desc: "Logística global porta a porta" },
@@ -10,6 +11,26 @@ const MINI_FEATURES = [
 ];
 
 export default function HeroSection() {
+  function handleWhatsApp() {
+    const msg = "Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro.";
+    trackCTAClick("Fale com Especialista", "hero", "whatsapp", "Fale com um Especialista");
+    trackWhatsAppClick("hero_cta_principal", msg);
+    openContact(msg);
+  }
+
+  function handleCalculator() {
+    trackCTAClick("Simule seus Custos", "hero", "calculadora", "Simule seus Custos");
+    trackCalculatorInteraction("abrir_calculadora", { origin: "hero" });
+    window.open("https://calculadora.enviandomeucarro.com?utm_source=site&utm_medium=hero", "_blank");
+  }
+
+  function handleServiceClick(label: string, anchor: string) {
+    trackNavClick(label, anchor);
+    trackCTAClick(label, "hero_services_card", anchor, label);
+    const el = document.querySelector(anchor);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <section
       id="inicio"
@@ -57,7 +78,7 @@ export default function HeroSection() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                onClick={() => openContact("Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro.")}
+                onClick={handleWhatsApp}
                 className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90"
                 aria-label="Fale com um especialista em importação de veículos via WhatsApp"
               >
@@ -66,7 +87,7 @@ export default function HeroSection() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.open("https://calculadora.enviandomeucarro.com?utm_source=site&utm_medium=hero", "_blank")}
+                onClick={handleCalculator}
                 className="h-14 px-8 text-lg font-bold uppercase tracking-wider border-white/20 text-white hover:bg-white/10"
                 aria-label="Simule os custos de importação de veículos com nossa calculadora online"
               >
@@ -117,8 +138,7 @@ export default function HeroSection() {
                       href={item.anchor}
                       onClick={(e) => {
                         e.preventDefault();
-                        const el = document.querySelector(item.anchor);
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                        handleServiceClick(item.label, item.anchor);
                       }}
                       className="w-full flex items-center gap-4 h-14 px-4 rounded-lg border border-white/10 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all group/btn text-left"
                       title={`Saiba mais sobre ${item.label}`}

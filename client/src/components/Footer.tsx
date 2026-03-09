@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { LOGO_URL, openContact, CLUB_AACA_URL, CLUB_ACB_URL } from "@/lib/contact";
 import { useState } from "react";
 import { toast } from "sonner";
+import { trackCTAClick, trackNavClick, trackWhatsAppClick } from "@/lib/analytics";
 
 const QUICK_LINKS = [
   { label: "Início", href: "#inicio" },
@@ -37,12 +38,14 @@ export default function Footer() {
   function handleNewsletter(e: React.FormEvent) {
     e.preventDefault();
     if (email) {
+      trackCTAClick("Newsletter", "footer_newsletter", "form_submit", "Inscrever-se");
       toast.success("Obrigado! Você receberá nossas novidades em breve.");
       setEmail("");
     }
   }
 
-  function scrollTo(anchor: string) {
+  function scrollTo(anchor: string, label?: string) {
+    trackNavClick(label || anchor, anchor);
     if (anchor === "#inicio") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -74,6 +77,7 @@ export default function Footer() {
                 href="https://www.instagram.com/enviandomeucarro"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCTAClick("Instagram", "footer_social", "https://www.instagram.com/enviandomeucarro", "Instagram")}
                 className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
                 aria-label="Siga a Enviando Meu Carro no Instagram"
               >
@@ -83,6 +87,7 @@ export default function Footer() {
                 href="https://www.facebook.com/enviandomeucarro"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCTAClick("Facebook", "footer_social", "https://www.facebook.com/enviandomeucarro", "Facebook")}
                 className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
                 aria-label="Siga a Enviando Meu Carro no Facebook"
               >
@@ -146,7 +151,7 @@ export default function Footer() {
             <h4 className="text-white font-display font-bold text-lg mb-6">Contato</h4>
             <address className="not-italic space-y-4">
               <button
-                onClick={() => openContact()}
+                onClick={() => { trackWhatsAppClick("footer_phone"); trackCTAClick("Telefone Footer", "footer_contact", "whatsapp", "Telefone"); openContact(); }}
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
                 aria-label="Entrar em contato via WhatsApp"
               >
@@ -155,6 +160,7 @@ export default function Footer() {
               </button>
               <a
                 href="mailto:atendimento@enviandomeucarro.com"
+                onClick={() => trackCTAClick("Email Footer", "footer_contact", "mailto:atendimento@enviandomeucarro.com", "Email")}
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
                 aria-label="Enviar email para atendimento da Enviando Meu Carro"
               >

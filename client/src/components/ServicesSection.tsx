@@ -2,6 +2,7 @@
 import { Ship, Globe, FileText, Plane, Cog, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContact, SERVICE_IMPORT_URL, SERVICE_EXPORT_URL, SERVICE_DESPACHO_URL, SERVICE_AEREO_URL, SERVICE_PECAS_URL, SERVICE_ADMISSAO_URL } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 const SERVICES = [
   {
@@ -115,7 +116,11 @@ export default function ServicesSection() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => openContact(service.message)}
+                  onClick={() => {
+                    trackCTAClick(`Saiba Mais - ${service.title}`, "services_section", "whatsapp", service.title);
+                    trackWhatsAppClick(`service_${service.title.toLowerCase().replace(/\s+/g, '_')}`, service.message);
+                    openContact(service.message);
+                  }}
                   className="border-primary/30 text-primary hover:bg-primary/10"
                   aria-label={`Solicitar orçamento para ${service.title}`}
                 >

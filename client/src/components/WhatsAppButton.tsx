@@ -1,10 +1,17 @@
-/* WhatsAppButton — Fixed floating WhatsApp button with tooltip */
+/* WhatsAppButton — Fixed floating WhatsApp button with tracking */
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { openContact } from "@/lib/contact";
+import { trackWhatsAppClick, trackCTAClick } from "@/lib/analytics";
 
 export default function WhatsAppButton() {
   const [hovered, setHovered] = useState(false);
+
+  function handleClick() {
+    trackCTAClick("WhatsApp Flutuante", "floating_button", "whatsapp", "Fale Conosco");
+    trackWhatsAppClick("botao_flutuante");
+    openContact();
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-4 duration-1000" style={{ animationDelay: "1000ms", animationFillMode: "both" }}>
@@ -19,7 +26,7 @@ export default function WhatsAppButton() {
 
         {/* Button */}
         <button
-          onClick={() => openContact()}
+          onClick={handleClick}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           className="w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg shadow-[#25D366]/20"

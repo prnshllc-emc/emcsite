@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { openContact } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 interface Props {
   open: boolean;
@@ -33,6 +34,7 @@ export default function TrackingLoginModal({ open, onOpenChange }: Props) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    trackCTAClick(`Rastreamento - ${tab === 'code' ? 'Código' : 'CPF'}`, "tracking_modal", "form_submit", "Rastrear");
     setError("Credenciais inválidas. Tente novamente.");
   }
 
@@ -123,7 +125,12 @@ export default function TrackingLoginModal({ open, onOpenChange }: Props) {
 
         <div className="text-center mt-4">
           <button
-            onClick={() => openContact("Olá! Não tenho meu código de rastreamento. Pode me ajudar?")}
+            onClick={() => {
+              const msg = "Olá! Não tenho meu código de rastreamento. Pode me ajudar?";
+              trackCTAClick("Sem código rastreamento", "tracking_modal", "whatsapp", "Fale Conosco");
+              trackWhatsAppClick("tracking_modal_help", msg);
+              openContact(msg);
+            }}
             className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 mx-auto"
           >
             <MessageCircle className="w-3 h-3" />

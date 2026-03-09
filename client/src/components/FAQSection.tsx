@@ -1,4 +1,5 @@
-/* FAQSection — SEO-optimized expanded FAQ targeting featured snippets, long-tail keywords, and "People Also Ask" */
+/* FAQSection — SEO-optimized FAQ with tracking on accordion and CTA */
+import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { openContact } from "@/lib/contact";
+import { trackFAQInteraction, trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 const FAQS = [
   {
@@ -73,6 +75,30 @@ const FAQS = [
 ];
 
 export default function FAQSection() {
+  const [openValue, setOpenValue] = useState<string | undefined>(undefined);
+
+  function handleValueChange(value: string) {
+    if (value && value !== openValue) {
+      const idx = parseInt(value.replace("faq-", ""));
+      if (!isNaN(idx) && FAQS[idx]) {
+        trackFAQInteraction(FAQS[idx].question, "open");
+      }
+    } else if (!value && openValue) {
+      const idx = parseInt(openValue.replace("faq-", ""));
+      if (!isNaN(idx) && FAQS[idx]) {
+        trackFAQInteraction(FAQS[idx].question, "close");
+      }
+    }
+    setOpenValue(value || undefined);
+  }
+
+  function handleCTA() {
+    const msg = "Olá! Tenho algumas dúvidas sobre os serviços da Enviando Meu Carro. Pode me ajudar?";
+    trackCTAClick("Tirar Dúvidas no WhatsApp", "faq_section", "whatsapp", "Tirar Dúvidas no WhatsApp");
+    trackWhatsAppClick("faq_cta", msg);
+    openContact(msg);
+  }
+
   return (
     <section
       id="faq"
@@ -93,7 +119,13 @@ export default function FAQSection() {
           </header>
 
           {/* Accordion — semantic dl structure */}
-          <Accordion type="single" collapsible className="space-y-4">
+          <Accordion
+            type="single"
+            collapsible
+            className="space-y-4"
+            value={openValue}
+            onValueChange={handleValueChange}
+          >
             {FAQS.map((faq, i) => (
               <AccordionItem
                 key={i}
@@ -116,7 +148,7 @@ export default function FAQSection() {
               Ainda tem dúvidas sobre importação ou exportação de veículos? Nossa equipe está pronta para te ajudar.
             </p>
             <Button
-              onClick={() => openContact("Olá! Tenho algumas dúvidas sobre os serviços da Enviando Meu Carro. Pode me ajudar?")}
+              onClick={handleCTA}
               className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-[#25D366] text-white hover:bg-[#128C7E]"
               aria-label="Tirar dúvidas sobre importação de veículos no WhatsApp"
             >
