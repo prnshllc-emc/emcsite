@@ -112,12 +112,12 @@ export default function HeroSection() {
 
           {/* Right — Services Card */}
           <aside className="hidden lg:block" aria-label="Resumo dos serviços de logística automotiva">
-            <div className="bg-card/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl shadow-black/30">
-              <h2 className="text-xl font-display font-bold text-white text-center mb-1.5">Nossos Serviços</h2>
-              <p className="text-sm text-gray-400 text-center font-body mb-5">
+            <div className="bg-card/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl shadow-black/30">
+              <h2 className="text-base font-display font-bold text-white text-center mb-1">Nossos Serviços</h2>
+              <p className="text-xs text-gray-400 text-center font-body mb-3">
                 Soluções completas em logística automotiva internacional
               </p>
-              <ul className="space-y-2 list-none">
+              <ul className="space-y-1.5 list-none">
                 {[
                   { label: "Importação de Veículos", desc: "Do mundo inteiro para o Brasil", anchor: "#services" },
                   { label: "Exportação de Veículos", desc: "Do Brasil para qualquer destino", anchor: "#services" },
@@ -129,14 +129,14 @@ export default function HeroSection() {
                   <li key={s.label}>
                     <button
                       onClick={() => handleServiceClick(s.label, s.anchor)}
-                      className="w-full flex items-center justify-between p-3.5 rounded-lg bg-background/50 border border-white/5 hover:border-primary/20 hover:bg-background/70 transition-all group text-left"
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg bg-background/50 border border-white/5 hover:border-primary/20 hover:bg-background/70 transition-all group text-left"
                       aria-label={`${s.label} — ${s.desc}`}
                     >
                       <div>
-                        <span className="text-white font-medium text-sm group-hover:text-primary transition-colors">{s.label}</span>
-                        <span className="block text-gray-500 text-xs font-body">{s.desc}</span>
+                        <span className="text-white font-medium text-xs group-hover:text-primary transition-colors">{s.label}</span>
+                        <span className="block text-gray-500 text-[11px] font-body leading-tight">{s.desc}</span>
                       </div>
-                      <svg className="w-4 h-4 text-gray-600 group-hover:text-primary transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <svg className="w-3.5 h-3.5 text-gray-600 group-hover:text-primary transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>

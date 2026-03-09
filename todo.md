@@ -127,3 +127,7 @@
 - [x] Center Hero CTA buttons on mobile (flex-col + items-center)
 - [x] Center WhyUs CTA button on mobile
 - [x] Verify on mobile viewport
+
+## Phase 11: Reduce Nossos Serviços Card in Hero
+- [x] Reduce card size (smaller text, tighter padding, compact service items)
+- [x] Verify desktop harmony
