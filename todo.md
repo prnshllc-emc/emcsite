@@ -88,3 +88,9 @@
 ## Phase 5: Footer Gap + Header Logo
 - [x] Fix: large white gap between last section and footer (removed pt-16, fixed TestimonialsSection footer tags)
 - [x] Fix: header logo increased to h-16 lg:h-20
+
+## Phase 6: Brand Color Palette Update
+- [x] Update CSS variables to EMC brand: #000000, #28292b, #d93711, #f7f5f4
+- [x] Update all hardcoded red values to #d93711 (only 1 found: ImportCalculator)
+- [x] Update all hardcoded gray/dark values to #28292b (all use CSS vars already)
+- [x] Verify visual consistency across all sections

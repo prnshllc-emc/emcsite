@@ -54,7 +54,7 @@ export default function ImportCalculator() {
   return (
     <div className="relative group">
       {/* Glow Effect */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-red-500/20 blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 rounded-2xl" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/20 blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 rounded-2xl" />
 
       {/* Card */}
       <div className="relative bg-card/95 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-2xl shadow-2xl min-h-[400px] flex flex-col justify-center">

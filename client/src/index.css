@@ -45,63 +45,83 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* EMC Brand Colors:
+   #000000 = oklch(0.00 0.000 0)    — Black (main background)
+   #28292b = oklch(0.28 0.004 264)  — Dark Gray (cards/secondary bg)
+   #d93711 = oklch(0.58 0.203 33)   — EMC Red (accent/primary)
+   #f7f5f4 = oklch(0.97 0.002 48)   — Off-white (foreground text)
+*/
+
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.13 0.03 260);
-  --foreground: oklch(0.92 0.005 285);
-  --card: oklch(0.16 0.025 260);
-  --card-foreground: oklch(0.92 0.005 285);
-  --popover: oklch(0.16 0.025 260);
-  --popover-foreground: oklch(0.92 0.005 285);
-  --primary: oklch(0.60 0.22 25);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.20 0.03 260);
-  --secondary-foreground: oklch(0.92 0.005 285);
-  --muted: oklch(0.22 0.03 260);
-  /* Improved contrast: bumped from 0.70 to 0.78 for better readability */
-  --muted-foreground: oklch(0.78 0.01 260);
-  --accent: oklch(0.22 0.03 260);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.35 0.15 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.30 0.01 285);
-  --input: oklch(0.30 0.01 285);
-  --ring: oklch(0.60 0.22 25);
-  --chart-1: oklch(0.60 0.22 25);
-  --chart-2: oklch(0.50 0.18 25);
-  --chart-3: oklch(0.40 0.15 25);
-  --chart-4: oklch(0.30 0.10 25);
-  --chart-5: oklch(0.20 0.05 25);
-  --sidebar: oklch(0.15 0.03 260);
-  --sidebar-foreground: oklch(0.92 0.005 285);
-  --sidebar-primary: oklch(0.60 0.22 25);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0.03 260);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.30 0.01 285);
-  --sidebar-ring: oklch(0.60 0.22 25);
+  /* Main background: #000000 */
+  --background: oklch(0.00 0.000 0);
+  /* Foreground text: #f7f5f4 */
+  --foreground: oklch(0.97 0.002 48);
+  /* Cards: #28292b */
+  --card: oklch(0.28 0.004 264);
+  --card-foreground: oklch(0.97 0.002 48);
+  /* Popover: same as card */
+  --popover: oklch(0.28 0.004 264);
+  --popover-foreground: oklch(0.97 0.002 48);
+  /* Primary: #d93711 EMC Red */
+  --primary: oklch(0.58 0.203 33);
+  --primary-foreground: oklch(0.97 0.002 48);
+  /* Secondary: slightly lighter than background */
+  --secondary: oklch(0.20 0.003 264);
+  --secondary-foreground: oklch(0.97 0.002 48);
+  /* Muted: dark gray for subtle backgrounds */
+  --muted: oklch(0.22 0.003 264);
+  /* Muted foreground: readable gray on dark bg */
+  --muted-foreground: oklch(0.75 0.005 264);
+  /* Accent: same as secondary */
+  --accent: oklch(0.22 0.003 264);
+  --accent-foreground: oklch(0.97 0.002 48);
+  /* Destructive: darker red variant */
+  --destructive: oklch(0.40 0.15 33);
+  --destructive-foreground: oklch(0.97 0.002 48);
+  /* Borders: subtle dark gray */
+  --border: oklch(0.32 0.004 264);
+  --input: oklch(0.32 0.004 264);
+  /* Ring: EMC Red */
+  --ring: oklch(0.58 0.203 33);
+  /* Charts: EMC Red variations */
+  --chart-1: oklch(0.58 0.203 33);
+  --chart-2: oklch(0.50 0.17 33);
+  --chart-3: oklch(0.42 0.14 33);
+  --chart-4: oklch(0.34 0.10 33);
+  --chart-5: oklch(0.26 0.06 33);
+  /* Sidebar */
+  --sidebar: oklch(0.15 0.003 264);
+  --sidebar-foreground: oklch(0.97 0.002 48);
+  --sidebar-primary: oklch(0.58 0.203 33);
+  --sidebar-primary-foreground: oklch(0.97 0.002 48);
+  --sidebar-accent: oklch(0.22 0.003 264);
+  --sidebar-accent-foreground: oklch(0.97 0.002 48);
+  --sidebar-border: oklch(0.32 0.004 264);
+  --sidebar-ring: oklch(0.58 0.203 33);
 }
 
 .dark {
-  --background: oklch(0.13 0.03 260);
-  --foreground: oklch(0.92 0.005 285);
-  --card: oklch(0.16 0.025 260);
-  --card-foreground: oklch(0.92 0.005 285);
-  --popover: oklch(0.16 0.025 260);
-  --popover-foreground: oklch(0.92 0.005 285);
-  --primary: oklch(0.60 0.22 25);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.20 0.03 260);
-  --secondary-foreground: oklch(0.92 0.005 285);
-  --muted: oklch(0.22 0.03 260);
-  --muted-foreground: oklch(0.78 0.01 260);
-  --accent: oklch(0.22 0.03 260);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.35 0.15 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.30 0.01 285);
-  --input: oklch(0.30 0.01 285);
-  --ring: oklch(0.60 0.22 25);
+  --background: oklch(0.00 0.000 0);
+  --foreground: oklch(0.97 0.002 48);
+  --card: oklch(0.28 0.004 264);
+  --card-foreground: oklch(0.97 0.002 48);
+  --popover: oklch(0.28 0.004 264);
+  --popover-foreground: oklch(0.97 0.002 48);
+  --primary: oklch(0.58 0.203 33);
+  --primary-foreground: oklch(0.97 0.002 48);
+  --secondary: oklch(0.20 0.003 264);
+  --secondary-foreground: oklch(0.97 0.002 48);
+  --muted: oklch(0.22 0.003 264);
+  --muted-foreground: oklch(0.75 0.005 264);
+  --accent: oklch(0.22 0.003 264);
+  --accent-foreground: oklch(0.97 0.002 48);
+  --destructive: oklch(0.40 0.15 33);
+  --destructive-foreground: oklch(0.97 0.002 48);
+  --border: oklch(0.32 0.004 264);
+  --input: oklch(0.32 0.004 264);
+  --ring: oklch(0.58 0.203 33);
 }
 
 @layer base {
@@ -166,16 +186,16 @@
     font-family: "Inter", sans-serif;
   }
 
-  /* Consistent section badge style across all sections */
+  /* Consistent section badge style — uses EMC Red #d93711 */
   .section-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0.875rem;
     border-radius: 9999px;
-    background: oklch(0.60 0.22 25 / 0.1);
-    border: 1px solid oklch(0.60 0.22 25 / 0.2);
-    color: oklch(0.60 0.22 25);
+    background: oklch(0.58 0.203 33 / 0.1);
+    border: 1px solid oklch(0.58 0.203 33 / 0.2);
+    color: oklch(0.58 0.203 33);
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -210,17 +230,17 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar — uses EMC brand colors */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: oklch(0.13 0.03 260);
+  background: oklch(0.00 0.000 0);
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.30 0.01 285);
+  background: oklch(0.32 0.004 264);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.60 0.22 25);
+  background: oklch(0.58 0.203 33);
 }
