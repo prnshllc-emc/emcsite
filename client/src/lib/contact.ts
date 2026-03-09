@@ -1,6 +1,16 @@
-const CONTACT_DESTINATION = "5511992448920";
+/**
+ * Contact utilities — now supports dynamic settings from DB.
+ * Components should use useSiteSettings() + openContactWithNumber() for dynamic behavior.
+ * The legacy openContact() still works as a fallback with the default number.
+ */
+
+const DEFAULT_WHATSAPP = "5511992448920";
 
 export function openContact(message?: string) {
+  openContactWithNumber(DEFAULT_WHATSAPP, message);
+}
+
+export function openContactWithNumber(whatsappNumber: string, message?: string) {
   const defaultMessage = "Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro.";
   const text = encodeURIComponent(message || defaultMessage);
 
@@ -11,12 +21,9 @@ export function openContact(message?: string) {
     });
   }
 
-  const isPhone = /^\d+$/.test(CONTACT_DESTINATION);
-  if (isPhone) {
-    window.open(`https://wa.me/${CONTACT_DESTINATION}?text=${text}`, "_blank");
-  } else {
-    window.open(`mailto:${CONTACT_DESTINATION}?subject=${text}`, "_blank");
-  }
+  // Extract digits only for wa.me URL
+  const digits = whatsappNumber.replace(/\D/g, "");
+  window.open(`https://wa.me/${digits}?text=${text}`, "_blank");
 }
 
 export const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/logo-emc_335975b5.png";

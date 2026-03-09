@@ -1,16 +1,19 @@
-/* WhatsAppButton — Fixed floating WhatsApp button with tracking */
+/* WhatsAppButton — Fixed floating WhatsApp button with tracking + dynamic settings */
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import { openContact } from "@/lib/contact";
+import { openContactWithNumber } from "@/lib/contact";
 import { trackWhatsAppClick, trackCTAClick } from "@/lib/analytics";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export default function WhatsAppButton() {
   const [hovered, setHovered] = useState(false);
+  const { get } = useSiteSettings();
+  const whatsappNumber = get("whatsapp_number");
 
   function handleClick() {
     trackCTAClick("WhatsApp Flutuante", "floating_button", "whatsapp", "Fale Conosco");
     trackWhatsAppClick("botao_flutuante");
-    openContact();
+    openContactWithNumber(whatsappNumber);
   }
 
   return (

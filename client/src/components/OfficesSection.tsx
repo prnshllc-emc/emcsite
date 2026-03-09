@@ -1,37 +1,40 @@
-/* OfficesSection — SEO-optimized with semantic HTML, address elements, and local business signals */
+/* OfficesSection — SEO-optimized with semantic HTML, dynamic addresses from DB */
 import { MapPin, Clock, Globe } from "lucide-react";
-
-const OFFICES = [
-  {
-    flag: "🇺🇸",
-    city: "Miami, FL",
-    role: "Sede Internacional",
-    address: "1150 NW 72nd Ave, Tower 1, Ste 455 #13677, Miami, FL 33126",
-    entity: "PRNSH LLC",
-    hours: "9:00 AM – 5:00 PM (EST)",
-    country: "Estados Unidos",
-  },
-  {
-    flag: "🇧🇷",
-    city: "São Paulo, SP",
-    role: "Escritório Comercial",
-    address: "Vila Olímpia, São Paulo - SP",
-    entity: "Enviando Meu Carro Com. Imp. e Exp. LTDA",
-    hours: "9:00 – 18:00 (BRT)",
-    country: "Brasil",
-  },
-  {
-    flag: "🇧🇷",
-    city: "Itajaí, SC",
-    role: "Base Operacional",
-    address: "Próximo ao Porto de Itajaí, SC",
-    entity: "Enviando Meu Carro Com. Imp. e Exp. LTDA",
-    hours: "9:00 – 18:00 (BRT)",
-    country: "Brasil",
-  },
-];
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export default function OfficesSection() {
+  const { get } = useSiteSettings();
+
+  const offices = [
+    {
+      flag: "🇺🇸",
+      city: "Miami, FL",
+      role: "Sede Internacional",
+      address: get("address_miami"),
+      entity: "PRNSH LLC",
+      hours: "9:00 AM – 5:00 PM (EST)",
+      country: "Estados Unidos",
+    },
+    {
+      flag: "🇧🇷",
+      city: "São Paulo, SP",
+      role: "Escritório Comercial",
+      address: get("address_sp"),
+      entity: "Enviando Meu Carro Com. Imp. e Exp. LTDA",
+      hours: "9:00 – 18:00 (BRT)",
+      country: "Brasil",
+    },
+    {
+      flag: "🇧🇷",
+      city: "Itajaí, SC",
+      role: "Base Operacional",
+      address: get("address_itajai"),
+      entity: "Enviando Meu Carro Com. Imp. e Exp. LTDA",
+      hours: "9:00 – 18:00 (BRT)",
+      country: "Brasil",
+    },
+  ];
+
   return (
     <section
       id="offices"
@@ -56,7 +59,7 @@ export default function OfficesSection() {
 
         {/* Offices Grid — semantic address elements */}
         <div className="grid md:grid-cols-3 gap-8" role="list">
-          {OFFICES.map((office) => (
+          {offices.map((office) => (
             <article
               key={office.city}
               className="group p-8 rounded-xl bg-background/50 border border-white/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1"

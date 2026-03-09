@@ -1,13 +1,14 @@
-/* Footer — SEO-optimized with semantic HTML (nav, address), proper link structure, and keyword-rich content */
+/* Footer — SEO-optimized with semantic HTML, dynamic settings from DB */
 import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LOGO_URL, openContact, CLUB_AACA_URL, CLUB_ACB_URL } from "@/lib/contact";
+import { LOGO_URL, CLUB_AACA_URL, CLUB_ACB_URL, openContactWithNumber } from "@/lib/contact";
 import { useState } from "react";
 import { toast } from "sonner";
-import { trackCTAClick, trackNavClick, trackWhatsAppClick } from "@/lib/analytics";
-import { trackNewsletterSubscribe } from "@/lib/analytics";
+import { trackCTAClick, trackNavClick, trackWhatsAppClick, trackNewsletterSubscribe } from "@/lib/analytics";
 import { trpc } from "@/lib/trpc";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { Link } from "wouter";
 
 const QUICK_LINKS = [
   { label: "Início", href: "#inicio" },
@@ -28,14 +29,24 @@ const SERVICE_LINKS = [
   { label: "Admissão Temporária", href: "#services" },
 ];
 
-const OFFICES = [
-  { flag: "🇺🇸", name: "Miami, FL (Sede)", addr: "1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126" },
-  { flag: "🇧🇷", name: "São Paulo, SP", addr: "Vila Olímpia, São Paulo - SP" },
-  { flag: "🇧🇷", name: "Itajaí, SC (Base Op.)", addr: "Próximo ao Porto de Itajaí, SC" },
-];
-
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const { get } = useSiteSettings();
+
+  const phone = get("phone_primary");
+  const emailAddr = get("email_primary");
+  const whatsappNumber = get("whatsapp_number");
+  const instagramUrl = get("instagram_url");
+  const facebookUrl = get("facebook_url");
+  const addressMiami = get("address_miami");
+  const addressSP = get("address_sp");
+  const addressItajai = get("address_itajai");
+
+  const offices = [
+    { flag: "🇺🇸", name: "Miami, FL (Sede)", addr: addressMiami },
+    { flag: "🇧🇷", name: "São Paulo, SP", addr: addressSP },
+    { flag: "🇧🇷", name: "Itajaí, SC (Base Op.)", addr: addressItajai },
+  ];
 
   const subscribeMutation = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
@@ -71,6 +82,12 @@ export default function Footer() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   }
 
+  function handleWhatsApp() {
+    trackWhatsAppClick("footer_phone");
+    trackCTAClick("Telefone Footer", "footer_contact", "whatsapp", "Telefone");
+    openContactWithNumber(whatsappNumber);
+  }
+
   return (
     <footer className="bg-card border-t border-white/10 pt-20 pb-10" role="contentinfo">
       <div className="container">
@@ -90,26 +107,30 @@ export default function Footer() {
               Logística automotiva internacional com transparência total há mais de 10 anos.
             </p>
             <div className="flex gap-3">
-              <a
-                href="https://www.instagram.com/enviandomeucarro"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackCTAClick("Instagram", "footer_social", "https://www.instagram.com/enviandomeucarro", "Instagram")}
-                className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
-                aria-label="Siga a Enviando Meu Carro no Instagram"
-              >
-                <Instagram className="w-5 h-5" aria-hidden="true" />
-              </a>
-              <a
-                href="https://www.facebook.com/enviandomeucarro"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackCTAClick("Facebook", "footer_social", "https://www.facebook.com/enviandomeucarro", "Facebook")}
-                className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
-                aria-label="Siga a Enviando Meu Carro no Facebook"
-              >
-                <Facebook className="w-5 h-5" aria-hidden="true" />
-              </a>
+              {instagramUrl && (
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackCTAClick("Instagram", "footer_social", instagramUrl, "Instagram")}
+                  className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                  aria-label="Siga a Enviando Meu Carro no Instagram"
+                >
+                  <Instagram className="w-5 h-5" aria-hidden="true" />
+                </a>
+              )}
+              {facebookUrl && (
+                <a
+                  href={facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackCTAClick("Facebook", "footer_social", facebookUrl, "Facebook")}
+                  className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                  aria-label="Siga a Enviando Meu Carro no Facebook"
+                >
+                  <Facebook className="w-5 h-5" aria-hidden="true" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -168,24 +189,24 @@ export default function Footer() {
             <h4 className="text-white font-display font-bold text-lg mb-6">Contato</h4>
             <address className="not-italic space-y-4">
               <button
-                onClick={() => { trackWhatsAppClick("footer_phone"); trackCTAClick("Telefone Footer", "footer_contact", "whatsapp", "Telefone"); openContact(); }}
+                onClick={handleWhatsApp}
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
                 aria-label="Entrar em contato via WhatsApp"
               >
                 <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                +55 (11) 99244-8920
+                {phone}
               </button>
               <a
-                href="mailto:atendimento@enviandomeucarro.com"
-                onClick={() => trackCTAClick("Email Footer", "footer_contact", "mailto:atendimento@enviandomeucarro.com", "Email")}
+                href={`mailto:${emailAddr}`}
+                onClick={() => trackCTAClick("Email Footer", "footer_contact", `mailto:${emailAddr}`, "Email")}
                 className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
                 aria-label="Enviar email para atendimento da Enviando Meu Carro"
               >
                 <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                atendimento@enviandomeucarro.com
+                {emailAddr}
               </a>
               <div className="pt-2 space-y-3">
-                {OFFICES.map((office) => (
+                {offices.map((office) => (
                   <div key={office.name} className="flex items-start gap-3 text-muted-foreground text-sm font-body">
                     <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
@@ -218,9 +239,10 @@ export default function Footer() {
               />
               <Button
                 type="submit"
+                disabled={subscribeMutation.isPending}
                 className="w-full bg-primary hover:bg-primary/90 font-bold tracking-wider uppercase text-sm"
               >
-                Inscrever-se
+                {subscribeMutation.isPending ? "Enviando..." : "Inscrever-se"}
               </Button>
             </form>
           </div>
@@ -296,12 +318,18 @@ export default function Footer() {
             © {new Date().getFullYear()} Enviando Meu Carro (EMC) — Importação e Exportação de Veículos — Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
+            <Link
+              href="/politica-de-privacidade"
+              className="text-muted-foreground hover:text-primary text-sm font-body transition-colors"
+            >
               Política de Privacidade
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary text-sm font-body transition-colors">
+            </Link>
+            <Link
+              href="/politica-de-privacidade"
+              className="text-muted-foreground hover:text-primary text-sm font-body transition-colors"
+            >
               Termos de Uso
-            </a>
+            </Link>
           </div>
         </div>
       </div>

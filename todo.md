@@ -54,3 +54,17 @@
 - [x] SEO: alt tags, heading hierarchy, semantic HTML already strong from previous work
 - [x] SEO: performance (preload, preconnect) and accessibility (skip-to-content, aria labels) improvements
 - [x] Fix: header menu items not harmonious — improved spacing, whitespace-nowrap, responsive font sizes
+
+## Phase 3: Public Settings + Privacy Policy + Search Console
+- [x] Create public settings tRPC endpoint (read-only, cached) — already existed
+- [x] Create SiteSettingsContext to provide settings to all components
+- [x] Connect Footer to read phone, email, addresses, social links from DB
+- [x] Connect Header logo link to DB settings
+- [x] Connect WhatsApp button to read phone number from DB
+- [x] Connect HeroSection WhatsApp CTA to DB settings
+- [x] Connect OfficesSection to read addresses from DB
+- [x] Create Privacy Policy page (LGPD compliant)
+- [x] Register /politica-de-privacidade route in App.tsx
+- [x] Update Footer links to point to Privacy Policy page
+- [x] Add Google Search Console verification meta tag (commented placeholder, needs user's code)
+- [x] Write/update vitest tests for new endpoints (13 tests passing)

@@ -1,8 +1,9 @@
-/* CTASection — SEO-optimized reusable CTA with tracking */
+/* CTASection — SEO-optimized reusable CTA with tracking + dynamic settings */
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { openContact } from "@/lib/contact";
+import { openContactWithNumber } from "@/lib/contact";
 import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 interface Props {
   title: string;
@@ -12,11 +13,14 @@ interface Props {
 }
 
 export default function CTASection({ title, description, buttonText, variant }: Props) {
+  const { get } = useSiteSettings();
+  const whatsappNumber = get("whatsapp_number");
+
   function handleClick() {
     const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
     trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
     trackWhatsAppClick(`cta_section_${variant}`, msg);
-    openContact(msg);
+    openContactWithNumber(whatsappNumber, msg);
   }
 
   return (
