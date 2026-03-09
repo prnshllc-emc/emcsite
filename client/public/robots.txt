@@ -4,7 +4,8 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /admin/
+Disallow: /admin
+Disallow: /404
 
 # Sitemaps
 Sitemap: https://enviandomeucarro.com/sitemap.xml

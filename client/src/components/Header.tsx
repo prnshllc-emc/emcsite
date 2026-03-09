@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/10" role="banner">
-      <div className="container flex items-center justify-between h-28">
+      <div className="container flex items-center justify-between h-20 lg:h-24">
         {/* Logo — proper anchor with title */}
         <a
           href="https://enviandomeucarro.com/"
@@ -52,14 +52,14 @@ export default function Header() {
           <img
             src={LOGO_URL}
             alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-            className="h-[6.3rem] w-auto hover:scale-105 transition-transform duration-300"
+            className="h-14 lg:h-[4.5rem] w-auto hover:scale-105 transition-transform duration-300"
             width="120"
             height="56"
           />
         </a>
 
         {/* Desktop Nav — semantic nav with proper anchors */}
-        <nav className="hidden lg:flex items-center gap-8" aria-label="Navegação principal">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8" aria-label="Navegação principal">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.anchor}
@@ -68,20 +68,20 @@ export default function Header() {
                 e.preventDefault();
                 scrollTo(item.anchor, item.label);
               }}
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
+              className="whitespace-nowrap text-[13px] xl:text-sm font-medium text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
             >
               {item.label}
             </a>
           ))}
           <button
             onClick={handleTrackingComingSoon}
-            className="text-sm font-bold text-muted-foreground/60 uppercase tracking-wider flex items-center gap-2 border border-white/10 px-3 py-1 rounded-full bg-white/5 cursor-default relative group"
+            className="whitespace-nowrap text-[13px] xl:text-sm font-bold text-muted-foreground/60 uppercase tracking-wider flex items-center gap-2 border border-white/10 px-3 py-1.5 rounded-full bg-white/5 cursor-default relative group ml-1"
             aria-label="Rastreamento de veículos — em breve"
           >
-            <Truck className="w-4 h-4" aria-hidden="true" />
+            <Truck className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
             <span>Rastrear</span>
             <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-primary/20 text-primary px-1.5 py-0.5 rounded-full uppercase tracking-widest">
-              <Clock className="w-3 h-3" aria-hidden="true" />
+              <Clock className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
               Em Breve
             </span>
           </button>
@@ -100,7 +100,7 @@ export default function Header() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-28 left-0 right-0 z-40">
+        <div className="lg:hidden bg-background/95 backdrop-blur-md border-t border-white/10 absolute top-20 left-0 right-0 z-40">
           <nav className="container py-6 flex flex-col gap-4" aria-label="Navegação mobile">
             {NAV_ITEMS.map((item) => (
               <a

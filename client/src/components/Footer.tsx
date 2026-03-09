@@ -6,6 +6,7 @@ import { LOGO_URL, openContact, CLUB_AACA_URL, CLUB_ACB_URL } from "@/lib/contac
 import { useState } from "react";
 import { toast } from "sonner";
 import { trackCTAClick, trackNavClick, trackWhatsAppClick } from "@/lib/analytics";
+import { trackNewsletterSubscribe } from "@/lib/analytics";
 import { trpc } from "@/lib/trpc";
 
 const QUICK_LINKS = [
@@ -39,6 +40,7 @@ export default function Footer() {
   const subscribeMutation = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       trackCTAClick("Newsletter", "footer_newsletter", "form_submit", "Inscrever-se");
+      trackNewsletterSubscribe(email);
       toast.success("Obrigado! Você receberá nossas novidades em breve.");
       setEmail("");
     },

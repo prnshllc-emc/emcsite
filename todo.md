@@ -43,3 +43,14 @@
 ## UI Changes
 - [x] Disable "Rastrear Meu Carro" button and show "Em Breve" badge
 - [x] Set site favicon to EMC logo
+- [x] Investigate: site not loading without www (enviandomeucarro.com vs www.enviandomeucarro.com) — DNS issue, root domain not configured in Cloudflare
+- [x] Fix: root domain issue resolved by user in Cloudflare
+- [x] Audit: HTML head meta tags, pixels, analytics tags, structured data
+- [x] Audit: data capture forms, newsletter, WhatsApp, CTAs, event tracking
+- [x] Audit: frontend components tracking integration and compliance
+- [x] Audit: compile comprehensive report with findings and recommendations
+- [x] SEO: robust optimization — theme-color, LocalBusiness schemas, skip-to-content, preload hero, preconnect Facebook
+- [x] SEO: sitemap.xml updated, robots.txt improved with /404 disallow
+- [x] SEO: alt tags, heading hierarchy, semantic HTML already strong from previous work
+- [x] SEO: performance (preload, preconnect) and accessibility (skip-to-content, aria labels) improvements
+- [x] Fix: header menu items not harmonious — improved spacing, whitespace-nowrap, responsive font sizes

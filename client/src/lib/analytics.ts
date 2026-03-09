@@ -503,6 +503,38 @@ export function trackSocialClick(platform: string, url: string) {
 }
 
 // ============================================================
+// NEWSLETTER SUBSCRIPTION TRACKING
+// ============================================================
+
+export function trackNewsletterSubscribe(email: string) {
+  // GA4 — dedicated newsletter event
+  gtag("event", "newsletter_subscribe", {
+    event_category: "Conversão",
+    event_label: "Newsletter",
+    method: "footer_form",
+  });
+
+  // Google Ads Conversion
+  gtag("event", "conversion", {
+    send_to: "AW-17154661982/newsletter_subscribe",
+    event_category: "Conversão",
+    event_label: "Newsletter",
+  });
+
+  // Data Layer
+  pushDataLayer({
+    event: "newsletter_subscribe",
+    subscription_method: "footer_form",
+  });
+
+  // Meta Pixel — CompleteRegistration
+  fbqTrack("CompleteRegistration", {
+    content_name: "Newsletter",
+    status: "subscribed",
+  });
+}
+
+// ============================================================
 // INITIALIZATION — Call once on app mount
 // ============================================================
 
