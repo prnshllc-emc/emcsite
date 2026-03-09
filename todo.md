@@ -84,3 +84,7 @@
 - [x] Fix Offices cards: equalized heights, consistent badge
 - [x] Fix Why Us: checklist text size, mini-stats, consistent CTA
 - [x] Fix spacing: normalized section transitions (py-16/py-20)
+
+## Phase 5: Footer Gap + Header Logo
+- [x] Fix: large white gap between last section and footer (removed pt-16, fixed TestimonialsSection footer tags)
+- [x] Fix: header logo increased to h-16 lg:h-20

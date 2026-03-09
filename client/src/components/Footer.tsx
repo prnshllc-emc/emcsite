@@ -89,7 +89,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-card pt-16 pb-8" role="contentinfo">
+    <footer className="bg-card pb-8" role="contentinfo">
       {/* Top accent */}
       <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" aria-hidden="true" />
 

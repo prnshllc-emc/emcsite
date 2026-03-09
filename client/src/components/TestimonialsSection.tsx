@@ -62,14 +62,14 @@ export default function TestimonialsSection() {
               </p>
 
               {/* Attribution */}
-              <footer>
+              <div className="mt-auto">
                 <cite className="not-italic">
                   <p className="text-white font-bold font-display">{t.name}</p>
                   <p className="text-[11px] uppercase tracking-wider text-primary/80 mt-0.5">
                     Cliente Enviando Meu Carro
                   </p>
                 </cite>
-              </footer>
+              </div>
             </blockquote>
           ))}
         </div>
