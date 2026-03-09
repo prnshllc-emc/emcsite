@@ -6,6 +6,7 @@ import { LOGO_URL, openContact, CLUB_AACA_URL, CLUB_ACB_URL } from "@/lib/contac
 import { useState } from "react";
 import { toast } from "sonner";
 import { trackCTAClick, trackNavClick, trackWhatsAppClick } from "@/lib/analytics";
+import { trpc } from "@/lib/trpc";
 
 const QUICK_LINKS = [
   { label: "Início", href: "#inicio" },
@@ -35,12 +36,26 @@ const OFFICES = [
 export default function Footer() {
   const [email, setEmail] = useState("");
 
-  function handleNewsletter(e: React.FormEvent) {
-    e.preventDefault();
-    if (email) {
+  const subscribeMutation = trpc.newsletter.subscribe.useMutation({
+    onSuccess: () => {
       trackCTAClick("Newsletter", "footer_newsletter", "form_submit", "Inscrever-se");
       toast.success("Obrigado! Você receberá nossas novidades em breve.");
       setEmail("");
+    },
+    onError: (err) => {
+      if (err.message.includes("Duplicate")) {
+        toast.info("Este e-mail já está cadastrado na nossa newsletter!");
+      } else {
+        toast.error("Erro ao inscrever. Tente novamente.");
+      }
+      setEmail("");
+    },
+  });
+
+  function handleNewsletter(e: React.FormEvent) {
+    e.preventDefault();
+    if (email) {
+      subscribeMutation.mutate({ email });
     }
   }
 

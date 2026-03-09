@@ -1,0 +1,90 @@
+{
+  "query": "SELECT `key`, value, category FROM site_settings ORDER BY category, `key`;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT `key`, value, category FROM site_settings ORDER BY category, `key`;",
+  "rows": [
+    {
+      "key": "address_itajai",
+      "value": "Próximo ao Porto de Itajaí, SC",
+      "category": "address"
+    },
+    {
+      "key": "address_miami",
+      "value": "1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126",
+      "category": "address"
+    },
+    {
+      "key": "address_sp",
+      "value": "Vila Olímpia, São Paulo, SP",
+      "category": "address"
+    },
+    {
+      "key": "email_primary",
+      "value": "atendimento@enviandomeucarro.com",
+      "category": "contact"
+    },
+    {
+      "key": "email_secondary",
+      "value": "contato@enviandomeucarro.com",
+      "category": "contact"
+    },
+    {
+      "key": "phone_primary",
+      "value": "+55 11 99244-8920",
+      "category": "contact"
+    },
+    {
+      "key": "phone_secondary",
+      "value": "+1 (786) 600-0430",
+      "category": "contact"
+    },
+    {
+      "key": "whatsapp_number",
+      "value": "+55 11 99244-8920",
+      "category": "contact"
+    },
+    {
+      "key": "whatsapp_url",
+      "value": "https://wa.me/5511992448920",
+      "category": "contact"
+    },
+    {
+      "key": "calculator_url",
+      "value": "https://calculadora.enviandomeucarro.com",
+      "category": "links"
+    },
+    {
+      "key": "google_reviews_url",
+      "value": "https://g.page/r/CfOy3RBqPbMVEBM/review",
+      "category": "links"
+    },
+    {
+      "key": "tracking_url",
+      "value": "https://rastreamento.enviandomeucarro.com",
+      "category": "links"
+    },
+    {
+      "key": "facebook_url",
+      "value": "https://www.facebook.com/enviandomeucarro",
+      "category": "social"
+    },
+    {
+      "key": "instagram_url",
+      "value": "https://www.instagram.com/enviandomeucarro",
+      "category": "social"
+    },
+    {
+      "key": "tiktok_url",
+      "value": "",
+      "category": "social"
+    },
+    {
+      "key": "youtube_url",
+      "value": "https://www.youtube.com/@enviandomeucarro",
+      "category": "social"
+    }
+  ],
+  "messages": [],
+  "stdout": "key\tvalue\tcategory\naddress_itajai\tPróximo ao Porto de Itajaí, SC\taddress\naddress_miami\t1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126\taddress\naddress_sp\tVila Olímpia, São Paulo, SP\taddress\nemail_primary\tatendimento@enviandomeucarro.com\tcontact\nemail_secondary\tcontato@enviandomeucarro.com\tcontact\nphone_primary\t+55 11 99244-8920\tcontact\nphone_secondary\t+1 (786) 600-0430\tcontact\nwhatsapp_number\t+55 11 99244-8920\tcontact\nwhatsapp_url\thttps://wa.me/5511992448920\tcontact\ncalculator_url\thttps://calculadora.enviandomeucarro.com\tlinks\ngoogle_reviews_url\thttps://g.page/r/CfOy3RBqPbMVEBM/review\tlinks\ntracking_url\thttps://rastreamento.enviandomeucarro.com\tlinks\nfacebook_url\thttps://www.facebook.com/enviandomeucarro\tsocial\ninstagram_url\thttps://www.instagram.com/enviandomeucarro\tsocial\ntiktok_url\t\tsocial\nyoutube_url\thttps://www.youtube.com/@enviandomeucarro\tsocial\n",
+  "stderr": "",
+  "execution_time_ms": 93
+}
