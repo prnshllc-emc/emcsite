@@ -122,3 +122,8 @@
 - [x] Keep calculator buttons in red EMC (verified)
 - [x] Visual verification across all sections
 - [x] Run tests to verify no regressions
+
+## Phase 10: Center CTA Buttons on Mobile
+- [x] Center Hero CTA buttons on mobile (flex-col + items-center)
+- [x] Center WhyUs CTA button on mobile
+- [x] Verify on mobile viewport

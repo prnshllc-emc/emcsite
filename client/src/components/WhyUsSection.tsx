@@ -60,20 +60,22 @@ export default function WhyUsSection() {
             </ul>
 
             {/* CTA Button */}
-            <Button
-              variant="ghost"
-              onClick={() => {
-                const msg = "Olá! Gostaria de falar com um consultor sobre os serviços da EMC.";
-                trackCTAClick("Falar com Consultor", "whyus_section", "whatsapp", "Falar com Consultor");
-                trackWhatsAppClick("whyus_cta", msg);
-                openContact(msg);
-              }}
-              className="cta-whatsapp"
-              aria-label="Falar com um consultor especialista em importação de veículos"
-            >
-              Falar com um Consultor
-              <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
-            </Button>
+            <div className="flex justify-center lg:justify-start">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  const msg = "Olá! Gostaria de falar com um consultor sobre os serviços da EMC.";
+                  trackCTAClick("Falar com Consultor", "whyus_section", "whatsapp", "Falar com Consultor");
+                  trackWhatsAppClick("whyus_cta", msg);
+                  openContact(msg);
+                }}
+                className="cta-whatsapp"
+                aria-label="Falar com um consultor especialista em importação de veículos"
+              >
+                Falar com um Consultor
+                <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+              </Button>
+            </div>
           </div>
 
           {/* Right — Image */}
