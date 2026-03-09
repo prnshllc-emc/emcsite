@@ -94,3 +94,11 @@
 - [x] Update all hardcoded red values to #d93711 (only 1 found: ImportCalculator)
 - [x] Update all hardcoded gray/dark values to #28292b (all use CSS vars already)
 - [x] Verify visual consistency across all sections
+
+## Phase 7: Terms of Use Page
+- [x] Create Termos de Uso page at /termos-de-uso with comprehensive legal content
+- [x] Register route in App.tsx with lazy loading
+- [x] Update Footer "Termos de Uso" link to point to /termos-de-uso
+- [x] Update sitemap.xml with new page
+- [x] Add cross-references between Privacy Policy and Terms of Use
+- [x] Run tests to verify no regressions

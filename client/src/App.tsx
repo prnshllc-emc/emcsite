@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 
 const Admin = lazy(() => import("./pages/Admin"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
         <Route path={"/"} component={Home} />
         <Route path={"/admin"} component={Admin} />
         <Route path={"/politica-de-privacidade"} component={PrivacyPolicy} />
+        <Route path={"/termos-de-uso"} component={TermsOfUse} />
         <Route path={"/404"} component={NotFound} />
         {/* Final fallback route */}
         <Route component={NotFound} />

@@ -46,7 +46,8 @@ export default function PrivacyPolicy() {
                 A <strong className="text-white">Enviando Meu Carro (EMC)</strong>, empresa especializada em importação e exportação de veículos, com sede em Miami, FL, EUA, e escritórios em São Paulo, SP e Itajaí, SC, Brasil, está comprometida com a proteção da privacidade e dos dados pessoais de seus clientes, parceiros e visitantes do site.
               </p>
               <p>
-                Esta Política de Privacidade descreve como coletamos, utilizamos, armazenamos e protegemos suas informações pessoais, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018) e demais legislações aplicáveis.
+                Esta Política de Privacidade descreve como coletamos, utilizamos, armazenamos e protegemos suas informações pessoais, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018) e demais legislações aplicáveis. Esta política deve ser lida em conjunto com nossos{" "}
+                <Link href="/termos-de-uso" className="text-primary hover:underline">Termos de Uso</Link>.
               </p>
             </section>
 

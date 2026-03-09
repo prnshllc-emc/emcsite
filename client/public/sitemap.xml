@@ -8,4 +8,18 @@
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/" />
   </url>
+  <url>
+    <loc>https://enviandomeucarro.com/politica-de-privacidade</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/politica-de-privacidade" />
+  </url>
+  <url>
+    <loc>https://enviandomeucarro.com/termos-de-uso</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/termos-de-uso" />
+  </url>
 </urlset>

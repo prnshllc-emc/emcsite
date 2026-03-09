@@ -326,7 +326,7 @@ export default function Footer() {
               Política de Privacidade
             </Link>
             <Link
-              href="/politica-de-privacidade"
+              href="/termos-de-uso"
               className="text-gray-400 hover:text-primary text-sm font-body transition-colors"
             >
               Termos de Uso
