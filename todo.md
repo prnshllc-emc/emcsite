@@ -42,3 +42,4 @@
 
 ## UI Changes
 - [x] Disable "Rastrear Meu Carro" button and show "Em Breve" badge
+- [x] Set site favicon to EMC logo
