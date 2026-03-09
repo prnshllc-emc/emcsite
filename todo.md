@@ -68,3 +68,19 @@
 - [x] Update Footer links to point to Privacy Policy page
 - [x] Add Google Search Console verification meta tag (commented placeholder, needs user's code)
 - [x] Write/update vitest tests for new endpoints (13 tests passing)
+
+## Phase 4: Visual Audit Improvements (72 points)
+- [x] Analyze sister sites (calculadora + importação) for design coherence
+- [x] Fix Header: logo proportion, nav spacing, rastrear button
+- [x] Fix contrast: all gray subtitles improved (muted-foreground + gray-400)
+- [x] Fix title breaks: balanced text-wrap on all section titles
+- [x] Fix Footer: bottom bar visibility, text size, newsletter input, social icons
+- [x] Fix badges: unified section-badge style across all sections
+- [x] Fix CTA buttons: unified cta-primary style across all CTAs
+- [x] Fix Stats section: clean red accent borders, consistent cards
+- [x] Fix Hero: badge size, CTA consistency, improved layout
+- [x] Fix Services cards: consistent badge, title wrapping, CTA buttons
+- [x] Fix Testimonials: red top border (not gold), consistent card styling
+- [x] Fix Offices cards: equalized heights, consistent badge
+- [x] Fix Why Us: checklist text size, mini-stats, consistent CTA
+- [x] Fix spacing: normalized section transitions (py-16/py-20)

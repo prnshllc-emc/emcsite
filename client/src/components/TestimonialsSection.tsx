@@ -1,4 +1,4 @@
-/* TestimonialsSection — SEO-optimized review cards with semantic HTML and accessibility (no video) */
+/* TestimonialsSection — SEO-optimized review cards with consistent design */
 import { Star, Quote, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackCTAClick } from "@/lib/analytics";
@@ -7,17 +7,14 @@ const TESTIMONIALS = [
   {
     name: "Marcelo Matheus",
     text: "Fiz a importação do meu carro com a empresa Enviando Meu Carro e o processo foi impecável. Transparência total em cada etapa, sem surpresas.",
-    delay: "0ms",
   },
   {
     name: "Maykon Siqueira",
     text: "Já é o sexto trabalho que faço com o Fred. Atenção, cuidado e profissionalismo em cada detalhe. Recomendo de olhos fechados para importação e exportação.",
-    delay: "150ms",
   },
   {
     name: "Rafael Marinho",
     text: "Processo de exportação do meu veículo foi muito mais simples do que eu imaginava. A equipe cuidou de toda a burocracia e documentação. Excelente!",
-    delay: "300ms",
   },
 ];
 
@@ -26,60 +23,49 @@ export default function TestimonialsSection() {
     <section
       id="testimonials"
       aria-label="Depoimentos de clientes sobre importação e exportação de veículos"
-      className="py-24 bg-background relative overflow-hidden"
+      className="py-20 bg-background relative overflow-hidden"
     >
-      {/* Decorative Lines */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden="true" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden="true" />
-
       <div className="container">
-        {/* Badge */}
-        <div className="text-center mb-4">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase">
-            Depoimentos
-          </span>
-        </div>
-
         {/* Section Header */}
-        <header className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-white">
-            Avaliações de Clientes que <span className="text-primary">Importaram e Exportaram</span> Veículos
+        <header className="text-center max-w-3xl mx-auto mb-14 space-y-4">
+          <span className="section-badge">Depoimentos</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            Clientes que <span className="text-primary">Importaram e Exportaram</span> Veículos
           </h2>
-          <p className="text-muted-foreground text-lg font-body">
-            <strong>5.0 estrelas no Google</strong> com 18+ avaliações verificadas.
-            Excelência comprovada em cada entrega de veículo importado ou exportado.
+          <p className="text-gray-300 text-lg font-body">
+            <strong className="text-white">5.0 estrelas no Google</strong> com 18+ avaliações verificadas.
+            Excelência comprovada em cada entrega.
           </p>
         </header>
 
         {/* Testimonial Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-8" role="list" aria-label="Avaliações de clientes">
+        <div className="grid md:grid-cols-3 gap-5" role="list" aria-label="Avaliações de clientes">
           {TESTIMONIALS.map((t) => (
             <blockquote
               key={t.name}
-              className="group p-8 rounded-xl bg-card border border-white/5 hover:border-primary/20 transition-colors relative animate-in slide-in-from-bottom-4 duration-500"
-              style={{ animationDelay: t.delay }}
+              className="group p-6 rounded-xl bg-card/80 border border-white/8 hover:border-primary/20 transition-all relative"
               role="listitem"
             >
               {/* Quote Icon */}
-              <Quote className="absolute top-4 right-4 w-10 h-10 text-white/5 group-hover:text-primary/15 transition-colors" aria-hidden="true" />
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-white/5 group-hover:text-primary/10 transition-colors" aria-hidden="true" />
 
               {/* Stars */}
-              <div className="flex gap-1 mb-4" aria-label="Avaliação 5 de 5 estrelas">
+              <div className="flex gap-0.5 mb-4" aria-label="Avaliação 5 de 5 estrelas">
                 {[...Array(5)].map((_, j) => (
-                  <Star key={j} className="w-5 h-5 fill-primary text-primary" aria-hidden="true" />
+                  <Star key={j} className="w-4 h-4 fill-primary text-primary" aria-hidden="true" />
                 ))}
               </div>
 
               {/* Text */}
-              <p className="text-gray-300 italic leading-relaxed font-body mb-6">
+              <p className="text-gray-300 italic leading-relaxed font-body mb-5 text-sm">
                 "{t.text}"
               </p>
 
               {/* Attribution */}
               <footer>
                 <cite className="not-italic">
-                  <p className="text-white font-bold font-display text-lg">{t.name}</p>
-                  <p className="text-xs uppercase tracking-wider text-primary mt-1">
+                  <p className="text-white font-bold font-display">{t.name}</p>
+                  <p className="text-[11px] uppercase tracking-wider text-primary/80 mt-0.5">
                     Cliente Enviando Meu Carro
                   </p>
                 </cite>
@@ -96,7 +82,7 @@ export default function TestimonialsSection() {
               trackCTAClick("Ver Avaliações Google", "testimonials_section", "https://www.google.com/search?q=Enviando+Meu+Carro+avaliacoes", "Google Reviews");
               window.open("https://www.google.com/search?q=Enviando+Meu+Carro+avalia%C3%A7%C3%B5es", "_blank");
             }}
-            className="border-white/10 hover:border-primary/50 text-muted-foreground hover:text-primary"
+            className="border-white/10 hover:border-primary/30 text-gray-400 hover:text-primary text-sm"
             aria-label="Ver todas as avaliações da Enviando Meu Carro no Google"
           >
             <img

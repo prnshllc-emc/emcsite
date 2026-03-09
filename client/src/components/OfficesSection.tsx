@@ -1,4 +1,4 @@
-/* OfficesSection — SEO-optimized with semantic HTML, dynamic addresses from DB */
+/* OfficesSection — SEO-optimized with consistent design, dynamic addresses from DB */
 import { MapPin, Clock, Globe } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
@@ -38,44 +38,47 @@ export default function OfficesSection() {
   return (
     <section
       id="offices"
-      aria-label="Escritórios internacionais da Enviando Meu Carro para importação e exportação de veículos"
-      className="py-24 bg-card border-y border-white/5 relative overflow-hidden"
+      aria-label="Escritórios internacionais da Enviando Meu Carro"
+      className="py-20 bg-card relative overflow-hidden"
     >
+      {/* Subtle top accent */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" aria-hidden="true" />
+
       <div className="container">
         {/* Section Header */}
-        <header className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mx-auto">
+        <header className="text-center max-w-3xl mx-auto mb-14 space-y-4">
+          <span className="section-badge">
             <Globe className="w-3 h-3" aria-hidden="true" />
             Presença Internacional
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white">
-            Escritórios de <span className="text-primary">Logística Automotiva</span> no Mundo
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            Escritórios de <span className="text-primary">Logística Automotiva</span>
           </h2>
-          <p className="text-muted-foreground text-lg font-body">
+          <p className="text-gray-300 text-lg font-body leading-relaxed">
             Presença estratégica em pontos-chave para garantir agilidade e proximidade em cada etapa
-            do processo de <strong>importação e exportação de veículos</strong>, onde quer que seu veículo esteja.
+            do processo de <strong className="text-white">importação e exportação de veículos</strong>.
           </p>
         </header>
 
-        {/* Offices Grid — semantic address elements */}
-        <div className="grid md:grid-cols-3 gap-8" role="list">
+        {/* Offices Grid — equalized heights with flex */}
+        <div className="grid md:grid-cols-3 gap-5" role="list">
           {offices.map((office) => (
             <article
               key={office.city}
-              className="group p-8 rounded-xl bg-background/50 border border-white/10 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1"
+              className="group flex flex-col p-6 rounded-xl bg-background/50 border border-white/8 hover:border-primary/20 transition-all duration-300"
               role="listitem"
             >
               {/* Flag & City */}
-              <div className="text-4xl mb-4" aria-hidden="true">{office.flag}</div>
-              <h3 className="text-2xl font-display font-bold text-white mb-1">
+              <div className="text-3xl mb-3" aria-hidden="true">{office.flag}</div>
+              <h3 className="text-xl font-display font-bold text-white mb-1">
                 {office.city}
               </h3>
-              <p className="text-primary text-sm font-bold uppercase tracking-wider mb-4">
+              <p className="text-primary text-xs font-bold uppercase tracking-wider mb-4">
                 {office.role}
               </p>
 
               {/* Details — address element for local SEO */}
-              <address className="not-italic space-y-3 text-sm text-muted-foreground font-body">
+              <address className="not-italic space-y-2.5 text-sm text-gray-300 font-body flex-1">
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary/60" aria-hidden="true" />
                   <span>{office.address}</span>
@@ -87,8 +90,8 @@ export default function OfficesSection() {
               </address>
 
               {/* Entity */}
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <p className="text-xs text-muted-foreground/60">{office.entity}</p>
+              <div className="mt-4 pt-3 border-t border-white/5">
+                <p className="text-xs text-gray-500">{office.entity}</p>
               </div>
             </article>
           ))}

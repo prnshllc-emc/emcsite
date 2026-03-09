@@ -1,4 +1,4 @@
-/* ServicesSection — SEO-optimized 6 service cards with semantic HTML, keyword-rich alt text, and article structure */
+/* ServicesSection — SEO-optimized 6 service cards with consistent design */
 import { Ship, Globe, FileText, Plane, Cog, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContact, SERVICE_IMPORT_URL, SERVICE_EXPORT_URL, SERVICE_DESPACHO_URL, SERVICE_AEREO_URL, SERVICE_PECAS_URL, SERVICE_ADMISSAO_URL } from "@/lib/contact";
@@ -60,56 +60,54 @@ export default function ServicesSection() {
     <section
       id="services"
       aria-label="Serviços de importação e exportação de veículos"
-      className="py-24 bg-background relative overflow-hidden"
+      className="py-20 bg-background relative overflow-hidden"
     >
       <div className="container">
         {/* Section Header */}
-        <header className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mx-auto">
-            Nossos Serviços
-          </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white">
+        <header className="text-center max-w-3xl mx-auto mb-14 space-y-4">
+          <span className="section-badge">Nossos Serviços</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
             Soluções Completas em{" "}
-            <span className="text-primary">Logística Automotiva Internacional</span>
+            <span className="text-primary block sm:inline">Logística Automotiva</span>
           </h2>
-          <p className="text-muted-foreground text-lg font-body">
+          <p className="text-gray-300 text-lg font-body leading-relaxed">
             Importação de veículos, exportação, despacho aduaneiro, peças, envios aéreos e admissão temporária.
-            Não importa a complexidade, temos a expertise para transportar seu veículo com segurança para qualquer lugar do mundo.
+            Não importa a complexidade, temos a expertise para transportar seu veículo com segurança.
           </p>
         </header>
 
-        {/* Services Grid — 3x2 with article semantics */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
+        {/* Services Grid — 3x2 */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5" role="list">
           {SERVICES.map((service) => (
             <article
               key={service.title}
-              className="group relative overflow-hidden rounded-xl border border-white/10 bg-card hover:border-primary/30 transition-all duration-300"
+              className="group relative overflow-hidden rounded-xl border border-white/8 bg-card/80 hover:border-primary/25 transition-all duration-300"
               role="listitem"
             >
               {/* Service Image */}
-              <figure className="h-48 overflow-hidden m-0">
+              <figure className="h-44 overflow-hidden m-0">
                 <img
                   src={service.image}
                   alt={service.alt}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
                   decoding="async"
                   width="400"
-                  height="192"
+                  height="176"
                 />
               </figure>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-5">
                 {/* Icon */}
-                <div className="w-12 h-12 rounded bg-primary/20 border border-primary/30 backdrop-blur-sm flex items-center justify-center mb-4 -mt-12 relative z-10 shadow-lg" aria-hidden="true">
-                  <service.icon className="w-6 h-6 text-primary" />
+                <div className="w-11 h-11 rounded-lg bg-primary/15 border border-primary/25 backdrop-blur-sm flex items-center justify-center mb-3 -mt-10 relative z-10 shadow-lg" aria-hidden="true">
+                  <service.icon className="w-5 h-5 text-primary" />
                 </div>
 
-                <h3 className="text-xl font-display font-bold text-white mb-2">
+                <h3 className="text-lg font-display font-bold text-white mb-2">
                   {service.title}
                 </h3>
-                <p className="text-gray-400 text-sm leading-relaxed font-body mb-4">
+                <p className="text-gray-300 text-sm leading-relaxed font-body mb-4">
                   {service.desc}
                 </p>
 
@@ -121,11 +119,11 @@ export default function ServicesSection() {
                     trackWhatsAppClick(`service_${service.title.toLowerCase().replace(/\s+/g, '_')}`, service.message);
                     openContact(service.message);
                   }}
-                  className="border-primary/30 text-primary hover:bg-primary/10"
+                  className="border-primary/25 text-primary hover:bg-primary/10 hover:border-primary/40 text-xs"
                   aria-label={`Solicitar orçamento para ${service.title}`}
                 >
                   Saiba Mais
-                  <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
                 </Button>
               </div>
             </article>
@@ -136,13 +134,13 @@ export default function ServicesSection() {
         <div className="text-center mt-12">
           <Button
             onClick={() => openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.")}
-            className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90"
+            className="cta-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all bg-primary text-primary-foreground hover:bg-primary/90"
             aria-label="Solicitar assessoria completa de importação e exportação de veículos"
           >
             Quero uma Assessoria Completa
             <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
           </Button>
-          <p className="text-muted-foreground text-sm mt-3 font-body">
+          <p className="text-gray-400 text-sm mt-3 font-body">
             Cuidamos de todo o processo para você, do início ao fim.
           </p>
         </div>

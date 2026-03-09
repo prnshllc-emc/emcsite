@@ -1,4 +1,4 @@
-/* Footer — SEO-optimized with semantic HTML, dynamic settings from DB */
+/* Footer — SEO-optimized with consistent design, dynamic settings from DB */
 import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,9 +89,12 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-card border-t border-white/10 pt-20 pb-10" role="contentinfo">
-      <div className="container">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+    <footer className="bg-card pt-16 pb-8" role="contentinfo">
+      {/* Top accent */}
+      <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" aria-hidden="true" />
+
+      <div className="container pt-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="space-y-4">
             <img
@@ -102,18 +105,17 @@ export default function Footer() {
               width="120"
               height="40"
             />
-            <p className="text-muted-foreground text-sm font-body leading-relaxed">
-              O jeito mais Rápido, Seguro e Barato de <strong>importar e exportar veículos</strong> para qualquer lugar do mundo.
-              Logística automotiva internacional com transparência total há mais de 10 anos.
+            <p className="text-gray-400 text-sm font-body leading-relaxed">
+              O jeito mais Rápido, Seguro e Barato de <strong className="text-gray-300">importar e exportar veículos</strong> para qualquer lugar do mundo.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               {instagramUrl && (
                 <a
                   href={instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackCTAClick("Instagram", "footer_social", instagramUrl, "Instagram")}
-                  className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/8 hover:bg-primary hover:border-primary hover:text-white flex items-center justify-center text-gray-400 transition-all"
                   aria-label="Siga a Enviando Meu Carro no Instagram"
                 >
                   <Instagram className="w-5 h-5" aria-hidden="true" />
@@ -125,7 +127,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackCTAClick("Facebook", "footer_social", facebookUrl, "Facebook")}
-                  className="w-10 h-10 rounded bg-white/5 hover:bg-primary hover:text-white flex items-center justify-center text-muted-foreground transition-colors"
+                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/8 hover:bg-primary hover:border-primary hover:text-white flex items-center justify-center text-gray-400 transition-all"
                   aria-label="Siga a Enviando Meu Carro no Facebook"
                 >
                   <Facebook className="w-5 h-5" aria-hidden="true" />
@@ -136,8 +138,8 @@ export default function Footer() {
 
           {/* Navigation Links */}
           <nav aria-label="Links de navegação do rodapé">
-            <h4 className="text-white font-display font-bold text-lg mb-6">Navegação</h4>
-            <ul className="space-y-3 list-none">
+            <h4 className="text-white font-display font-bold mb-5">Navegação</h4>
+            <ul className="space-y-2.5 list-none">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
                   {"external" in link && link.external ? (
@@ -145,7 +147,7 @@ export default function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                      className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
                     >
                       {link.label}
                     </a>
@@ -156,7 +158,7 @@ export default function Footer() {
                         e.preventDefault();
                         scrollTo(link.href);
                       }}
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                      className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
                     >
                       {link.label}
                     </a>
@@ -165,7 +167,7 @@ export default function Footer() {
               ))}
             </ul>
 
-            <h4 className="text-white font-display font-bold text-lg mt-8 mb-4">Serviços</h4>
+            <h4 className="text-white font-display font-bold mt-6 mb-3">Serviços</h4>
             <ul className="space-y-2 list-none">
               {SERVICE_LINKS.map((link) => (
                 <li key={link.label}>
@@ -175,7 +177,7 @@ export default function Footer() {
                       e.preventDefault();
                       scrollTo(link.href);
                     }}
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                    className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
                   >
                     {link.label}
                   </a>
@@ -186,11 +188,11 @@ export default function Footer() {
 
           {/* Contact & Offices */}
           <div>
-            <h4 className="text-white font-display font-bold text-lg mb-6">Contato</h4>
-            <address className="not-italic space-y-4">
+            <h4 className="text-white font-display font-bold mb-5">Contato</h4>
+            <address className="not-italic space-y-3">
               <button
                 onClick={handleWhatsApp}
-                className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                className="flex items-center gap-2.5 text-gray-400 hover:text-primary transition-colors text-sm font-body"
                 aria-label="Entrar em contato via WhatsApp"
               >
                 <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
@@ -199,20 +201,20 @@ export default function Footer() {
               <a
                 href={`mailto:${emailAddr}`}
                 onClick={() => trackCTAClick("Email Footer", "footer_contact", `mailto:${emailAddr}`, "Email")}
-                className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors text-sm font-body"
+                className="flex items-center gap-2.5 text-gray-400 hover:text-primary transition-colors text-sm font-body"
                 aria-label="Enviar email para atendimento da Enviando Meu Carro"
               >
                 <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 {emailAddr}
               </a>
-              <div className="pt-2 space-y-3">
+              <div className="pt-2 space-y-2.5">
                 {offices.map((office) => (
-                  <div key={office.name} className="flex items-start gap-3 text-muted-foreground text-sm font-body">
-                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <div key={office.name} className="flex items-start gap-2.5 text-gray-400 text-sm font-body">
+                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary/50" aria-hidden="true" />
                     <div>
-                      <span className="text-white font-medium">{office.flag} {office.name}</span>
+                      <span className="text-gray-300 font-medium">{office.flag} {office.name}</span>
                       <br />
-                      <span className="text-xs">{office.addr}</span>
+                      <span className="text-xs text-gray-500">{office.addr}</span>
                     </div>
                   </div>
                 ))}
@@ -222,25 +224,24 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-white font-display font-bold text-lg mb-6">Newsletter</h4>
-            <p className="text-muted-foreground text-sm font-body mb-4">
-              Receba condições exclusivas e informações sobre <strong>importação e exportação de veículos</strong>,
-              novidades do mercado automotivo e dicas de logística internacional.
+            <h4 className="text-white font-display font-bold mb-5">Newsletter</h4>
+            <p className="text-gray-400 text-sm font-body mb-4 leading-relaxed">
+              Receba condições exclusivas e informações sobre <strong className="text-gray-300">importação e exportação de veículos</strong>.
             </p>
-            <form onSubmit={handleNewsletter} className="space-y-3" aria-label="Formulário de inscrição na newsletter">
+            <form onSubmit={handleNewsletter} className="space-y-2.5" aria-label="Formulário de inscrição na newsletter">
               <Input
                 type="email"
                 placeholder="Digite seu e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-background/50 border-white/10 focus:border-primary"
+                className="bg-background/50 border-white/15 focus:border-primary h-10 text-sm"
                 required
                 aria-label="Endereço de e-mail para newsletter"
               />
               <Button
                 type="submit"
                 disabled={subscribeMutation.isPending}
-                className="w-full bg-primary hover:bg-primary/90 font-bold tracking-wider uppercase text-sm"
+                className="w-full bg-primary hover:bg-primary/90 font-bold tracking-wider uppercase text-xs h-10"
               >
                 {subscribeMutation.isPending ? "Enviando..." : "Inscrever-se"}
               </Button>
@@ -249,9 +250,9 @@ export default function Footer() {
         </div>
 
         {/* Instituto Ayrton Senna */}
-        <div className="border-t border-white/10 mt-12 pt-8">
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm font-body">
-            <Heart className="w-4 h-4 text-primary" aria-hidden="true" />
+        <div className="border-t border-white/8 mt-10 pt-8">
+          <div className="flex items-center justify-center gap-2 text-gray-400 text-sm font-body">
+            <Heart className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
             <span>
               Na Enviando Meu Carro apoiamos o{" "}
               <a
@@ -262,16 +263,16 @@ export default function Footer() {
               >
                 Instituto Ayrton Senna
               </a>
-              , acreditamos no impacto das boas ações e inspiramos outros a também transformar vidas.
+              , acreditamos no impacto das boas ações.
             </span>
           </div>
         </div>
 
         {/* Membro Afiliado */}
-        <div className="border-t border-white/10 mt-8 pt-8">
-          <div className="flex flex-col items-center gap-5">
-            <h4 className="text-white font-display font-bold text-lg tracking-widest uppercase">Membro Afiliado</h4>
-            <div className="bg-white rounded-lg px-10 py-5 flex items-center gap-10">
+        <div className="border-t border-white/8 mt-6 pt-8">
+          <div className="flex flex-col items-center gap-4">
+            <h4 className="text-white font-display font-bold text-sm tracking-widest uppercase">Membro Afiliado</h4>
+            <div className="bg-white rounded-lg px-6 py-3 flex items-center gap-6">
               <a
                 href="https://www.aaca.org"
                 target="_blank"
@@ -281,14 +282,14 @@ export default function Footer() {
               >
                 <img
                   src={CLUB_AACA_URL}
-                  alt="Antique Automobile Club of America - AACA - Fundado em 1935"
-                  className="h-14 md:h-18 w-auto group-hover:scale-105 transition-transform"
+                  alt="Antique Automobile Club of America - AACA"
+                  className="h-12 md:h-16 w-auto group-hover:scale-105 transition-transform"
                   loading="lazy"
                   width="108"
                   height="80"
                 />
               </a>
-              <div className="w-px h-12 bg-gray-300" />
+              <div className="w-px h-10 bg-gray-300" />
               <a
                 href="https://www.automovelclube.com.br"
                 target="_blank"
@@ -298,35 +299,35 @@ export default function Footer() {
               >
                 <img
                   src={CLUB_ACB_URL}
-                  alt="Automóvel Clube do Brasil - ACB - Fundado em 1907"
-                  className="h-14 md:h-18 w-auto group-hover:scale-105 transition-transform"
+                  alt="Automóvel Clube do Brasil - ACB"
+                  className="h-12 md:h-16 w-auto group-hover:scale-105 transition-transform"
                   loading="lazy"
                   width="80"
                   height="80"
                 />
               </a>
             </div>
-            <p className="text-muted-foreground text-xs font-body text-center max-w-md">
+            <p className="text-gray-500 text-xs font-body text-center max-w-md">
               Orgulhosamente afiliados aos mais tradicionais clubes de automóveis clássicos do Brasil e dos Estados Unidos.
             </p>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm font-body">
+        <div className="border-t border-white/8 mt-8 pt-6 pb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-gray-400 text-sm font-body">
             © {new Date().getFullYear()} Enviando Meu Carro (EMC) — Importação e Exportação de Veículos — Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
             <Link
               href="/politica-de-privacidade"
-              className="text-muted-foreground hover:text-primary text-sm font-body transition-colors"
+              className="text-gray-400 hover:text-primary text-sm font-body transition-colors"
             >
               Política de Privacidade
             </Link>
             <Link
               href="/politica-de-privacidade"
-              className="text-muted-foreground hover:text-primary text-sm font-body transition-colors"
+              className="text-gray-400 hover:text-primary text-sm font-body transition-colors"
             >
               Termos de Uso
             </Link>

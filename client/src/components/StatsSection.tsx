@@ -1,10 +1,11 @@
-/* StatsSection — SEO-optimized company numbers with semantic HTML and keyword-rich content */
+/* StatsSection — SEO-optimized company numbers with improved visual consistency */
+import { Ship, Clock, Star, Globe } from "lucide-react";
 
 const STATS = [
-  { value: "+1.500", label: "Veículos Transportados" },
-  { value: "10+", label: "Anos de Experiência" },
-  { value: "5.0 ★", label: "Avaliação Google" },
-  { value: "3", label: "Escritórios Internacionais" },
+  { icon: Ship, value: "+1.500", label: "Veículos Transportados", desc: "Importados e exportados com segurança" },
+  { icon: Clock, value: "10+", label: "Anos de Experiência", desc: "Referência em logística automotiva" },
+  { icon: Star, value: "5.0 ★", label: "Avaliação Google", desc: "Nota máxima com 18+ avaliações" },
+  { icon: Globe, value: "3", label: "Escritórios", desc: "Miami, São Paulo e Itajaí" },
 ];
 
 export default function StatsSection() {
@@ -12,58 +13,53 @@ export default function StatsSection() {
     <section
       id="stats"
       aria-label="Números e resultados da Enviando Meu Carro em importação e exportação de veículos"
-      className="py-24 bg-card border-y border-white/5 relative overflow-hidden"
+      className="py-20 bg-card relative overflow-hidden"
     >
-      {/* Grid Pattern Background */}
-      <div
-        className="absolute inset-0 opacity-100"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #80808012 1px, transparent 1px), linear-gradient(to bottom, #80808012 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
+      {/* Subtle top accent */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" aria-hidden="true" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" aria-hidden="true" />
 
       <div className="container relative z-10">
         {/* Section Header */}
-        <header className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-white">
-            Quem entende de <span className="text-primary">importação de carros</span>, escolhe a{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-400">
-              EMC
-            </span>
+        <header className="text-center max-w-3xl mx-auto mb-14 space-y-4">
+          <span className="section-badge">Nossos Números</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+            Quem Entende de <span className="text-primary">Importação de Carros</span>, Escolhe a EMC
           </h2>
-          <p className="text-muted-foreground text-lg font-body">
+          <p className="text-gray-300 text-lg font-body leading-relaxed">
             Nossos números refletem mais de uma década de compromisso com transparência, segurança e excelência
-            em <strong>logística automotiva internacional</strong> — importação, exportação e muito mais.
+            em <strong className="text-white">logística automotiva internacional</strong>.
           </p>
         </header>
 
-        {/* Stats Grid — semantic list */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8" role="list" aria-label="Estatísticas da empresa">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" role="list" aria-label="Estatísticas da empresa">
           {STATS.map((stat) => (
-            <div
+            <article
               key={stat.label}
-              className="group relative bg-background/50 backdrop-blur-sm border border-white/10 rounded-lg p-6 text-center hover:border-primary/50 transition-all duration-300"
+              className="group relative p-6 md:p-8 rounded-xl bg-background/50 border border-white/8 hover:border-primary/25 transition-all duration-300 text-center"
               role="listitem"
             >
-              {/* Hover Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 blur-lg transition-opacity duration-500 rounded-lg" aria-hidden="true" />
-
-              {/* Decorative Corners */}
-              <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-primary/30" aria-hidden="true" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-primary/30" aria-hidden="true" />
-
-              <div className="relative z-10">
-                <p className="text-4xl md:text-5xl font-display font-bold text-white tracking-tighter">
-                  {stat.value}
-                </p>
-                <p className="text-xs font-bold text-primary tracking-widest uppercase mt-2">
-                  {stat.label}
-                </p>
+              {/* Icon */}
+              <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/15 transition-colors" aria-hidden="true">
+                <stat.icon className="w-5 h-5 text-primary" />
               </div>
-            </div>
+
+              {/* Value */}
+              <p className="text-3xl md:text-4xl font-display font-extrabold text-white mb-1 tracking-tight">
+                {stat.value}
+              </p>
+
+              {/* Label */}
+              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                {stat.label}
+              </p>
+
+              {/* Description */}
+              <p className="text-xs text-gray-400 font-body">
+                {stat.desc}
+              </p>
+            </article>
           ))}
         </div>
       </div>

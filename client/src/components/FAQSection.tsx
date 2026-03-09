@@ -1,4 +1,4 @@
-/* FAQSection — SEO-optimized FAQ with tracking on accordion and CTA */
+/* FAQSection — SEO-optimized FAQ with consistent design and tracking */
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -103,26 +103,26 @@ export default function FAQSection() {
     <section
       id="faq"
       aria-label="Perguntas frequentes sobre importação e exportação de veículos"
-      className="py-24 bg-background relative overflow-hidden"
+      className="py-20 bg-background relative overflow-hidden"
     >
       <div className="container">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <header className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl md:text-5xl font-bold text-white">
-              Dúvidas Frequentes sobre <span className="text-primary">Importação de Veículos</span>
+          <header className="text-center mb-14 space-y-4">
+            <span className="section-badge">FAQ</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+              Dúvidas sobre <span className="text-primary">Importação de Veículos</span>
             </h2>
-            <p className="text-muted-foreground text-lg font-body">
-              Tudo o que você precisa saber sobre <strong>como importar carro</strong>, exportação de veículos,
-              custos, prazos, impostos e logística automotiva internacional.
+            <p className="text-gray-300 text-lg font-body leading-relaxed">
+              Tudo sobre <strong className="text-white">como importar carro</strong>, exportação, custos, prazos, impostos e logística automotiva.
             </p>
           </header>
 
-          {/* Accordion — semantic dl structure */}
+          {/* Accordion */}
           <Accordion
             type="single"
             collapsible
-            className="space-y-4"
+            className="space-y-3"
             value={openValue}
             onValueChange={handleValueChange}
           >
@@ -130,12 +130,12 @@ export default function FAQSection() {
               <AccordionItem
                 key={i}
                 value={`faq-${i}`}
-                className="border border-white/10 bg-card rounded-lg px-6"
+                className="border border-white/8 bg-card/80 rounded-lg px-5"
               >
-                <AccordionTrigger className="text-lg font-medium text-white hover:text-primary hover:no-underline py-6 text-left">
+                <AccordionTrigger className="text-base font-medium text-white hover:text-primary hover:no-underline py-5 text-left">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 text-base leading-relaxed font-body">
+                <AccordionContent className="text-gray-300 pb-5 text-sm leading-relaxed font-body">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -143,13 +143,13 @@ export default function FAQSection() {
           </Accordion>
 
           {/* CTA */}
-          <div className="text-center mt-12 space-y-3">
-            <p className="text-muted-foreground font-body">
-              Ainda tem dúvidas sobre importação ou exportação de veículos? Nossa equipe está pronta para te ajudar.
+          <div className="text-center mt-10 space-y-3">
+            <p className="text-gray-400 text-sm font-body">
+              Ainda tem dúvidas? Nossa equipe está pronta para te ajudar.
             </p>
             <Button
               onClick={handleCTA}
-              className="h-14 px-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:scale-105 transition-transform bg-[#25D366] text-white hover:bg-[#128C7E]"
+              className="h-12 px-7 text-base font-bold uppercase tracking-wider shadow-lg hover:scale-[1.02] transition-all bg-[#25D366] text-white hover:bg-[#20BD5A]"
               aria-label="Tirar dúvidas sobre importação de veículos no WhatsApp"
             >
               <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
