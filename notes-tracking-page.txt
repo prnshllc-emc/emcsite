@@ -1,0 +1,10 @@
+Tracking page observations:
+- Clean dark design matching EMC brand
+- Ship icon in red/primary color at top
+- "Rastreie Seu Veículo" heading with Chakra Petch font
+- Input field with EMC-XXXX-XXXX-XXXX placeholder, centered, monospace
+- Red "RASTREAR" button with search icon
+- Info box explaining where to find the tracking code
+- EMC logo in header with "Voltar ao site" link
+- Footer with copyright
+- Page looks professional and on-brand

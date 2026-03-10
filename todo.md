@@ -159,3 +159,56 @@
 - [x] Integrate real-time sync into newsletter subscribe tRPC mutation (fire-and-forget)
 - [x] Update scheduled task from 00:01 to 23:50 BRT as incremental retry for failed syncs
 - [x] Test real-time sync and retry logic (14 tests passing, token validated)
+
+## Phase 17: Update WhatsApp Number
+- [x] Update all WhatsApp links to +55 11 992448920 (already configured correctly)
+
+## Phase 18: Cargo Tracking Backend - Database & Foundation
+- [x] Install additional dependencies (p-limit, nanoid, express-rate-limit)
+- [x] Configure environment variables (DATA_ENCRYPTION_KEY)
+- [x] Create full database schema (12 tables) in drizzle/schema.ts
+- [x] Create relations in drizzle/relations.ts
+- [x] Run pnpm db:push to sync schema
+- [x] Create shared/schemas.ts (ClientDataSchema, VehicleDataSchema, etc.)
+
+## Phase 19: Shared Infrastructure
+- [x] Create server/shared/pagination.ts (PaginatedQuerySchema + helpers)
+- [x] Create server/shared/security.ts (AES-256-GCM, HMAC, rate limiting)
+- [x] Create server/shared/retry.ts (withRetry with exponential backoff)
+- [x] Create server/shared/cache.ts (InMemoryCache with TTL)
+- [x] Create server/shared/audit.ts + audit.repository.ts
+- [x] Create server/shared/config.repository.ts (system_config CRUD + cache)
+- [x] Create server/shared/events.ts (EventEmitter for SSE)
+
+## Phase 20: Core Domain Modules
+- [x] Customers module (repository + service + router)
+- [x] Vehicles module (repository + service + router)
+- [x] Bills of Lading module (repository + service + router)
+
+## Phase 21: Tracking & Reconciliation
+- [x] Tracking codes repository + tracking history repository
+- [x] Tracking service (lifecycle management)
+- [x] Tracking router (admin + public endpoints)
+- [ ] Reconciliation service + router (deferred)
+
+## Phase 22: Admin Panel Frontend
+- [x] Admin layout with sidebar navigation (existing tabs extended)
+- [ ] Dashboard page (overview stats) — deferred
+- [ ] Customers CRUD page — deferred
+- [x] BLs management tab in Admin panel
+- [ ] Vehicles page — deferred
+- [x] Tracking Codes management tab in Admin panel
+
+## Phase 23: Public Tracking Page
+- [x] Tracking input page (code entry + CPF verification)
+- [x] Tracking result page (status + timeline + progress)
+- [x] Connect Rastrear button in header to tracking page (/rastrear)
+- [x] Remove "Em Breve" badge from Rastrear button
+
+## Phase 24: Tests & Verification
+- [x] Security module tests (encryption, hashing, CPF validation, VIN validation)
+- [x] Cache and rate limiter tests
+- [x] Tracking schema validation tests (71 tests passing)
+- [x] Code generation uniqueness and format tests
+- [x] Masking and sanitization tests
+- [x] End-to-end compilation verification

@@ -22,6 +22,13 @@
       "when": 1773149117556,
       "tag": "0002_large_karnak",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1773152938780,
+      "tag": "0003_greedy_nova",
+      "breakpoints": true
     }
   ]
 }

@@ -16,6 +16,12 @@ import {
 } from "./db";
 import { syncLeadToHubSpot } from "./hubspotSync";
 
+// ── Domain module routers ───────────────────────────────────
+import { customersRouter } from "./modules/customers/router";
+import { vehiclesRouter } from "./modules/vehicles/router";
+import { blsRouter } from "./modules/bls/router";
+import { trackingRouter } from "./modules/tracking/router";
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -26,6 +32,12 @@ export const appRouter = router({
       return { success: true } as const;
     }),
   }),
+
+  // ===== Domain Modules =====
+  customers: customersRouter,
+  vehicles: vehiclesRouter,
+  bls: blsRouter,
+  tracking: trackingRouter,
 
   // ===== Admin: Site Settings =====
   settings: router({

@@ -43,10 +43,14 @@ import {
   Shield,
   Globe,
   Pencil,
+  FileText,
+  QrCode,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
+import BlsPanel from "@/components/admin/BlsPanel";
+import TrackingPanel from "@/components/admin/TrackingPanel";
 
 // ============================================================
 // TYPES
@@ -230,14 +234,22 @@ export default function Admin() {
       {/* Main Content */}
       <main className="container py-8">
         <Tabs defaultValue="settings" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="settings" className="font-display">
-              <Settings className="mr-2 h-4 w-4" />
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+            <TabsTrigger value="settings" className="font-display text-xs">
+              <Settings className="mr-1.5 h-4 w-4" />
               Configurações
             </TabsTrigger>
-            <TabsTrigger value="newsletter" className="font-display">
-              <Mail className="mr-2 h-4 w-4" />
+            <TabsTrigger value="newsletter" className="font-display text-xs">
+              <Mail className="mr-1.5 h-4 w-4" />
               Newsletter
+            </TabsTrigger>
+            <TabsTrigger value="bls" className="font-display text-xs">
+              <FileText className="mr-1.5 h-4 w-4" />
+              BLs
+            </TabsTrigger>
+            <TabsTrigger value="tracking" className="font-display text-xs">
+              <QrCode className="mr-1.5 h-4 w-4" />
+              Rastreamento
             </TabsTrigger>
           </TabsList>
 
@@ -247,6 +259,14 @@ export default function Admin() {
 
           <TabsContent value="newsletter">
             <NewsletterPanel />
+          </TabsContent>
+
+          <TabsContent value="bls">
+            <BlsPanel />
+          </TabsContent>
+
+          <TabsContent value="tracking">
+            <TrackingPanel />
           </TabsContent>
         </Tabs>
       </main>

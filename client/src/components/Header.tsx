@@ -1,9 +1,8 @@
 /* Header — SEO-optimized with semantic nav, tracking events, and accessibility */
 import { useState, useEffect } from "react";
-import { Clock, Menu, Truck, X } from "lucide-react";
+import { Menu, Truck, X } from "lucide-react";
 import { LOGO_URL } from "@/lib/contact";
 import { trackNavClick } from "@/lib/analytics";
-import { toast } from "sonner";
 
 const NAV_ITEMS = [
   { label: "Início", anchor: "#inicio" },
@@ -34,12 +33,6 @@ export default function Header() {
     const el = document.querySelector(anchor);
     if (el) el.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
-  }
-
-  function handleTrackingComingSoon() {
-    toast.info("Rastreamento em breve! Estamos finalizando esta funcionalidade para você.", {
-      duration: 4000,
-    });
   }
 
   return (
@@ -88,19 +81,15 @@ export default function Header() {
             </a>
           ))}
 
-          {/* Tracking Coming Soon - subtle pill */}
-          <button
-            onClick={handleTrackingComingSoon}
-            className="whitespace-nowrap ml-2 text-[12px] xl:text-[13px] font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1.5 border border-white/8 px-3 py-1.5 rounded-full bg-white/3 cursor-default hover:bg-white/5 transition-colors"
-            aria-label="Rastreamento de veículos — em breve"
+          {/* Tracking Button — Active link to /rastrear */}
+          <a
+            href="/rastrear"
+            className="whitespace-nowrap ml-2 text-[12px] xl:text-[13px] font-semibold text-white uppercase tracking-wider flex items-center gap-1.5 border border-primary/40 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 hover:border-primary/60 transition-all"
+            aria-label="Rastrear veículo"
           >
             <Truck className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
             <span>Rastrear</span>
-            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-primary/15 text-primary/80 px-1.5 py-0.5 rounded-full">
-              <Clock className="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" />
-              Breve
-            </span>
-          </button>
+          </a>
         </nav>
 
         {/* Mobile Hamburger */}
@@ -131,21 +120,14 @@ export default function Header() {
                 {item.label}
               </a>
             ))}
-            <button
-              onClick={() => {
-                handleTrackingComingSoon();
-                setMobileOpen(false);
-              }}
-              className="text-sm font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2 border border-white/8 px-3 py-2.5 rounded-full bg-white/3 w-fit cursor-default mt-2"
-              aria-label="Rastreamento de veículos — em breve"
+            <a
+              href="/rastrear"
+              className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2 border border-primary/40 px-4 py-2.5 rounded-full bg-primary/10 hover:bg-primary/20 w-fit mt-2"
+              aria-label="Rastrear veículo"
             >
               <Truck className="w-4 h-4" aria-hidden="true" />
               <span>Rastrear</span>
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-primary/15 text-primary/80 px-1.5 py-0.5 rounded-full">
-                <Clock className="w-2.5 h-2.5" aria-hidden="true" />
-                Breve
-              </span>
-            </button>
+            </a>
           </nav>
         </div>
       )}
