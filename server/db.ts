@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, isNull, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, siteSettings, newsletterSubscribers, type InsertSiteSetting, type InsertNewsletterSubscriber } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -140,12 +140,29 @@ export async function getAllSubscribers() {
   return db.select().from(newsletterSubscribers);
 }
 
-export async function addSubscriber(data: { email: string; name?: string }) {
+export async function addSubscriber(data: {
+  email: string;
+  name?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
+  referrer?: string;
+  landingPage?: string;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.insert(newsletterSubscribers).values({
     email: data.email,
     name: data.name ?? null,
+    utmSource: data.utmSource ?? null,
+    utmMedium: data.utmMedium ?? null,
+    utmCampaign: data.utmCampaign ?? null,
+    utmContent: data.utmContent ?? null,
+    utmTerm: data.utmTerm ?? null,
+    referrer: data.referrer ?? null,
+    landingPage: data.landingPage ?? null,
   }).onDuplicateKeyUpdate({
     set: {
       active: true,
@@ -166,4 +183,27 @@ export async function toggleSubscriberActive(id: number, active: boolean) {
   await db.update(newsletterSubscribers)
     .set({ active, unsubscribedAt: active ? null : new Date() })
     .where(eq(newsletterSubscribers.id, id));
+}
+
+// ===== HubSpot Sync =====
+
+export async function getUnsyncedSubscribers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(newsletterSubscribers)
+    .where(isNull(newsletterSubscribers.hubspotSyncedAt));
+}
+
+export async function markSubscribersAsSynced(ids: number[], hubspotContactIds: Map<number, string>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  for (const id of ids) {
+    const contactId = hubspotContactIds.get(id) ?? null;
+    await db.update(newsletterSubscribers)
+      .set({
+        hubspotSyncedAt: new Date(),
+        hubspotContactId: contactId,
+      })
+      .where(eq(newsletterSubscribers.id, id));
+  }
 }

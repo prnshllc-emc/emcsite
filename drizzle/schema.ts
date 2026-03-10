@@ -44,6 +44,17 @@ export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
   active: boolean("active").default(true).notNull(),
   subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
   unsubscribedAt: timestamp("unsubscribedAt"),
+  // UTM tracking fields
+  utmSource: varchar("utm_source", { length: 256 }),
+  utmMedium: varchar("utm_medium", { length: 256 }),
+  utmCampaign: varchar("utm_campaign", { length: 256 }),
+  utmContent: varchar("utm_content", { length: 256 }),
+  utmTerm: varchar("utm_term", { length: 256 }),
+  referrer: varchar("referrer", { length: 512 }),
+  landingPage: varchar("landing_page", { length: 512 }),
+  // HubSpot sync tracking
+  hubspotSyncedAt: timestamp("hubspot_synced_at"),
+  hubspotContactId: varchar("hubspot_contact_id", { length: 64 }),
 });
 
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;

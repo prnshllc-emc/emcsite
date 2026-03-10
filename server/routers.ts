@@ -85,6 +85,13 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           name: z.string().optional(),
+          utmSource: z.string().optional(),
+          utmMedium: z.string().optional(),
+          utmCampaign: z.string().optional(),
+          utmContent: z.string().optional(),
+          utmTerm: z.string().optional(),
+          referrer: z.string().optional(),
+          landingPage: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {

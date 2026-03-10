@@ -15,6 +15,13 @@
       "when": 1773076731843,
       "tag": "0001_absent_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773149117556,
+      "tag": "0002_large_karnak",
+      "breakpoints": true
     }
   ]
 }

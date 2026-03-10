@@ -145,3 +145,11 @@
 - [x] Integrate consent checks with existing analytics tracking
 - [x] Add banner to App.tsx
 - [x] Visual verification and testing
+
+## Phase 15: Daily Lead Export to HubSpot
+- [x] Analyze lead data structure in DB (newsletter_subscribers table)
+- [x] Check HubSpot MCP tools available for contact creation
+- [x] Ensure UTM/referrer tracking data is captured with leads
+- [ ] Build export script that syncs leads to HubSpot with "Canal de Aquisição" = "Site" and "Origem" from tracking
+- [ ] Schedule daily task at 00:01 BRT
+- [ ] Test end-to-end flow
