@@ -150,6 +150,12 @@
 - [x] Analyze lead data structure in DB (newsletter_subscribers table)
 - [x] Check HubSpot MCP tools available for contact creation
 - [x] Ensure UTM/referrer tracking data is captured with leads
-- [ ] Build export script that syncs leads to HubSpot with "Canal de Aquisição" = "Site" and "Origem" from tracking
-- [ ] Schedule daily task at 00:01 BRT
-- [ ] Test end-to-end flow
+- [x] Build export script that syncs leads to HubSpot with "Canal de Aquisição" = "Site" and "Origem" from tracking
+- [x] Schedule daily task at 00:01 BRT
+- [x] Test end-to-end flow
+
+## Phase 16: Real-time HubSpot Sync + Incremental Retry
+- [x] Create server-side HubSpot sync service (REST API v3 with Private App Token)
+- [x] Integrate real-time sync into newsletter subscribe tRPC mutation (fire-and-forget)
+- [x] Update scheduled task from 00:01 to 23:50 BRT as incremental retry for failed syncs
+- [x] Test real-time sync and retry logic (14 tests passing, token validated)

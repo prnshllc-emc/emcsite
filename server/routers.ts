@@ -12,7 +12,9 @@ import {
   addSubscriber,
   removeSubscriber,
   toggleSubscriberActive,
+  markSubscribersAsSynced,
 } from "./db";
+import { syncLeadToHubSpot } from "./hubspotSync";
 
 export const appRouter = router({
   system: systemRouter,
@@ -95,7 +97,36 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
+        // 1. Save to database
         await addSubscriber(input);
+
+        // 2. Sync to HubSpot in real-time (fire-and-forget, don't block the user)
+        syncLeadToHubSpot(input)
+          .then(async (hubspotContactId) => {
+            if (hubspotContactId) {
+              // Mark as synced in DB
+              const { getDb } = await import("./db");
+              const db = await getDb();
+              if (db) {
+                const { eq } = await import("drizzle-orm");
+                const { newsletterSubscribers } = await import("../drizzle/schema");
+                await db.update(newsletterSubscribers)
+                  .set({
+                    hubspotSyncedAt: new Date(),
+                    hubspotContactId: hubspotContactId,
+                  })
+                  .where(eq(newsletterSubscribers.email, input.email));
+              }
+              console.log(`[HubSpot] Lead ${input.email} synced successfully (ID: ${hubspotContactId})`);
+            } else {
+              console.warn(`[HubSpot] Lead ${input.email} sync returned no ID — will retry in nightly job`);
+            }
+          })
+          .catch((err) => {
+            console.error(`[HubSpot] Real-time sync failed for ${input.email}:`, err);
+            // Will be retried by the nightly 23:50 job
+          });
+
         return { success: true };
       }),
   }),
