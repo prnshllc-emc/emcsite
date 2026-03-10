@@ -262,3 +262,47 @@ export async function validateHubSpotToken(): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Validate that the HubSpot token has write permission.
+ * Creates a test contact, then immediately deletes it.
+ * Returns true if the token can create contacts.
+ */
+export async function validateHubSpotWritePermission(): Promise<boolean> {
+  const testEmail = `manus-test-${Date.now()}@gmail.com`;
+  try {
+    // Try to create a test contact
+    const createResponse = await hubspotFetch("/crm/v3/objects/contacts", {
+      method: "POST",
+      body: JSON.stringify({
+        properties: {
+          email: testEmail,
+          firstname: "EMC_Test",
+          lastname: "Validation",
+        },
+      }),
+    });
+
+    if (!createResponse.ok) {
+      const errorText = await createResponse.text();
+      console.error("[HubSpot] Write permission test failed:", createResponse.status, errorText);
+      return false;
+    }
+
+    const data = await createResponse.json();
+    const contactId = data.id;
+
+    // Clean up: delete the test contact
+    if (contactId) {
+      await hubspotFetch(`/crm/v3/objects/contacts/${contactId}`, {
+        method: "DELETE",
+      });
+      console.log(`[HubSpot] Write permission validated. Test contact ${contactId} created and deleted.`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("[HubSpot] Write permission validation error:", error);
+    return false;
+  }
+}
