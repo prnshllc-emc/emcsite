@@ -212,3 +212,34 @@
 - [x] Code generation uniqueness and format tests
 - [x] Masking and sanitization tests
 - [x] End-to-end compilation verification
+
+## Phase 25: AI Agent API for BL Ingestion
+- [x] Create API key authentication middleware for agent access (x-agent-api-key / Bearer)
+- [x] Create REST endpoints: POST /api/agent/bl, PUT /api/agent/bl, POST /api/agent/tracking-event
+- [x] Create POST /api/agent/generate-code endpoint
+- [x] Create POST /api/agent/ingest bulk operations endpoint
+- [x] Create GET /api/agent/health and GET /api/agent/stats endpoints
+- [x] Create GET /api/agent/bl/:blNumber detail endpoint
+- [x] Auto-resolve customers by CPF (create if not exists)
+- [x] Auto-resolve vehicles by VIN (create if not exists)
+- [x] Write comprehensive AI agent prompt document (docs/AGENT_PROMPT.md)
+- [x] Test agent API schemas and logic (63 tests passing)
+
+## Phase 26: Admin Dashboard with Overview Statistics
+- [x] Create dashboard.stats tRPC endpoint (BLs by status, active codes, customers, vehicles, recent events)
+- [x] Build DashboardPanel component with KPI cards (Total BLs, Em Trânsito, Códigos Ativos, Clientes, Veículos)
+- [x] Add BLs por Status breakdown with progress bars
+- [x] Add recent activity feed with event timeline
+- [x] Dashboard is now the default tab in admin panel
+- [x] Auto-refresh every 60 seconds
+
+## Phase 27: Automatic Notifications on Tracking Events
+- [x] Create centralized notification module (server/modules/tracking/notifications.ts)
+- [x] Event importance classification (critical/high/normal/low)
+- [x] Owner notifications via Manus built-in notification service
+- [x] WhatsApp message templates for tracking events and new codes
+- [x] Integrated notification dispatch into tracking service (fire-and-forget)
+- [x] Notifications on: tracking events, new tracking codes, agent ingestion
+- [x] Portuguese-localized status labels and emoji per event type
+- [ ] WhatsApp Business API integration (ready for future — templates prepared)
+- [ ] Customer notification preferences (deferred)

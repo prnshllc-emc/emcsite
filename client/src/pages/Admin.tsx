@@ -45,12 +45,14 @@ import {
   Pencil,
   FileText,
   QrCode,
+  LayoutDashboard,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 import BlsPanel from "@/components/admin/BlsPanel";
 import TrackingPanel from "@/components/admin/TrackingPanel";
+import DashboardPanel from "@/components/admin/DashboardPanel";
 
 // ============================================================
 // TYPES
@@ -233,8 +235,12 @@ export default function Admin() {
 
       {/* Main Content */}
       <main className="container py-8">
-        <Tabs defaultValue="settings" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5">
+            <TabsTrigger value="dashboard" className="font-display text-xs">
+              <LayoutDashboard className="mr-1.5 h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
             <TabsTrigger value="settings" className="font-display text-xs">
               <Settings className="mr-1.5 h-4 w-4" />
               Configurações
@@ -252,6 +258,10 @@ export default function Admin() {
               Rastreamento
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard">
+            <DashboardPanel />
+          </TabsContent>
 
           <TabsContent value="settings">
             <SettingsPanel />

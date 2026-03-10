@@ -8,6 +8,7 @@ import * as customerRepo from "../customers/repository";
 import { logAudit } from "../../shared/audit";
 import { hashCpfForSearch } from "../../shared/security";
 import { InMemoryCache } from "../../shared/cache";
+import { dispatchEventNotifications, notifyNewTrackingCode } from "./notifications";
 import type { PaginatedQuery, PaginatedResult } from "../../shared/pagination";
 
 // ── Cache for public tracking lookups (5 min TTL) ────────────
@@ -77,6 +78,15 @@ export async function generateTrackingCode(
       customerId: { before: null, after: customerId },
     },
   });
+
+  // Notify about new tracking code (fire-and-forget)
+  notifyNewTrackingCode({
+    blNumber: bl.blNumber,
+    trackingCode: code.code,
+    customerName: customer.fullName,
+    customerId: customer.id,
+    vehicleDescription: bl.vehicleDescription,
+  }).catch((err) => console.error("[Tracking Service] Code notification error:", err));
 
   return code;
 }
@@ -257,6 +267,19 @@ export async function addTrackingEvent(
       blId: { before: null, after: data.blId },
     },
   });
+
+  // Dispatch notifications (fire-and-forget)
+  dispatchEventNotifications({
+    blId: data.blId,
+    blNumber: bl.blNumber,
+    eventType: data.status,
+    title: data.description ?? data.status,
+    description: data.description,
+    location: data.location,
+    eventDate: data.eventDate ?? new Date(),
+    vehicleDescription: bl.vehicleDescription,
+    customerId: bl.customerId ?? undefined,
+  }).catch((err) => console.error("[Tracking Service] Notification dispatch error:", err));
 
   return event;
 }

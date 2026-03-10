@@ -39,6 +39,38 @@ export const appRouter = router({
   bls: blsRouter,
   tracking: trackingRouter,
 
+  // ===== Admin Dashboard Stats =====
+  dashboard: router({
+    stats: adminProcedure.query(async () => {
+      const [blsByStatus, activeBls, activeCodes, activeCustomers, activeVehicles, recentEvents] = await Promise.all([
+        import("./modules/bls/service").then(m => m.countBlsByStatus()),
+        import("./modules/bls/service").then(m => m.countActiveBls()),
+        import("./modules/tracking/service").then(m => m.countActiveCodes()),
+        import("./modules/customers/service").then(m => m.countActiveCustomers()),
+        import("./modules/vehicles/service").then(m => m.countActiveVehicles()),
+        import("./modules/tracking/repository").then(async m => {
+          // Get recent events across all BLs (last 10)
+          const { getDb } = await import("./db");
+          const db = await getDb();
+          if (!db) return [];
+          const { trackingHistory } = await import("../drizzle/schema");
+          const { desc } = await import("drizzle-orm");
+          const rows = await db.select().from(trackingHistory).orderBy(desc(trackingHistory.eventDate)).limit(10);
+          return rows;
+        }),
+      ]);
+
+      return {
+        blsByStatus,
+        activeBls,
+        activeCodes,
+        activeCustomers,
+        activeVehicles,
+        recentEvents,
+      };
+    }),
+  }),
+
   // ===== Admin: Site Settings =====
   settings: router({
     list: adminProcedure.query(async () => {
