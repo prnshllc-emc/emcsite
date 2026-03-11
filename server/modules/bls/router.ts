@@ -87,7 +87,8 @@ export const blsRouter = router({
       if (input.data.blNumber !== undefined) updateData.blNumber = input.data.blNumber;
       if (input.data.vehicleId !== undefined) updateData.vehicleId = input.data.vehicleId;
       if (input.data.customerId !== undefined) updateData.customerId = input.data.customerId;
-      if (input.data.status !== undefined) updateData.status = input.data.status;
+      // Status changes MUST go through updateStatus or forceUpdateStatus — not through generic update
+      // if (input.data.status !== undefined) updateData.status = input.data.status;
       if (input.data.portOfLoading !== undefined) updateData.originPort = input.data.portOfLoading;
       if (input.data.portOfDischarge !== undefined) updateData.destinationPort = input.data.portOfDischarge;
       if (input.data.etd !== undefined) updateData.estimatedDeparture = input.data.etd ? new Date(input.data.etd) : null;

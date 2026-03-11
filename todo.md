@@ -260,3 +260,6 @@
 - [x] All 181 tests passing across 7 test files
 - [ ] Update public tracking page to show per-vehicle info from bl_vehicles (deferred)
 - [ ] Migrate existing data: parse vehicle_description and populate bl_vehicles (deferred)
+
+## Bug Fix: forceUpdateStatus not working
+- [x] Fix: admin status buttons calling updateStatus instead of forceUpdateStatus — removed status from generic update mutation, status changes now exclusively via forceUpdateStatus/updateStatus
