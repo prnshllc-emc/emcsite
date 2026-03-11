@@ -23,6 +23,8 @@ import { blsRouter } from "./modules/bls/router";
 import { trackingRouter } from "./modules/tracking/router";
 import { cmsRouter } from "./modules/cms/router";
 import { reconciliationRouter } from "./modules/reconciliation/router";
+import { contractsRouter } from "./modules/contracts/router";
+import { notificationsRouter } from "./modules/notifications/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -42,6 +44,8 @@ export const appRouter = router({
   tracking: trackingRouter,
   cms: cmsRouter,
   reconciliation: reconciliationRouter,
+  contracts: contractsRouter,
+  notifications: notificationsRouter,
 
   // ===== Admin Dashboard Stats =====
   dashboard: router({

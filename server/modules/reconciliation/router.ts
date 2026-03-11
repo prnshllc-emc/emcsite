@@ -23,6 +23,10 @@ import {
   STAGE_LABELS,
   STAGE_ORDER,
 } from "./service";
+import {
+  getSchedulerStatus,
+  runScheduledReconciliation,
+} from "./scheduler";
 
 export const reconciliationRouter = router({
   // ── Pipeline summary (grouped by stage) ────────────────────
@@ -87,5 +91,15 @@ export const reconciliationRouter = router({
   // ── Run full reconciliation ────────────────────────────────
   runReconciliation: adminProcedure.mutation(async ({ ctx }) => {
     return runReconciliation(ctx.user.id);
+  }),
+
+  // ── Scheduler status ───────────────────────────────────
+  schedulerStatus: adminProcedure.query(() => {
+    return getSchedulerStatus();
+  }),
+
+  // ── Trigger scheduled reconciliation manually ───────────
+  triggerScheduled: adminProcedure.mutation(async () => {
+    return runScheduledReconciliation();
   }),
 });

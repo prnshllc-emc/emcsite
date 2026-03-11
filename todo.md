@@ -552,3 +552,26 @@
 - [x] Manual client insertion for tracking delivery (no Clicksign required)
 - [x] Tracking code absence is not a fatal error (beta/sandbox phase)
 - [x] Stage detection is informative only, never blocking
+
+## Phase 44: Manual Contract PDF Upload + CPF/VIN Extraction
+- [x] PDF upload endpoint (accept PDF, store in S3)
+- [x] PDF text extraction service (extract CPF and VIN from contract content using LLM)
+- [x] Auto-create customer record from extracted CPF (or link to existing)
+- [x] Auto-create vehicle record from extracted VIN (or link to existing)
+- [x] Mark as "contrato fechado, fase documental" and trigger reconciliation chain
+- [x] Admin UI: contract upload panel with drag-and-drop PDF upload
+- [x] Admin UI: show extracted data (CPF, VIN, name) for confirmation before saving
+- [x] Tests for PDF extraction and contract processing (12 tests passing)
+
+## Phase 44: Stage-Based Notifications
+- [x] Notification service: send email AND/OR phone (WhatsApp) per stage change
+- [x] Logic: has email → send email; has phone → send phone; has both → send both
+- [x] Logic: has neither email nor phone → flag for admin to correct
+- [x] Notification templates per stage (embarque, trânsito, desembaraço, entrega)
+- [x] Notification history via audit log (track what was sent, when, to whom)
+- [x] Admin UI: notification endpoints (missing contact list, templates, send)
+- [x] Tests for notification logic (9 tests passing)
+
+## Phase 44: Scheduled Reconciliation
+- [x] Schedule reconciliation to run every 6 hours automatically
+- [x] Log reconciliation results for admin review + owner notification

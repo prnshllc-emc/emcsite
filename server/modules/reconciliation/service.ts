@@ -44,6 +44,7 @@ import {
 import { eq, isNull, and, inArray } from "drizzle-orm";
 import { logAudit } from "../../shared/audit";
 import type { CustomerStatus } from "../../../shared/schemas";
+import { notifyCustomerStageChange } from "../notifications/service";
 
 // ══════════════════════════════════════════════════════════════
 // TYPES
@@ -681,6 +682,12 @@ export async function runReconciliation(
             },
           },
         });
+
+        // Send notification for stage change (fire-and-forget)
+        notifyCustomerStageChange(d.customerId, d.currentStage, adminUserId)
+          .catch((err) =>
+            console.error(`[Reconciliation] Notification failed for customer ${d.customerId}:`, err)
+          );
 
         updated++;
       } else {

@@ -44,6 +44,7 @@ import {
   Globe,
   Pencil,
   FileText,
+  FileUp,
   QrCode,
   LayoutDashboard,
   Megaphone,
@@ -57,6 +58,7 @@ import TrackingPanel from "@/components/admin/TrackingPanel";
 import DashboardPanel from "@/components/admin/DashboardPanel";
 import CustomersPanel from "@/components/admin/CustomersPanel";
 import PipelinePanel from "@/components/admin/PipelinePanel";
+import ContractsPanel from "@/components/admin/ContractsPanel";
 
 // ============================================================
 // TYPES
@@ -247,7 +249,7 @@ export default function Admin() {
             </h2>
           </div>
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-4xl grid-cols-6">
+            <TabsList className="grid w-full max-w-5xl grid-cols-7">
               <TabsTrigger value="dashboard" className="font-display text-xs">
                 <LayoutDashboard className="mr-1.5 h-4 w-4" />
                 Dashboard
@@ -263,6 +265,10 @@ export default function Admin() {
               <TabsTrigger value="tracking" className="font-display text-xs">
                 <QrCode className="mr-1.5 h-4 w-4" />
                 Rastreamento
+              </TabsTrigger>
+              <TabsTrigger value="contracts" className="font-display text-xs">
+                <FileUp className="mr-1.5 h-4 w-4" />
+                Contratos
               </TabsTrigger>
               <TabsTrigger value="pipeline" className="font-display text-xs">
                 <GitBranch className="mr-1.5 h-4 w-4" />
@@ -288,6 +294,10 @@ export default function Admin() {
 
             <TabsContent value="tracking">
               <TrackingPanel />
+            </TabsContent>
+
+            <TabsContent value="contracts">
+              <ContractsPanel />
             </TabsContent>
 
             <TabsContent value="pipeline">
