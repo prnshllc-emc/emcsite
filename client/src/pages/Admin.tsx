@@ -249,7 +249,7 @@ export default function Admin() {
             </h2>
           </div>
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-5xl grid-cols-7">
+            <TabsList className="grid w-full max-w-5xl grid-cols-8">
               <TabsTrigger value="dashboard" className="font-display text-xs">
                 <LayoutDashboard className="mr-1.5 h-4 w-4" />
                 Dashboard
@@ -273,6 +273,10 @@ export default function Admin() {
               <TabsTrigger value="pipeline" className="font-display text-xs">
                 <GitBranch className="mr-1.5 h-4 w-4" />
                 Pipeline
+              </TabsTrigger>
+              <TabsTrigger value="leads" className="font-display text-xs">
+                <Megaphone className="mr-1.5 h-4 w-4" />
+                Leads
               </TabsTrigger>
               <TabsTrigger value="settings" className="font-display text-xs">
                 <Settings className="mr-1.5 h-4 w-4" />
@@ -304,30 +308,12 @@ export default function Admin() {
               <PipelinePanel />
             </TabsContent>
 
+            <TabsContent value="leads">
+              <NewsletterPanel />
+            </TabsContent>
+
             <TabsContent value="settings">
               <SettingsPanel />
-            </TabsContent>
-          </Tabs>
-        </section>
-
-        {/* ── MARKETING & LEADS ─────────────────────────────── */}
-        <section>
-          <Separator className="mb-6" />
-          <div className="mb-4">
-            <h2 className="text-sm font-display font-bold uppercase tracking-widest text-muted-foreground">
-              Marketing & Leads
-            </h2>
-          </div>
-          <Tabs defaultValue="newsletter" className="space-y-6">
-            <TabsList className="w-fit">
-              <TabsTrigger value="newsletter" className="font-display text-xs">
-                <Megaphone className="mr-1.5 h-4 w-4" />
-                Newsletter (Leads)
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="newsletter">
-              <NewsletterPanel />
             </TabsContent>
           </Tabs>
         </section>

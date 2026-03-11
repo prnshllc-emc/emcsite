@@ -575,3 +575,7 @@
 ## Phase 44: Scheduled Reconciliation
 - [x] Schedule reconciliation to run every 6 hours automatically
 - [x] Log reconciliation results for admin review + owner notification
+
+## Phase 45: Admin Organization — Glossary + Leads Separation
+- [x] Add status/tag glossary to Clientes page (chronological order of process stages)
+- [x] Separate Newsletter/Leads into its own admin tab (apart from operational system)

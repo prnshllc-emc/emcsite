@@ -49,6 +49,16 @@ import {
   RefreshCw,
   ArrowUpDown,
   Shield,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  FileSignature,
+  Ship,
+  Anchor,
+  Package,
+  Ban,
+  FileX,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -113,6 +123,248 @@ function maskCpf(cpf: string): string {
 }
 
 // ============================================================
+// STATUS GLOSSARY — Chronological process stages
+// ============================================================
+
+const GLOSSARY_STAGES = [
+  {
+    order: 1,
+    tag: "sem_contrato",
+    label: "Sem Contrato",
+    icon: FileX,
+    color: "text-gray-400",
+    bgColor: "bg-gray-500/10",
+    borderColor: "border-gray-500/20",
+    description:
+      "Nenhum contrato Clicksign vinculado ao cliente. Pode ser uma operação recorrente de exportação sem contrato individual, ou o contrato ainda não foi gerado.",
+  },
+  {
+    order: 2,
+    tag: "aguardando_assinatura",
+    label: "Aguardando Assinatura",
+    icon: FileSignature,
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500/20",
+    description:
+      "Contrato gerado e enviado ao cliente via Clicksign, aguardando assinatura digital. O processo só avança quando o contrato é assinado.",
+  },
+  {
+    order: 3,
+    tag: "contrato_ativo",
+    label: "Contrato Ativo",
+    icon: FileCheck,
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/20",
+    description:
+      "Contrato assinado e ativo. O VIN do veículo foi identificado no contrato. O processo segue para a fase documental.",
+  },
+  {
+    order: 4,
+    tag: "fase_documental",
+    label: "Fase Documental (LI)",
+    icon: Clock,
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/10",
+    borderColor: "border-yellow-500/20",
+    description:
+      "Fase de processamento da Licença de Importação (LI) e demais trâmites documentais. Precede o embarque. O veículo ainda não foi carregado em container.",
+  },
+  {
+    order: 5,
+    tag: "aguardando_embarque",
+    label: "Aguardando Embarque",
+    icon: Package,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
+    description:
+      "Documentação concluída. O veículo está no porto de origem aguardando carregamento no container e emissão do BL (Bill of Lading).",
+  },
+  {
+    order: 6,
+    tag: "em_transito",
+    label: "Em Trânsito",
+    icon: Ship,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/20",
+    description:
+      "O container com o veículo embarcou e está navegando rumo ao porto de destino. O BL foi emitido e o tracking está ativo.",
+  },
+  {
+    order: 7,
+    tag: "em_desembaraco",
+    label: "Desembaraço Aduaneiro",
+    icon: Anchor,
+    color: "text-indigo-400",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/20",
+    description:
+      "O navio chegou ao porto de destino. O container foi descarregado e está em processo de liberação alfandegária, inspeções e pagamento de impostos.",
+  },
+  {
+    order: 8,
+    tag: "concluido",
+    label: "Concluído",
+    icon: CheckCircle2,
+    color: "text-green-400",
+    bgColor: "bg-green-500/10",
+    borderColor: "border-green-500/20",
+    description:
+      "Processo finalizado com sucesso. O veículo foi liberado, entregue ao cliente e toda a documentação foi concluída.",
+  },
+  {
+    order: 9,
+    tag: "cancelado",
+    label: "Cancelado",
+    icon: Ban,
+    color: "text-red-400",
+    bgColor: "bg-red-500/10",
+    borderColor: "border-red-500/20",
+    description:
+      "Operação cancelada pelo cliente ou pela empresa. Pode ocorrer em qualquer etapa do processo.",
+  },
+];
+
+const TAG_BADGES = [
+  {
+    category: "Status do Cliente",
+    items: [
+      { tag: "Aguardando Embarque", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
+      { tag: "Aguardando LI", color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" },
+      { tag: "Em Processo", color: "bg-primary/20 text-primary border-primary/30" },
+      { tag: "Concluído", color: "bg-green-500/20 text-green-300 border-green-500/30" },
+      { tag: "Cancelado", color: "bg-red-500/20 text-red-300 border-red-500/30" },
+    ],
+  },
+  {
+    category: "Tipo de Operação",
+    items: [
+      { tag: "Importação", color: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" },
+      { tag: "Exportação", color: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
+    ],
+  },
+  {
+    category: "Fonte de Dados",
+    items: [
+      { tag: "Manual", color: "bg-gray-500/20 text-gray-300 border-gray-500/30" },
+      { tag: "Clicksign", color: "bg-orange-500/20 text-orange-300 border-orange-500/30" },
+      { tag: "Agente IA", color: "bg-violet-500/20 text-violet-300 border-violet-500/30" },
+    ],
+  },
+  {
+    category: "Proteções",
+    items: [
+      { tag: "Override Manual", color: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
+      { tag: "Sem Proteção", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
+    ],
+  },
+];
+
+function StatusGlossary() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Card className="border-border/50">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors rounded-lg"
+      >
+        <div className="flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-display font-semibold text-muted-foreground">
+            Glossário de Status e Tags
+          </span>
+        </div>
+        {open ? (
+          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        )}
+      </button>
+
+      {open && (
+        <CardContent className="pt-0 pb-5 space-y-6">
+          {/* Process Stages — Chronological */}
+          <div>
+            <h4 className="text-xs font-display font-bold uppercase tracking-widest text-muted-foreground mb-3">
+              Etapas do Processo (Ordem Cronológica)
+            </h4>
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-[19px] top-4 bottom-4 w-px bg-border" />
+
+              <div className="space-y-1">
+                {GLOSSARY_STAGES.map((stage) => {
+                  const Icon = stage.icon;
+                  return (
+                    <div key={stage.tag} className="flex items-start gap-3 relative">
+                      <div
+                        className={`relative z-10 flex-shrink-0 w-10 h-10 rounded-full ${stage.bgColor} ${stage.borderColor} border flex items-center justify-center`}
+                      >
+                        <Icon className={`w-4 h-4 ${stage.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0 py-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-muted-foreground">
+                            {stage.order}.
+                          </span>
+                          <span className={`text-sm font-display font-semibold ${stage.color}`}>
+                            {stage.label}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] font-mono px-1.5 py-0 h-4 text-muted-foreground border-border/50"
+                          >
+                            {stage.tag}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground font-body mt-0.5 leading-relaxed">
+                          {stage.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Tag Badges Reference */}
+          <div>
+            <h4 className="text-xs font-display font-bold uppercase tracking-widest text-muted-foreground mb-3">
+              Referência de Tags
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {TAG_BADGES.map((cat) => (
+                <div key={cat.category}>
+                  <p className="text-xs font-display font-semibold text-muted-foreground mb-2">
+                    {cat.category}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cat.items.map((item) => (
+                      <Badge
+                        key={item.tag}
+                        variant="outline"
+                        className={`${item.color} font-body text-[10px] px-2 py-0.5`}
+                      >
+                        {item.tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  );
+}
+
+// ============================================================
 // MAIN PANEL
 // ============================================================
 
@@ -174,6 +426,9 @@ export default function CustomersPanel() {
           Novo Cliente
         </Button>
       </div>
+
+      {/* Glossary */}
+      <StatusGlossary />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
