@@ -157,7 +157,11 @@ export default function ServicesSection() {
         <div className="text-center mt-12">
           <Button
             variant="ghost"
-            onClick={() => openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.")}
+            onClick={() => {
+              trackCTAClick("Assessoria Completa", "services_section_bottom", "whatsapp", "Quero uma Assessoria Completa");
+              trackWhatsAppClick("services_section_bottom_cta", "Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.");
+              openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.");
+            }}
             className="cta-whatsapp"
             aria-label="Solicitar assessoria completa de importação e exportação de veículos"
           >

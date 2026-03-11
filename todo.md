@@ -486,3 +486,22 @@
 - [x] Analyze previous AI logo aspect ratio vs new EMC logo aspect ratio (content was only 21% of image height)
 - [x] Cropped logos to remove whitespace, re-uploaded to CDN, updated all references
 - [x] Visual verification — logo now prominently visible with EMC + ENVIANDO MEU CARRO text
+
+## Phase 40: CTA Tracking Audit
+- [x] Review analytics library (15 tracking functions: trackCTAClick, trackWhatsAppClick, trackNavClick, trackCalculatorInteraction, trackOutboundLink, trackModalOpen/Close/Submit, trackPhoneCall, trackEmailClick, trackFAQInteraction, trackSocialClick, trackNewsletterSubscribe)
+- [x] Audit all CTAs in Header component
+- [x] Audit all CTAs in HeroSection component (already tracked)
+- [x] Audit all CTAs in StatsSection component (no CTAs, informational only)
+- [x] Audit all CTAs in BenefitsGrid component (no CTAs, informational only)
+- [x] Audit all CTAs in CTASection component (already tracked)
+- [x] Audit all CTAs in ServicesSection component
+- [x] Audit all CTAs in WhyUsSection component (already tracked)
+- [x] Audit all CTAs in TestimonialsSection component (already tracked)
+- [x] Audit all CTAs in OfficesSection component (no CTAs, informational only)
+- [x] Audit all CTAs in FAQSection component (already tracked)
+- [x] Audit all CTAs in Footer component (already tracked)
+- [x] Audit all CTAs in WhatsAppButton component (already tracked)
+- [x] Audit all CTAs in KnowledgeCenter page
+- [x] Audit all CTAs in Tracking page
+- [x] Audit all CTAs in service pages (ServicePageLayout already tracked, RoutePageLayout fixed, ImportCalculator fixed)
+- [x] Add missing tracking to 16 untracked CTAs across 6 files

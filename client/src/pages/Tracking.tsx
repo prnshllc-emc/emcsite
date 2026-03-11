@@ -7,6 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LOGO_URL } from "@/lib/contact";
+import { trackCTAClick } from "@/lib/analytics";
 import {
   Ship,
   MapPin,
@@ -142,10 +143,12 @@ export default function Tracking() {
       return;
     }
 
+    trackCTAClick("Rastrear Veículo", "tracking_page", "form_submit", `Rastrear ${code}`);
     setSubmittedCode(code);
   }
 
   function handleReset() {
+    trackCTAClick("Nova Consulta", "tracking_page", "reset", "Nova Consulta");
     setSubmittedCode(null);
     setCodeInput("");
     setInputError(null);

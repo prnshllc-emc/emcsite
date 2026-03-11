@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { openContact } from "@/lib/contact";
 import { trpc } from "@/lib/trpc";
+import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 /* ── Icon map — maps DB icon name to Lucide component ──── */
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -166,7 +167,11 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
             <h2 className="text-2xl font-bold text-white mb-4 font-display">Tem dúvidas sobre {category.label.toLowerCase()}?</h2>
             <p className="text-gray-300 mb-6 font-body">Nossos especialistas podem ajudar com seu projeto específico.</p>
             <Button
-              onClick={() => openContact(`Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`)}
+              onClick={() => {
+                trackCTAClick("Falar com Especialista", `knowledge_category_${category.slug}`, "whatsapp", "Falar com Especialista");
+                trackWhatsAppClick(`knowledge_category_${category.slug}`, `Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`);
+                openContact(`Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`);
+              }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >
               Falar com Especialista
@@ -332,7 +337,11 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
                   Enquanto isso, entre em contato para tirar suas dúvidas.
                 </p>
                 <Button
-                  onClick={() => openContact(`Olá! Gostaria de saber mais sobre: ${article.title}`)}
+                  onClick={() => {
+                    trackCTAClick("Falar com Especialista", `knowledge_article_${article.slug}`, "whatsapp", "Falar com Especialista");
+                    trackWhatsAppClick(`knowledge_article_${article.slug}`, `Olá! Gostaria de saber mais sobre: ${article.title}`);
+                    openContact(`Olá! Gostaria de saber mais sobre: ${article.title}`);
+                  }}
                   className="mt-4 bg-primary hover:bg-primary/90"
                 >
                   Falar com Especialista
@@ -374,7 +383,11 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
               Nossa equipe de especialistas em logística automotiva pode ajudar com importação, exportação e transporte de veículos.
             </p>
             <Button
-              onClick={() => openContact("Olá! Gostaria de uma assessoria personalizada.")}
+              onClick={() => {
+                trackCTAClick("Assessoria Personalizada", "knowledge_article_bottom", "whatsapp", "Solicitar Assessoria");
+                trackWhatsAppClick("knowledge_article_bottom", "Olá! Gostaria de uma assessoria personalizada.");
+                openContact("Olá! Gostaria de uma assessoria personalizada.");
+              }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >
               Solicitar Assessoria Gratuita
@@ -577,7 +590,11 @@ function KnowledgeCenterListing() {
               Nossa equipe de especialistas pode responder suas dúvidas sobre importação, exportação e logística automotiva.
             </p>
             <Button
-              onClick={() => openContact("Olá! Tenho uma dúvida sobre logística automotiva.")}
+              onClick={() => {
+                trackCTAClick("Falar com Especialista", "knowledge_main_bottom", "whatsapp", "Falar com Especialista");
+                trackWhatsAppClick("knowledge_main_bottom", "Olá! Tenho uma dúvida sobre logística automotiva.");
+                openContact("Olá! Tenho uma dúvida sobre logística automotiva.");
+              }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >
               Falar com Especialista

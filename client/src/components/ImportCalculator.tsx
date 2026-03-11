@@ -2,6 +2,7 @@
 import { Car, Bike, Calculator, Share2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { trackCTAClick, trackCalculatorInteraction, trackOutboundLink } from "@/lib/analytics";
 
 const VEHICLE_TYPES = [
   {
@@ -25,11 +26,12 @@ const VEHICLE_TYPES = [
 ];
 
 export default function ImportCalculator() {
-  function openCalculator(utm: string) {
-    window.open(
-      `https://calculadora.enviandomeucarro.com?utm_source=site&utm_medium=calculator&utm_campaign=${utm}`,
-      "_blank"
-    );
+  function openCalculator(utm: string, label: string) {
+    const url = `https://calculadora.enviandomeucarro.com?utm_source=site&utm_medium=calculator&utm_campaign=${utm}`;
+    trackCTAClick(`Calculadora - ${label}`, "import_calculator_card", url, label);
+    trackCalculatorInteraction("selecionar_tipo_veiculo", { vehicle_type: utm, origin: "calculator_card" });
+    trackOutboundLink(url, `Calculadora ${label}`);
+    window.open(url, "_blank");
   }
 
   async function shareSimulator() {
@@ -38,6 +40,8 @@ export default function ImportCalculator() {
       text: "Simule a viabilidade estratégica da sua importação com precisão.",
       url: "https://calculadora.enviandomeucarro.com?utm_source=share&utm_medium=social",
     };
+
+    trackCTAClick("Compartilhar Simulador", "import_calculator_card", shareData.url, "Compartilhar Simulador");
 
     if (navigator.share) {
       try {
@@ -76,7 +80,7 @@ export default function ImportCalculator() {
           {VEHICLE_TYPES.map((type) => (
             <button
               key={type.utm}
-              onClick={() => openCalculator(type.utm)}
+              onClick={() => openCalculator(type.utm, type.label)}
               className="w-full flex items-center gap-4 h-14 px-4 rounded-lg border border-white/10 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all group/btn"
             >
               <type.icon className="w-5 h-5 text-muted-foreground group-hover/btn:text-primary transition-colors" />

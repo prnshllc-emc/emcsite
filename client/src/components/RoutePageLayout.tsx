@@ -6,6 +6,7 @@ import { Link } from "wouter";
 import { ArrowRight, Clock, DollarSign, FileText, Ship, CheckCircle, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openContact } from "@/lib/contact";
+import { trackCTAClick, trackWhatsAppClick, trackOutboundLink, trackNavClick } from "@/lib/analytics";
 
 export interface RouteStep {
   title: string;
@@ -69,7 +70,11 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
             <p className="text-gray-300 text-lg max-w-3xl font-body mb-6">{data.subtitle}</p>
             <div className="flex flex-wrap gap-4">
               <Button
-                onClick={() => openContact(data.ctaText)}
+                onClick={() => {
+                  trackCTAClick("Solicitar Cotação", `route_hero_${data.origin}_${data.destination}`, "whatsapp", "Solicitar Cotação");
+                  trackWhatsAppClick(`route_hero_${data.origin}_${data.destination}`, data.ctaText);
+                  openContact(data.ctaText);
+                }}
                 className="bg-primary hover:bg-primary/90 font-bold"
                 size="lg"
               >
@@ -77,7 +82,15 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
               {data.calculatorLink && (
-                <a href={data.calculatorLink} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={data.calculatorLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    trackCTAClick("Simular Custos", `route_hero_${data.origin}_${data.destination}`, data.calculatorLink!, "Simular Custos");
+                    trackOutboundLink(data.calculatorLink!, `Calculadora Rota ${data.origin}-${data.destination}`);
+                  }}
+                >
                   <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/5">
                     <DollarSign className="mr-2 w-4 h-4" />
                     Simular Custos
@@ -285,7 +298,7 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
               <h2 className="text-xl font-bold text-white font-display mb-4">Rotas Relacionadas</h2>
               <div className="flex flex-wrap gap-3">
                 {data.relatedRoutes.map((route) => (
-                  <Link key={route.href} href={route.href}>
+                  <Link key={route.href} href={route.href} onClick={() => trackNavClick(route.label, route.href)}>
                     <Button variant="outline" className="border-white/15 text-gray-300 hover:text-white hover:bg-white/5">
                       {route.label}
                       <ArrowRight className="ml-2 w-3 h-3" />
@@ -307,7 +320,11 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
               Solicite uma cotação personalizada para a rota {data.origin} → {data.destination}. Nossa equipe responde em até 24 horas.
             </p>
             <Button
-              onClick={() => openContact(data.ctaText)}
+              onClick={() => {
+                trackCTAClick("Solicitar Cotação Gratuita", `route_bottom_${data.origin}_${data.destination}`, "whatsapp", "Solicitar Cotação Gratuita");
+                trackWhatsAppClick(`route_bottom_${data.origin}_${data.destination}`, data.ctaText);
+                openContact(data.ctaText);
+              }}
               className="bg-primary hover:bg-primary/90 font-bold"
               size="lg"
             >

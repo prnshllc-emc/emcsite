@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Menu, Truck, X } from "lucide-react";
 import { LOGO_URL } from "@/lib/contact";
-import { trackNavClick } from "@/lib/analytics";
+import { trackNavClick, trackCTAClick } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
 
 interface NavItem {
@@ -133,6 +133,7 @@ export default function Header() {
             href="/rastrear"
             className="whitespace-nowrap ml-2 text-[12px] xl:text-[13px] font-semibold text-white uppercase tracking-wider flex items-center gap-1.5 border border-primary/40 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 hover:border-primary/60 transition-all"
             aria-label="Rastrear veículo"
+            onClick={() => trackCTAClick("Rastrear", "header_desktop", "/rastrear", "Rastrear")}
           >
             <Truck className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
             <span>Rastrear</span>
@@ -159,6 +160,7 @@ export default function Header() {
               href="/rastrear"
               className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2 border border-primary/40 px-4 py-2.5 rounded-full bg-primary/10 hover:bg-primary/20 w-fit mt-2"
               aria-label="Rastrear veículo"
+              onClick={() => trackCTAClick("Rastrear", "header_mobile", "/rastrear", "Rastrear")}
             >
               <Truck className="w-4 h-4" aria-hidden="true" />
               <span>Rastrear</span>
