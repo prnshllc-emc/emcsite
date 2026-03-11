@@ -43,7 +43,7 @@ export default function Footer() {
   const { get } = useSiteSettings();
 
   const phone = get("phone_primary");
-  const emailAddr = get("email_primary");
+  const emailAddr = get("email_primary") || "info@enviandomeucarro.com";
   const whatsappNumber = get("whatsapp_number");
   const instagramUrl = get("instagram_url");
   const facebookUrl = get("facebook_url");
@@ -117,7 +117,7 @@ export default function Footer() {
       <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" aria-hidden="true" />
 
       <div className="container pt-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
           {/* Brand */}
           <div className="space-y-4">
             <img
@@ -245,7 +245,7 @@ export default function Footer() {
                 aria-label="Enviar email para atendimento da Enviando Meu Carro"
               >
                 <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                {emailAddr}
+                <span className="break-all">{emailAddr}</span>
               </a>
               <div className="pt-2 space-y-2.5">
                 {offices.map((office) => (
@@ -266,7 +266,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-display font-bold mb-5">Newsletter</h4>
             <p className="text-gray-400 text-sm font-body mb-4 leading-relaxed">
-              Receba condições exclusivas e informações sobre <strong className="text-gray-300">importação e exportação de veículos</strong>.
+              Receba condições exclusivas sobre <strong className="text-gray-300">importação e exportação de veículos</strong>.
             </p>
             <form onSubmit={handleNewsletter} className="space-y-2.5" aria-label="Formulário de inscrição na newsletter">
               <Input

@@ -579,3 +579,7 @@
 ## Phase 45: Admin Organization — Glossary + Leads Separation
 - [x] Add status/tag glossary to Clientes page (chronological order of process stages)
 - [x] Separate Newsletter/Leads into its own admin tab (apart from operational system)
+
+## Phase 46: Footer Fixes
+- [x] Change footer email from atendimento@ to info@enviandomeucarro.com
+- [x] Fix footer layout overlap between columns

@@ -8,7 +8,7 @@ import { trpc } from "@/lib/trpc";
 const DEFAULTS: Record<string, string> = {
   phone_primary: "+55 11 99244-8920",
   phone_secondary: "+1 (786) 600-0430",
-  email_primary: "atendimento@enviandomeucarro.com",
+  email_primary: "info@enviandomeucarro.com",
   email_secondary: "contato@enviandomeucarro.com",
   whatsapp_url: "https://wa.me/5511992448920",
   whatsapp_number: "+55 11 99244-8920",
