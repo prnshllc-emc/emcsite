@@ -123,7 +123,7 @@ export default function Footer() {
             <img
               src={LOGO_URL}
               alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-              className="h-10 w-auto"
+              className="h-16 w-auto"
               loading="lazy"
               width="120"
               height="40"

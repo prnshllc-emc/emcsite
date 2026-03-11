@@ -160,7 +160,7 @@ export default function Tracking() {
             <img
               src={LOGO_URL}
               alt="EMC - Enviando Meu Carro"
-              className="h-10"
+              className="h-14"
             />
           </a>
           <a

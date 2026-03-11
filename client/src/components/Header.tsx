@@ -118,7 +118,7 @@ export default function Header() {
           <img
             src={LOGO_URL}
             alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-            className="h-16 lg:h-20 w-auto hover:scale-105 transition-transform duration-300"
+            className="h-20 lg:h-24 w-auto hover:scale-105 transition-transform duration-300"
             width="180"
             height="80"
           />

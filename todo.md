@@ -468,3 +468,9 @@
 - [x] Replace logo in JSON-LD schemas (4 instances in index.html → IMG_8092 light bg for Google)
 - [x] VITE_APP_LOGO is built-in and cannot be changed via secrets (not used in code)
 - [x] Visual verification across all sections (Header, Footer, Tracking page, JSON-LD schemas)
+
+## Phase 37: Logo Size Adjustments
+- [x] Increase logo size in Header component (h-16/h-20 → h-20/h-24)
+- [x] Increase logo size in Footer component (h-10 → h-16)
+- [x] Increase logo size in Tracking page (h-10 → h-14)
+- [x] Visual verification of all logo sizes
