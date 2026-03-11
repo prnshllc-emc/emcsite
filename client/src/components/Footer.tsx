@@ -123,10 +123,10 @@ export default function Footer() {
             <img
               src={LOGO_URL}
               alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-              className="h-16 w-auto"
+              className="h-[87px] w-auto"
               loading="lazy"
-              width="120"
-              height="40"
+              width="250"
+              height="87"
             />
             <p className="text-gray-400 text-sm font-body leading-relaxed">
               O jeito mais Rápido, Seguro e Inteligente de <strong className="text-gray-300">importar e exportar veículos</strong> para qualquer lugar do mundo.
