@@ -481,3 +481,8 @@
 - [x] Apply new sizes to Footer logo (h-[87px])
 - [x] Apply new sizes to Tracking page logo (h-[87px])
 - [x] Visual verification
+
+## Phase 39: Logo Size — Match Previous Logo Visual Prominence
+- [x] Analyze previous AI logo aspect ratio vs new EMC logo aspect ratio (content was only 21% of image height)
+- [x] Cropped logos to remove whitespace, re-uploaded to CDN, updated all references
+- [x] Visual verification — logo now prominently visible with EMC + ENVIANDO MEU CARRO text

@@ -99,7 +99,7 @@ export default function Header() {
       }`}
       role="banner"
     >
-      <div className="container flex items-center justify-between h-28 lg:h-32">
+      <div className="container flex items-center justify-between h-20 lg:h-24">
         {/* Logo */}
         <a
           href="https://enviandomeucarro.com/"
@@ -118,9 +118,9 @@ export default function Header() {
           <img
             src={LOGO_URL}
             alt="EMC - Enviando Meu Carro - Importação e Exportação de Veículos"
-            className="h-[140px] lg:h-[174px] w-auto hover:scale-105 transition-transform duration-300"
-            width="400"
-            height="174"
+            className="h-16 lg:h-20 w-auto hover:scale-105 transition-transform duration-300"
+            width="240"
+            height="80"
           />
         </a>
 

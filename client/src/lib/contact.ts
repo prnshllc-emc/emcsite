@@ -26,10 +26,10 @@ export function openContactWithNumber(whatsappNumber: string, message?: string) 
   window.open(`https://wa.me/${digits}?text=${text}`, "_blank");
 }
 
-/** Logo for dark backgrounds (white/light subtitle text) */
-export const LOGO_DARK_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/emc-logo-dark-bg_f58f6f58.png";
-/** Logo for light backgrounds (black/dark subtitle text) */
-export const LOGO_LIGHT_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/emc-logo-light-bg_180ed932.png";
+/** Logo for dark backgrounds (white/light subtitle text) — cropped */
+export const LOGO_DARK_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/emc-logo-dark-bg-cropped_92288254.png";
+/** Logo for light backgrounds (black/dark subtitle text) — cropped */
+export const LOGO_LIGHT_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/emc-logo-light-bg-cropped_43015709.png";
 /** Default logo — dark bg version (site is dark themed) */
 export const LOGO_URL = LOGO_DARK_BG_URL;
 export const HERO_BG_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663215721079/mdqtoTdxUgyafXfA49s4Hx/hero-bg-iguX4vEEPsn2MVYBbBBz7c.webp";
