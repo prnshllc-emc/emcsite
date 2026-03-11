@@ -1,0 +1,50 @@
+{
+  "query": "\nSELECT b.id as bl_id, b.bl_number, b.vehicle_id, b.customer_id, b.vehicle_description, b.status\nFROM bills_of_lading b\nORDER BY b.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute \nSELECT b.id as bl_id, b.bl_number, b.vehicle_id, b.customer_id, b.vehicle_description, b.status\nFROM bills_of_lading b\nORDER BY b.id;\n",
+  "rows": [
+    {
+      "bl_id": "1",
+      "bl_number": "MAEU266193682",
+      "vehicle_id": "1",
+      "customer_id": "NULL",
+      "vehicle_description": "1986 BMW 320i E30 - VIN: WBADA110X0EB56026",
+      "status": "in_transit"
+    },
+    {
+      "bl_id": "2",
+      "bl_number": "MAEU266742227",
+      "vehicle_id": "NULL",
+      "customer_id": "NULL",
+      "vehicle_description": "1968 VW Fusca 1300 (B8457749) | 2000 Ford F250 XL L (9BFFF25L81B060580) | 1974 VW Kombi (BH328258)",
+      "status": "arrived"
+    },
+    {
+      "bl_id": "3",
+      "bl_number": "MAEU265399692",
+      "vehicle_id": "NULL",
+      "customer_id": "NULL",
+      "vehicle_description": "1995 Fiat Tempra Ouro 16V (9BD159000S9123467) | 1972 GM Opala (52871BB140501) | 1969 VW Fusca (B9672772) | 1987 Honda CBX 750 F (9C2RC1701JR100203)",
+      "status": "customs"
+    },
+    {
+      "bl_id": "4",
+      "bl_number": "MAEU266742326",
+      "vehicle_id": "NULL",
+      "customer_id": "NULL",
+      "vehicle_description": "1985 VW Voyage LS (9BWZZZ30ZFP003230) | 1989 GM Chevette SL (9BGTC11JKKC153234) | 1997 GM Vectra GLS (9BGJK19BVVB596206)",
+      "status": "in_transit"
+    },
+    {
+      "bl_id": "5",
+      "bl_number": "BUE105691RCN",
+      "vehicle_id": "2",
+      "customer_id": "NULL",
+      "vehicle_description": "VW Fusca - VIN: BJ487579",
+      "status": "customs"
+    }
+  ],
+  "messages": [],
+  "stdout": "bl_id\tbl_number\tvehicle_id\tcustomer_id\tvehicle_description\tstatus\n1\tMAEU266193682\t1\tNULL\t1986 BMW 320i E30 - VIN: WBADA110X0EB56026\tin_transit\n2\tMAEU266742227\tNULL\tNULL\t1968 VW Fusca 1300 (B8457749) | 2000 Ford F250 XL L (9BFFF25L81B060580) | 1974 VW Kombi (BH328258)\tarrived\n3\tMAEU265399692\tNULL\tNULL\t1995 Fiat Tempra Ouro 16V (9BD159000S9123467) | 1972 GM Opala (52871BB140501) | 1969 VW Fusca (B9672772) | 1987 Honda CBX 750 F (9C2RC1701JR100203)\tcustoms\n4\tMAEU266742326\tNULL\tNULL\t1985 VW Voyage LS (9BWZZZ30ZFP003230) | 1989 GM Chevette SL (9BGTC11JKKC153234) | 1997 GM Vectra GLS (9BGJK19BVVB596206)\tin_transit\n5\tBUE105691RCN\t2\tNULL\tVW Fusca - VIN: BJ487579\tcustoms\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

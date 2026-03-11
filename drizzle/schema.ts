@@ -178,6 +178,33 @@ export type BillOfLading = typeof billsOfLading.$inferSelect;
 export type InsertBillOfLading = typeof billsOfLading.$inferInsert;
 
 // ─────────────────────────────────────────────────────────────
+// 6b. BL_VEHICLES — Many-to-many junction between BLs and Vehicles
+// A single BL/container can carry multiple vehicles from different owners.
+// Each row links one vehicle to one BL, with its specific customer (owner).
+// ─────────────────────────────────────────────────────────────
+export const blVehicles = mysqlTable(
+  "bl_vehicles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    blId: int("bl_id").notNull(), // FK → bills_of_lading
+    vehicleId: int("vehicle_id").notNull(), // FK → vehicles
+    customerId: int("customer_id"), // FK → customers (owner of THIS vehicle in this BL)
+    position: int("position"), // Position in container (1, 2, 3...)
+    notes: varchar("notes", { length: 500 }), // e.g. "DU-E 26BR0003342440"
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_blv_bl").on(table.blId),
+    index("idx_blv_vehicle").on(table.vehicleId),
+    index("idx_blv_customer").on(table.customerId),
+    uniqueIndex("idx_blv_bl_vehicle").on(table.blId, table.vehicleId),
+  ]
+);
+
+export type BlVehicle = typeof blVehicles.$inferSelect;
+export type InsertBlVehicle = typeof blVehicles.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
 // 7. TRACKING CODES — Access codes for clients to track shipments
 // Format: EMC-XXXX-XXXX-XXXX (~62 bits entropy, no ambiguous chars)
 // ─────────────────────────────────────────────────────────────

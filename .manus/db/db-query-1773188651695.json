@@ -1,0 +1,30 @@
+{
+  "query": "\nSELECT 'bills_of_lading' as tbl, COUNT(*) as cnt FROM bills_of_lading\nUNION ALL SELECT 'vehicles', COUNT(*) FROM vehicles\nUNION ALL SELECT 'customers', COUNT(*) FROM customers\nUNION ALL SELECT 'tracking_codes', COUNT(*) FROM tracking_codes\nUNION ALL SELECT 'tracking_history', COUNT(*) FROM tracking_history;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute \nSELECT 'bills_of_lading' as tbl, COUNT(*) as cnt FROM bills_of_lading\nUNION ALL SELECT 'vehicles', COUNT(*) FROM vehicles\nUNION ALL SELECT 'customers', COUNT(*) FROM customers\nUNION ALL SELECT 'tracking_codes', COUNT(*) FROM tracking_codes\nUNION ALL SELECT 'tracking_history', COUNT(*) FROM tracking_history;\n",
+  "rows": [
+    {
+      "tbl": "vehicles",
+      "cnt": "2"
+    },
+    {
+      "tbl": "customers",
+      "cnt": "0"
+    },
+    {
+      "tbl": "tracking_codes",
+      "cnt": "0"
+    },
+    {
+      "tbl": "tracking_history",
+      "cnt": "20"
+    },
+    {
+      "tbl": "bills_of_lading",
+      "cnt": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\nvehicles\t2\ncustomers\t0\ntracking_codes\t0\ntracking_history\t20\nbills_of_lading\t5\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

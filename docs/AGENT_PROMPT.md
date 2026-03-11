@@ -50,24 +50,85 @@ Para cada email relevante, extraia o máximo possível dos seguintes campos:
 | `vessel` | Nome do navio | `MSC GULSUN` |
 | `voyage` | Número da viagem | `FE425A` |
 
-### Dados do Cliente (se disponíveis no email)
+### Dados dos Veículos e Clientes (NOVO: Array `vehicles`)
+
+> **IMPORTANTE:** Um BL pode conter **múltiplos veículos**, cada um com seu próprio dono (cliente). Use o array `vehicles` dentro do objeto `bl` para enviar todos os veículos encontrados no email. Cada veículo pode ter seu próprio CPF de cliente.
 
 | Campo | Descrição | Exemplo |
-|-------|-----------|---------|
-| `customerCpf` | CPF do cliente (11 dígitos) | `12345678901` |
-| `customerName` | Nome completo | `João da Silva` |
-| `customerEmail` | Email do cliente | `joao@email.com` |
-| `customerPhone` | Telefone | `+5511999998888` |
+|-------|-----------|----------|
+| `vehicles[].vin` | VIN do veículo (obrigatório) | `1FA6P8CF5L5123456` |
+| `vehicles[].make` | Marca | `Ford` |
+| `vehicles[].model` | Modelo | `Mustang GT` |
+| `vehicles[].year` | Ano | `2024` |
+| `vehicles[].color` | Cor | `Vermelho` |
+| `vehicles[].customerCpf` | CPF do dono DESTE veículo | `12345678901` |
+| `vehicles[].customerName` | Nome do dono | `João da Silva` |
+| `vehicles[].customerEmail` | Email do dono | `joao@email.com` |
+| `vehicles[].customerPhone` | Telefone do dono | `+5511999998888` |
+| `vehicles[].notes` | Notas (ex: número DU-E) | `DU-E 2026/001234` |
+| `vehicles[].position` | Posição no container | `1` |
 
-### Dados do Veículo (se disponíveis)
+> Os campos legados `customerCpf`, `vehicleVin`, etc. no nível raiz do `bl` ainda funcionam para backward compatibility (1 veículo por BL), mas **prefira sempre o array `vehicles`** para novos processamentos.
 
-| Campo | Descrição | Exemplo |
-|-------|-----------|---------|
-| `vehicleVin` | VIN (17 caracteres) | `1FA6P8CF5L5123456` |
-| `vehicleMake` | Marca | `Ford` |
-| `vehicleModel` | Modelo | `Mustang GT` |
-| `vehicleYear` | Ano | `2024` |
-| `vehicleColor` | Cor | `Vermelho` |
+### Exemplo de BL com Múltiplos Veículos
+
+```json
+{
+  "bl": {
+    "blNumber": "MAEU265399692",
+    "containerNumber": "MSKU4567890",
+    "vehicleDescription": "4 veículos — Porsche 911, BMW M3, Mercedes C63, Audi RS6",
+    "originPort": "Port Newark, NJ, USA",
+    "destinationPort": "Porto de Santos, SP, Brasil",
+    "status": "in_transit",
+    "vehicles": [
+      {
+        "vin": "WP0AB2A95LS123456",
+        "make": "Porsche",
+        "model": "911 Carrera S",
+        "year": 2024,
+        "color": "Branco",
+        "customerCpf": "11122233344",
+        "customerName": "Pedro Almeida",
+        "position": 1
+      },
+      {
+        "vin": "WBS8M9C50J5K98765",
+        "make": "BMW",
+        "model": "M3 Competition",
+        "year": 2023,
+        "color": "Preto",
+        "customerCpf": "55566677788",
+        "customerName": "Maria Santos",
+        "position": 2
+      },
+      {
+        "vin": "WDDWF8EB1LA654321",
+        "make": "Mercedes-Benz",
+        "model": "C63 AMG",
+        "year": 2024,
+        "color": "Cinza",
+        "customerCpf": "99988877766",
+        "customerName": "Carlos Mendes",
+        "position": 3
+      },
+      {
+        "vin": "WUAASAF47KA012345",
+        "make": "Audi",
+        "model": "RS6 Avant",
+        "year": 2023,
+        "color": "Verde",
+        "customerCpf": "11122233344",
+        "customerName": "Pedro Almeida",
+        "notes": "Segundo veículo do mesmo cliente",
+        "position": 4
+      }
+    ]
+  }
+}
+```
+
+> Note que o mesmo cliente (Pedro Almeida, CPF 111.222.333-44) pode ter múltiplos veículos no mesmo BL.
 
 ---
 
@@ -403,13 +464,17 @@ POST /api/agent/ingest
 
 6. **Para emails com múltiplos BLs**, processe cada BL separadamente com uma chamada individual ao `/ingest`.
 
-7. **Preserve o `emailMessageId`** do header do email para evitar processamento duplicado.
+7. **Para BLs com múltiplos veículos**, use o array `vehicles` dentro do objeto `bl`. Cada veículo pode ter seu próprio CPF de cliente. O sistema criará automaticamente os registros na tabela `bl_vehicles` (relação N:N entre BLs e Veículos).
 
-8. **Ao encontrar um email de atualização de ETA**, atualize as datas no BL via `PUT /api/agent/bl` e adicione um evento com `eventType: "info"` descrevendo a mudança.
+8. **Quando o email lista vários VINs**, extraia cada um como um item separado no array `vehicles`, com as informações do respectivo dono se disponíveis.
 
-9. **Para emails de alerta ou problema** (atraso, avaria, greve portuária), use `eventType: "alert"` ou `eventType: "delay"` conforme apropriado.
+9. **Preserve o `emailMessageId`** do header do email para evitar processamento duplicado.
 
-10. **Sempre inclua a localização** no evento quando disponível — isso aparece na timeline do cliente.
+10. **Ao encontrar um email de atualização de ETA**, atualize as datas no BL via `PUT /api/agent/bl` e adicione um evento com `eventType: "info"` descrevendo a mudança.
+
+11. **Para emails de alerta ou problema** (atraso, avaria, greve portuária), use `eventType: "alert"` ou `eventType: "delay"` conforme apropriado.
+
+12. **Sempre inclua a localização** no evento quando disponível — isso aparece na timeline do cliente.
 
 ---
 

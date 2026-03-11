@@ -243,3 +243,20 @@
 - [x] Portuguese-localized status labels and emoji per event type
 - [ ] WhatsApp Business API integration (ready for future — templates prepared)
 - [ ] Customer notification preferences (deferred)
+
+## Phase 28: BL-Vehicle N:N Restructure + Manual Status Change
+- [x] Create bl_vehicles junction table in drizzle schema (N:N relationship)
+- [x] Push migration with pnpm db:push
+- [x] Update BL repository to support bl_vehicles CRUD (addVehicleToBl, getVehiclesForBl, removeVehicleFromBl, getBlsForVehicle, getBlVehiclesForCustomer)
+- [x] Update BL service to handle multi-vehicle BLs with audit logging
+- [x] Update Agent API `/ingest` and `/bl` POST to populate bl_vehicles via `vehicles[]` array
+- [x] Update Agent API `/bl/:blNumber` GET to include linked vehicles
+- [x] Auto-resolve customers by CPF and vehicles by VIN in agent ingestion
+- [x] Implement `forceUpdateStatus` in BL service (skip transition validation)
+- [x] Add manual BL status change buttons in admin BlsPanel (forward=green, backward=yellow)
+- [x] Allow status advance and retrocede to any status (admin override)
+- [x] Update agent prompt document (AGENT_PROMPT.md) with `vehicles[]` directive and multi-vehicle examples
+- [x] Write 29 vitest tests for BLs module (status transitions, force update, junction, agent vehicles)
+- [x] All 181 tests passing across 7 test files
+- [ ] Update public tracking page to show per-vehicle info from bl_vehicles (deferred)
+- [ ] Migrate existing data: parse vehicle_description and populate bl_vehicles (deferred)

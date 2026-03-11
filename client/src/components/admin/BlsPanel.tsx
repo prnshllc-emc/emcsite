@@ -453,7 +453,7 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
     onError: (err) => toast.error(err.message),
   });
 
-  const statusMutation = trpc.bls.updateStatus.useMutation({
+  const statusMutation = trpc.bls.forceUpdateStatus.useMutation({
     onSuccess: () => {
       utils.bls.list.invalidate();
       utils.bls.getById.invalidate({ id: blId });
@@ -478,17 +478,9 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
     });
   }
 
-  // Status transition options
-  const TRANSITIONS: Record<string, string[]> = {
-    draft: ["final", "in_transit"],
-    final: ["in_transit"],
-    in_transit: ["arrived"],
-    arrived: ["customs"],
-    customs: ["delivered"],
-    delivered: [],
-  };
-
-  const nextStatuses = bl ? (TRANSITIONS[bl.status] ?? []) : [];
+  // All available statuses for force-update (admin can go to any status)
+  const ALL_STATUSES = ["draft", "final", "in_transit", "arrived", "customs", "delivered"];
+  const otherStatuses = bl ? ALL_STATUSES.filter((s) => s !== bl.status) : [];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -506,32 +498,58 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Status Section */}
+            {/* Status Section — Force Update (admin override) */}
             <div className="p-4 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center justify-between mb-3">
                 <Label className="font-display text-sm">Status Atual</Label>
                 <StatusBadge status={bl.status} />
               </div>
-              {nextStatuses.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Altere o status manualmente para qualquer etapa (avançar ou retroceder):
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-xs text-muted-foreground self-center">Avançar para:</span>
-                  {nextStatuses.map((s) => {
+                  {otherStatuses.map((s) => {
                     const config = STATUS_MAP[s];
+                    const statusIndex = ALL_STATUSES.indexOf(s);
+                    const currentIndex = ALL_STATUSES.indexOf(bl.status);
+                    const isForward = statusIndex > currentIndex;
+                    const Icon = config?.icon ?? Package;
                     return (
                       <Button
                         key={s}
                         variant="outline"
                         size="sm"
-                        className="text-xs"
-                        onClick={() => statusMutation.mutate({ id: blId, status: s as any })}
+                        className={`text-xs gap-1.5 ${
+                          isForward
+                            ? "border-green-500/40 hover:bg-green-500/10 text-green-400"
+                            : "border-yellow-500/40 hover:bg-yellow-500/10 text-yellow-400"
+                        }`}
+                        onClick={() => {
+                          const direction = isForward ? "avançar" : "retroceder";
+                          if (
+                            confirm(
+                              `Tem certeza que deseja ${direction} o status para "${config?.label ?? s}"?`
+                            )
+                          ) {
+                            statusMutation.mutate({ id: blId, status: s as any });
+                          }
+                        }}
                         disabled={statusMutation.isPending}
                       >
-                        {config?.label ?? s}
+                        <Icon className="w-3.5 h-3.5" />
+                        {isForward ? "\u25B6" : "\u25C0"} {config?.label ?? s}
                       </Button>
                     );
                   })}
                 </div>
-              )}
+                {statusMutation.isPending && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Atualizando status...
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Edit Form */}

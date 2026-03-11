@@ -226,6 +226,93 @@ export async function linkBlToVehicleAndCustomer(
   return updated;
 }
 
+// ── Force update status (admin override — skip transition validation) ────
+const STATUS_ORDER: repo.BlStatus[] = ["draft", "final", "in_transit", "arrived", "customs", "delivered"];
+
+export function getStatusOrder(): repo.BlStatus[] {
+  return [...STATUS_ORDER];
+}
+
+export async function forceUpdateBlStatus(
+  id: number,
+  newStatus: repo.BlStatus,
+  adminUserId?: number
+): Promise<repo.BlRecord | null> {
+  const bl = await repo.findBlById(id);
+  if (!bl) throw new Error("BL não encontrado.");
+
+  if (bl.status === newStatus) return bl;
+
+  const updated = await repo.updateBlStatus(id, newStatus);
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "update",
+    entity: "bl",
+    entityId: id,
+    changes: { status: { before: bl.status, after: newStatus }, forced: { before: false, after: true } },
+  });
+
+  return updated;
+}
+
+// ── Add vehicle to BL (N:N junction) ────────────────────────
+export async function addVehicleToBl(
+  blId: number,
+  vehicleId: number,
+  customerId?: number | null,
+  position?: number | null,
+  notes?: string | null,
+  adminUserId?: number
+): Promise<repo.BlVehicleRecord> {
+  const bl = await repo.findBlById(blId);
+  if (!bl) throw new Error("BL não encontrado.");
+
+  const record = await repo.addVehicleToBl({ blId, vehicleId, customerId, position, notes });
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "create",
+    entity: "bl_vehicle",
+    entityId: record.id,
+    changes: { blId: { before: null, after: blId }, vehicleId: { before: null, after: vehicleId } },
+  });
+
+  return record;
+}
+
+// ── Get vehicles for a BL ───────────────────────────────────
+export async function getVehiclesForBl(blId: number): Promise<repo.BlVehicleRecord[]> {
+  return repo.getVehiclesForBl(blId);
+}
+
+// ── Get BLs for a vehicle ───────────────────────────────────
+export async function getBlsForVehicle(vehicleId: number): Promise<repo.BlVehicleRecord[]> {
+  return repo.getBlsForVehicle(vehicleId);
+}
+
+// ── Get BL-vehicles for a customer ──────────────────────────
+export async function getBlVehiclesForCustomer(customerId: number): Promise<repo.BlVehicleRecord[]> {
+  return repo.getBlVehiclesForCustomer(customerId);
+}
+
+// ── Remove vehicle from BL ──────────────────────────────────
+export async function removeVehicleFromBl(
+  blId: number,
+  vehicleId: number,
+  adminUserId?: number
+): Promise<void> {
+  await repo.removeVehicleFromBl(blId, vehicleId);
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "delete",
+    entity: "bl_vehicle",
+    entityId: blId,
+    changes: { vehicleId: { before: vehicleId, after: null } },
+  });
+}
+
 // ── Soft delete ──────────────────────────────────────────────
 export async function deleteBl(
   id: number,

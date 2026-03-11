@@ -3,7 +3,7 @@
  * BL Number is unique key; controls full tracking lifecycle.
  */
 import { getDb } from "../../db";
-import { billsOfLading } from "../../../drizzle/schema";
+import { billsOfLading, blVehicles } from "../../../drizzle/schema";
 import { eq, desc, count, isNull, and } from "drizzle-orm";
 import {
   calcOffset,
@@ -341,4 +341,124 @@ export async function linkBlToVehicleAndCustomer(
   customerId: number
 ): Promise<BlRecord | null> {
   return updateBl(blId, { vehicleId, customerId });
+}
+
+// ══════════════════════════════════════════════════════════════
+// BL_VEHICLES — Many-to-many junction
+// ══════════════════════════════════════════════════════════════
+
+export interface BlVehicleRecord {
+  id: number;
+  blId: number;
+  vehicleId: number;
+  customerId: number | null;
+  position: number | null;
+  notes: string | null;
+  createdAt: Date;
+}
+
+function toBlVehicleRecord(row: typeof blVehicles.$inferSelect): BlVehicleRecord {
+  return {
+    id: row.id,
+    blId: row.blId,
+    vehicleId: row.vehicleId,
+    customerId: row.customerId,
+    position: row.position,
+    notes: row.notes,
+    createdAt: row.createdAt,
+  };
+}
+
+// ── Add vehicle to BL ───────────────────────────────────────
+export async function addVehicleToBl(data: {
+  blId: number;
+  vehicleId: number;
+  customerId?: number | null;
+  position?: number | null;
+  notes?: string | null;
+}): Promise<BlVehicleRecord> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if already linked
+  const existing = await db
+    .select()
+    .from(blVehicles)
+    .where(and(eq(blVehicles.blId, data.blId), eq(blVehicles.vehicleId, data.vehicleId)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update existing link if customer/position changed
+    const updateValues: Record<string, unknown> = {};
+    if (data.customerId !== undefined) updateValues.customerId = data.customerId;
+    if (data.position !== undefined) updateValues.position = data.position;
+    if (data.notes !== undefined) updateValues.notes = data.notes;
+
+    if (Object.keys(updateValues).length > 0) {
+      await db.update(blVehicles).set(updateValues).where(eq(blVehicles.id, existing[0].id));
+    }
+    const [updated] = await db.select().from(blVehicles).where(eq(blVehicles.id, existing[0].id)).limit(1);
+    return toBlVehicleRecord(updated);
+  }
+
+  const [result] = await db.insert(blVehicles).values({
+    blId: data.blId,
+    vehicleId: data.vehicleId,
+    customerId: data.customerId ?? null,
+    position: data.position ?? null,
+    notes: data.notes ?? null,
+  }).$returningId();
+
+  const [inserted] = await db.select().from(blVehicles).where(eq(blVehicles.id, result.id)).limit(1);
+  return toBlVehicleRecord(inserted);
+}
+
+// ── Get vehicles for a BL ───────────────────────────────────
+export async function getVehiclesForBl(blId: number): Promise<BlVehicleRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(blVehicles)
+    .where(eq(blVehicles.blId, blId))
+    .orderBy(blVehicles.position);
+
+  return rows.map(toBlVehicleRecord);
+}
+
+// ── Get BLs for a vehicle ───────────────────────────────────
+export async function getBlsForVehicle(vehicleId: number): Promise<BlVehicleRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(blVehicles)
+    .where(eq(blVehicles.vehicleId, vehicleId));
+
+  return rows.map(toBlVehicleRecord);
+}
+
+// ── Get BLs for a customer (via bl_vehicles) ────────────────
+export async function getBlVehiclesForCustomer(customerId: number): Promise<BlVehicleRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(blVehicles)
+    .where(eq(blVehicles.customerId, customerId));
+
+  return rows.map(toBlVehicleRecord);
+}
+
+// ── Remove vehicle from BL ──────────────────────────────────
+export async function removeVehicleFromBl(blId: number, vehicleId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(blVehicles).where(
+    and(eq(blVehicles.blId, blId), eq(blVehicles.vehicleId, vehicleId))
+  );
 }

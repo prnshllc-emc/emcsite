@@ -148,6 +148,65 @@ export const blsRouter = router({
       );
     }),
 
+  // ── Force update status (admin override, skip transition validation) ──
+  forceUpdateStatus: adminProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        status: BlStatusEnum,
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return service.forceUpdateBlStatus(input.id, input.status, ctx.user.id);
+    }),
+
+  // ── Get status order (for UI dropdown) ──────────────────────
+  getStatusOrder: adminProcedure.query(async () => {
+    return service.getStatusOrder();
+  }),
+
+  // ── Add vehicle to BL (N:N junction) ───────────────────────
+  addVehicle: adminProcedure
+    .input(
+      z.object({
+        blId: z.number().int().positive(),
+        vehicleId: z.number().int().positive(),
+        customerId: z.number().int().positive().optional(),
+        position: z.number().int().positive().optional(),
+        notes: z.string().max(500).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return service.addVehicleToBl(
+        input.blId,
+        input.vehicleId,
+        input.customerId ?? null,
+        input.position ?? null,
+        input.notes ?? null,
+        ctx.user.id
+      );
+    }),
+
+  // ── Get vehicles for a BL ───────────────────────────────────
+  getVehicles: adminProcedure
+    .input(z.object({ blId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      return service.getVehiclesForBl(input.blId);
+    }),
+
+  // ── Remove vehicle from BL ──────────────────────────────────
+  removeVehicle: adminProcedure
+    .input(
+      z.object({
+        blId: z.number().int().positive(),
+        vehicleId: z.number().int().positive(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await service.removeVehicleFromBl(input.blId, input.vehicleId, ctx.user.id);
+      return { success: true };
+    }),
+
   // ── Delete BL (soft) ────────────────────────────────────────
   delete: adminProcedure
     .input(z.object({ id: z.number().int().positive() }))

@@ -38,6 +38,21 @@ function requireAgentApiKey(req: Request, res: Response, next: NextFunction): vo
 
 // ── Zod Schemas for Agent Payloads ──────────────────────────
 
+// Schema for a single vehicle entry in a BL
+const AgentVehicleEntrySchema = z.object({
+  vin: z.string().min(1).max(17),
+  make: z.string().optional().nullable(),
+  model: z.string().optional().nullable(),
+  year: z.number().int().optional().nullable(),
+  color: z.string().optional().nullable(),
+  customerCpf: z.string().optional().nullable(), // owner of THIS vehicle
+  customerName: z.string().optional().nullable(),
+  customerEmail: z.string().email().optional().nullable(),
+  customerPhone: z.string().optional().nullable(),
+  notes: z.string().max(500).optional().nullable(), // e.g. DU-E number
+  position: z.number().int().optional().nullable(),
+});
+
 const AgentBlCreateSchema = z.object({
   blNumber: z.string().min(1).max(50),
   containerNumber: z.string().max(20).optional().nullable(),
@@ -52,8 +67,8 @@ const AgentBlCreateSchema = z.object({
   blType: z.enum(["draft", "final"]).default("draft"),
   sourceEmail: z.string().max(320).optional().nullable(),
   rawBlData: z.string().optional().nullable(), // raw email JSON
-  // Optional: link to customer/vehicle by reference
-  customerCpf: z.string().optional().nullable(), // will look up or create
+  // DEPRECATED: single vehicle/customer fields (kept for backward compat)
+  customerCpf: z.string().optional().nullable(),
   customerName: z.string().optional().nullable(),
   customerEmail: z.string().email().optional().nullable(),
   customerPhone: z.string().optional().nullable(),
@@ -62,6 +77,8 @@ const AgentBlCreateSchema = z.object({
   vehicleModel: z.string().optional().nullable(),
   vehicleYear: z.number().int().optional().nullable(),
   vehicleColor: z.string().optional().nullable(),
+  // NEW: multiple vehicles array (preferred over single vehicle fields)
+  vehicles: z.array(AgentVehicleEntrySchema).optional().default([]),
   // Shipper/Consignee info (stored in rawBlData)
   shipper: z.string().optional().nullable(),
   consignee: z.string().optional().nullable(),
@@ -181,6 +198,57 @@ export function createAgentRouter(): Router {
         importedBy: "ai-agent",
       });
 
+      // 4. Resolve multiple vehicles from the `vehicles` array (N:N)
+      const resolvedVehicles: Array<{ vehicleId: number; customerId?: number; position?: number | null; notes?: string | null }> = [];
+
+      for (let i = 0; i < (input.vehicles || []).length; i++) {
+        const v = input.vehicles![i];
+        const vin = v.vin.toUpperCase();
+        let vCustomerId: number | undefined;
+
+        // Resolve customer for this vehicle
+        if (v.customerCpf) {
+          const cpfDigits = v.customerCpf.replace(/\D/g, "");
+          if (cpfDigits.length === 11) {
+            let customer = await customerService.getCustomerByCpf(cpfDigits);
+            if (!customer && v.customerName) {
+              customer = await customerService.createCustomer({
+                cpf: cpfDigits,
+                fullName: v.customerName,
+                email: v.customerEmail ?? undefined,
+                phone: v.customerPhone ?? undefined,
+              });
+            }
+            if (customer) vCustomerId = customer.id;
+          }
+        }
+
+        // Resolve or create vehicle
+        let vehicle = await vehicleService.getVehicleByVin(vin);
+        if (!vehicle) {
+          vehicle = await vehicleService.createVehicle({
+            vin,
+            make: v.make || "N/A",
+            model: v.model || "N/A",
+            year: v.year ?? undefined,
+            color: v.color ?? undefined,
+            customerId: vCustomerId ?? undefined,
+          });
+        } else if (vCustomerId && !vehicle.customerId) {
+          // Link existing vehicle to customer if not yet linked
+          await vehicleService.updateVehicle(vehicle.id, { customerId: vCustomerId });
+        }
+
+        if (vehicle) {
+          resolvedVehicles.push({
+            vehicleId: vehicle.id,
+            customerId: vCustomerId,
+            position: v.position ?? (i + 1),
+            notes: v.notes ?? null,
+          });
+        }
+      }
+
       if (existingBl) {
         // Update existing BL
         const updateData: Record<string, unknown> = {};
@@ -201,11 +269,17 @@ export function createAgentRouter(): Router {
 
         const updated = await blService.updateBl(existingBl.id, updateData);
 
+        // Link vehicles via bl_vehicles junction
+        for (const rv of resolvedVehicles) {
+          await blService.addVehicleToBl(existingBl.id, rv.vehicleId, rv.customerId, rv.position, rv.notes);
+        }
+
         res.json({
           action: "updated",
           bl: updated,
           customerId,
           vehicleId,
+          linkedVehicles: resolvedVehicles.length,
         });
       } else {
         // Create new BL
@@ -230,11 +304,17 @@ export function createAgentRouter(): Router {
         // Auto-activate tracking for new BLs
         await blService.activateTracking(bl.id);
 
+        // Link vehicles via bl_vehicles junction
+        for (const rv of resolvedVehicles) {
+          await blService.addVehicleToBl(bl.id, rv.vehicleId, rv.customerId, rv.position, rv.notes);
+        }
+
         res.status(201).json({
           action: "created",
           bl,
           customerId,
           vehicleId,
+          linkedVehicles: resolvedVehicles.length,
         });
       }
     } catch (error: any) {
@@ -496,6 +576,66 @@ export function createAgentRouter(): Router {
       results.blId = bl.id;
       results.blNumber = bl.blNumber;
 
+      // 1b. Resolve multiple vehicles from the `vehicles` array (N:N)
+      const resolvedVehicles: Array<{ vehicleId: number; customerId?: number; position?: number | null; notes?: string | null }> = [];
+
+      for (let i = 0; i < (input.bl.vehicles || []).length; i++) {
+        const v = input.bl.vehicles![i];
+        const vin = v.vin.toUpperCase();
+        let vCustomerId: number | undefined;
+
+        // Resolve customer for this vehicle
+        if (v.customerCpf) {
+          const cpfDigits = v.customerCpf.replace(/\D/g, "");
+          if (cpfDigits.length === 11) {
+            let customer = await customerService.getCustomerByCpf(cpfDigits);
+            if (!customer && v.customerName) {
+              customer = await customerService.createCustomer({
+                cpf: cpfDigits,
+                fullName: v.customerName,
+                email: v.customerEmail ?? undefined,
+                phone: v.customerPhone ?? undefined,
+              });
+            }
+            if (customer) vCustomerId = customer.id;
+          }
+        }
+
+        // Resolve or create vehicle
+        let vehicle = await vehicleService.getVehicleByVin(vin);
+        if (!vehicle) {
+          vehicle = await vehicleService.createVehicle({
+            vin,
+            make: v.make || "N/A",
+            model: v.model || "N/A",
+            year: v.year ?? undefined,
+            color: v.color ?? undefined,
+            customerId: vCustomerId ?? undefined,
+          });
+        } else if (vCustomerId && !vehicle.customerId) {
+          await vehicleService.updateVehicle(vehicle.id, { customerId: vCustomerId });
+        }
+
+        if (vehicle) {
+          resolvedVehicles.push({
+            vehicleId: vehicle.id,
+            customerId: vCustomerId,
+            position: v.position ?? (i + 1),
+            notes: v.notes ?? null,
+          });
+        }
+      }
+
+      // Link resolved vehicles to BL via bl_vehicles junction
+      for (const rv of resolvedVehicles) {
+        try {
+          await blService.addVehicleToBl(bl.id, rv.vehicleId, rv.customerId, rv.position, rv.notes);
+        } catch {
+          // Duplicate link — skip silently
+        }
+      }
+      results.linkedVehicles = resolvedVehicles.length;
+
       // 2. Add tracking events
       const eventResults: unknown[] = [];
       for (const eventInput of input.trackingEvents) {
@@ -596,7 +736,10 @@ export function createAgentRouter(): Router {
       // Get tracking codes
       const codes = await trackingService.getCodesForBl(bl.id);
 
-      res.json({ bl, events, codes });
+      // Get linked vehicles
+      const vehicles = await blService.getVehiclesForBl(bl.id);
+
+      res.json({ bl, events, codes, vehicles });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Internal server error" });
     }
