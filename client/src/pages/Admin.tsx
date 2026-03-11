@@ -46,6 +46,7 @@ import {
   FileText,
   QrCode,
   LayoutDashboard,
+  Megaphone,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -235,59 +236,81 @@ export default function Admin() {
       </header>
 
       {/* Main Content */}
-      <main className="container py-8">
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full max-w-4xl grid-cols-6">
-            <TabsTrigger value="dashboard" className="font-display text-xs">
-              <LayoutDashboard className="mr-1.5 h-4 w-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="font-display text-xs">
-              <Settings className="mr-1.5 h-4 w-4" />
-              Configurações
-            </TabsTrigger>
-            <TabsTrigger value="newsletter" className="font-display text-xs">
-              <Mail className="mr-1.5 h-4 w-4" />
-              Newsletter
-            </TabsTrigger>
-            <TabsTrigger value="bls" className="font-display text-xs">
-              <FileText className="mr-1.5 h-4 w-4" />
-              BLs
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="font-display text-xs">
-              <Users className="mr-1.5 h-4 w-4" />
-              Clientes
-            </TabsTrigger>
-            <TabsTrigger value="tracking" className="font-display text-xs">
-              <QrCode className="mr-1.5 h-4 w-4" />
-              Rastreamento
-            </TabsTrigger>
-          </TabsList>
+      <main className="container py-8 space-y-10">
+        {/* ── OPERAÇÕES ─────────────────────────────────────── */}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-sm font-display font-bold uppercase tracking-widest text-muted-foreground">
+              Operações
+            </h2>
+          </div>
+          <Tabs defaultValue="dashboard" className="space-y-6">
+            <TabsList className="grid w-full max-w-3xl grid-cols-5">
+              <TabsTrigger value="dashboard" className="font-display text-xs">
+                <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="bls" className="font-display text-xs">
+                <FileText className="mr-1.5 h-4 w-4" />
+                BLs
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="font-display text-xs">
+                <Users className="mr-1.5 h-4 w-4" />
+                Clientes
+              </TabsTrigger>
+              <TabsTrigger value="tracking" className="font-display text-xs">
+                <QrCode className="mr-1.5 h-4 w-4" />
+                Rastreamento
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="font-display text-xs">
+                <Settings className="mr-1.5 h-4 w-4" />
+                Configurações
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="dashboard">
-            <DashboardPanel />
-          </TabsContent>
+            <TabsContent value="dashboard">
+              <DashboardPanel />
+            </TabsContent>
 
-          <TabsContent value="settings">
-            <SettingsPanel />
-          </TabsContent>
+            <TabsContent value="bls">
+              <BlsPanel />
+            </TabsContent>
 
-          <TabsContent value="newsletter">
-            <NewsletterPanel />
-          </TabsContent>
+            <TabsContent value="customers">
+              <CustomersPanel />
+            </TabsContent>
 
-          <TabsContent value="bls">
-            <BlsPanel />
-          </TabsContent>
+            <TabsContent value="tracking">
+              <TrackingPanel />
+            </TabsContent>
 
-          <TabsContent value="customers">
-            <CustomersPanel />
-          </TabsContent>
+            <TabsContent value="settings">
+              <SettingsPanel />
+            </TabsContent>
+          </Tabs>
+        </section>
 
-          <TabsContent value="tracking">
-            <TrackingPanel />
-          </TabsContent>
-        </Tabs>
+        {/* ── MARKETING & LEADS ─────────────────────────────── */}
+        <section>
+          <Separator className="mb-6" />
+          <div className="mb-4">
+            <h2 className="text-sm font-display font-bold uppercase tracking-widest text-muted-foreground">
+              Marketing & Leads
+            </h2>
+          </div>
+          <Tabs defaultValue="newsletter" className="space-y-6">
+            <TabsList className="w-fit">
+              <TabsTrigger value="newsletter" className="font-display text-xs">
+                <Megaphone className="mr-1.5 h-4 w-4" />
+                Newsletter (Leads)
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="newsletter">
+              <NewsletterPanel />
+            </TabsContent>
+          </Tabs>
+        </section>
       </main>
     </div>
   );
@@ -326,7 +349,7 @@ function SettingsPanel() {
       for (const s of settings) {
         initial[s.key] = s.value;
       }
-      setEditValues(initial);
+      setEditValues((prev) => ({ ...initial, ...prev }));
       setHasChanges({});
     }
   }, [settings]);
@@ -444,7 +467,7 @@ function SettingsPanel() {
 }
 
 // ============================================================
-// NEWSLETTER PANEL
+// NEWSLETTER PANEL (Marketing & Leads — separated from operations)
 // ============================================================
 
 function NewsletterPanel() {
@@ -510,9 +533,9 @@ function NewsletterPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-display font-bold">Inscritos na Newsletter</h2>
+          <h2 className="text-2xl font-display font-bold">Leads — Newsletter</h2>
           <p className="text-muted-foreground font-body mt-1">
-            Gerencie os inscritos que se cadastraram pelo formulário do site.
+            Repositório de leads que se cadastraram pelo formulário do site. Sincronizado com HubSpot.
           </p>
         </div>
         <Button onClick={handleExportCSV} variant="outline" disabled={totalCount === 0}>
@@ -531,7 +554,7 @@ function NewsletterPanel() {
               </div>
               <div>
                 <p className="text-2xl font-display font-bold">{totalCount}</p>
-                <p className="text-sm text-muted-foreground font-body">Total de Inscritos</p>
+                <p className="text-sm text-muted-foreground font-body">Total de Leads</p>
               </div>
             </div>
           </CardContent>
@@ -579,9 +602,9 @@ function NewsletterPanel() {
         <Card>
           <CardContent className="py-12 text-center">
             <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-display font-semibold">Nenhum inscrito ainda</p>
+            <p className="text-lg font-display font-semibold">Nenhum lead ainda</p>
             <p className="text-muted-foreground font-body mt-1">
-              Os inscritos aparecerão aqui quando alguém se cadastrar pelo formulário do site.
+              Os leads aparecerão aqui quando alguém se cadastrar pelo formulário de newsletter do site.
             </p>
           </CardContent>
         </Card>

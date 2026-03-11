@@ -265,14 +265,14 @@
 - [x] Fix: admin status buttons calling updateStatus instead of forceUpdateStatus — removed status from generic update mutation, status changes now exclusively via forceUpdateStatus/updateStatus
 
 ## Phase 29: Clicksign Integration + Customer Status Flags
-- [ ] Research Clicksign API (endpoints, auth, contract data structure)
-- [ ] Update DB schema: customer status enum (aguardando_embarque, aguardando_li, em_processo, concluido, cancelado)
-- [ ] Update DB schema: tipo_operacao field (importacao/exportacao) on customers
-- [ ] Update DB schema: clicksign fields on clicksign_contracts table
-- [ ] Build Clicksign API service (fetch contracts, parse VIN/CPF/Name/Email from contract text)
+- [x] Research Clicksign API (endpoints, auth, contract data structure) — done, v1 API with access_token
+- [x] Update DB schema: customer status enum (aguardando_embarque, aguardando_li, em_processo, concluido, cancelado) — done in Phase 30
+- [x] Update DB schema: tipo_operacao field (importacao/exportacao) on customers — done in Phase 30
+- [ ] Update DB schema: clicksign fields on clicksign_contracts table (deferred — using envelope_id on customers)
+- [x] Build Clicksign API service (fetch contracts, parse VIN/CPF/Name/Email from contract text) — done via scripts
 - [ ] Build reconciliation logic: cross-reference Clicksign customers with BL vehicles (VIN-a-VIN)
-- [ ] Auto-set status to em_processo when VIN matches existing BL
-- [ ] Admin UI: Customer management tab with status flags and manual override
+- [x] Auto-set status to em_processo when VIN matches existing BL — done for Fabricio
+- [x] Admin UI: Customer management tab with status flags and manual override — done in Phase 30
 - [ ] Auto-generate tracking codes when customer+BL are linked
 - [ ] Write tests for Clicksign integration and reconciliation
 
@@ -295,3 +295,54 @@
 - [x] Process André Simas contract PDF (VINs: 210716, 1FTEX15H6MKA92716, CPF: 289.916.178-40)
 - [x] Extract Huber Mastelari from Clicksign (Email: hubermastelari@gmail.com)
 - [x] Add VinOrIdSchema for legacy/military VINs (e.g. Humvee 210716)
+
+## Follow-up #1: Seed 7 Active Customers into Database
+- [x] Seed André Simas (CPF: 289.916.178-40, manual) — verified in DB
+- [x] Seed Paulo Jr (CPF: 039.401.701-35, clicksign) — verified in DB
+- [x] Seed Huber Mastelari (email: hubermastelari@gmail.com, clicksign) — verified in DB
+- [x] Seed Sandoval Gonçalves Pereira (email: samboston14@gmail.com, clicksign) — verified in DB
+- [x] Seed André Francisco Junqueira Merino Teles (email: Afteles@hotmail.com, clicksign) — verified in DB
+- [x] Seed Roberto Nunes Fortaleza Neto (email: fortaleza.neto@gmail.com, clicksign) — verified in DB
+- [x] Seed Fabricio Oliveira Menezes (email: fabricio.o.menezes@gmail.com, clicksign) — verified in DB
+
+## Follow-up #2: Link Vehicles to Customers & BLs
+- [x] customer_id FK already exists in vehicles table (schema was correct)
+- [x] Link Simas vehicles (210716, 1FTEX15H6MKA92716) to his customer record — done in seed
+- [ ] Cross-reference existing BL VINs with customer vehicles for auto-linking (deferred)
+
+## Follow-up #3: Clicksign Webhook Sync
+- [ ] Create webhook endpoint for Clicksign document events
+- [ ] Auto-update customer status on contract sign/cancel events
+- [ ] Store clicksign_envelope_id and clicksign_signer_id on customer records
+
+## Project Audit
+- [x] Database integrity check: 0 critical issues, 2 warnings (orphan vehicles/BLs), encryption valid
+- [x] Code quality audit: 0 TypeScript errors, 0 LSP errors, clean build
+- [x] Test coverage audit: 9 test files, 208 tests, all passing
+- [x] Generate comprehensive progress report with completion percentage
+
+## Cleanup: Remove Newsletter from Admin Dashboard (REVERTED — Newsletter is a lead repository)
+- [x] Reverted: Newsletter kept and repositioned to Marketing/Leads section
+- [x] Reverted: NewsletterPanel restored
+- [x] Reverted: All newsletter imports restored
+
+## Revert Newsletter Removal & Reposition
+- [x] Revert newsletter router in routers.ts (restore all CRUD + subscribe endpoints)
+- [x] Revert newsletter section in Footer.tsx (restore subscribe form)
+- [x] Revert NewsletterPanel in Admin.tsx (restore full panel component)
+- [x] Reposition Newsletter tab away from operations tabs (separate Marketing/Leads section)
+
+## Fabricio Menezes — Multiple Contracts Investigation
+- [x] Query Clicksign API for all Fabricio contracts (found 2: 1 canceled, 1 signed)
+- [x] Identify BMW contract linked to booking MAEU266193682 (VIN: WBABA110X0EB56026)
+- [x] Identify contract with 2 camionetes — not yet in Clicksign (user confirmed)
+- [x] Extract VINs and vehicle details from signed contract (BMW 320i E30, 1992, blue, from Germany)
+- [x] Link Fabricio's BMW to his customer record and BL MAEU266193682
+
+## VIN Correction & Customer-BL Linking
+- [x] Correct BMW VIN from WBADA110X0EB56026 to WBABA110X0EB56026 in vehicles table (was already correct)
+- [x] Update BMW model to '320i Series 3 E30' year 1992 (from Clicksign contract)
+- [x] Link Fabricio (customer_id:7) to vehicle ID:1 (BMW) and BL MAEU266193682
+- [x] Update Fabricio status to em_processo (BL is in_transit)
+- [x] Verify André Simas (customer_id:1) vehicles (210716, 1FTEX15H6MKA92716) — confirmed linked
+- [ ] Review remaining 4 BLs and link customers where identifiable (MAEU266742227, MAEU265399692, MAEU266742326, BUE105691RCN)

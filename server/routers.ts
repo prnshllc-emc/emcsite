@@ -105,7 +105,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ===== Admin: Newsletter Subscribers =====
+  // ===== Marketing: Newsletter Subscribers (Lead repository) =====
   newsletter: router({
     list: adminProcedure.query(async () => {
       return getAllSubscribers();
@@ -163,7 +163,7 @@ export const appRouter = router({
               }
               console.log(`[HubSpot] Lead ${input.email} synced successfully (ID: ${hubspotContactId})`);
             } else {
-              console.warn(`[HubSpot] Lead ${input.email} sync returned no ID — will retry in nightly job`);
+              console.warn(`[HubSpot] Lead ${input.email} sync returned no ID \u2014 will retry in nightly job`);
             }
           })
           .catch((err) => {

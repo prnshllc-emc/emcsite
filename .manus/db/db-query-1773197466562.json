@@ -1,0 +1,122 @@
+{
+  "query": "SELECT id, vin, customer_id, make, model, year FROM vehicles WHERE deleted_at IS NULL ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, vin, customer_id, make, model, year FROM vehicles WHERE deleted_at IS NULL ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "vin": "WBADA110X0EB56026",
+      "customer_id": "NULL",
+      "make": "BMW",
+      "model": "320i E30",
+      "year": "1986"
+    },
+    {
+      "id": "2",
+      "vin": "BJ487579",
+      "customer_id": "NULL",
+      "make": "VW",
+      "model": "Fusca",
+      "year": "NULL"
+    },
+    {
+      "id": "30001",
+      "vin": "B8457749",
+      "customer_id": "NULL",
+      "make": "VW",
+      "model": "Fusca 1300",
+      "year": "1968"
+    },
+    {
+      "id": "30002",
+      "vin": "9BFFF25L81B060580",
+      "customer_id": "NULL",
+      "make": "Ford",
+      "model": "F250 XL L",
+      "year": "2000"
+    },
+    {
+      "id": "30003",
+      "vin": "BH328258",
+      "customer_id": "NULL",
+      "make": "VW",
+      "model": "Kombi",
+      "year": "1974"
+    },
+    {
+      "id": "30004",
+      "vin": "9BD159000S9123467",
+      "customer_id": "NULL",
+      "make": "Fiat",
+      "model": "Tempra Ouro 16V",
+      "year": "1995"
+    },
+    {
+      "id": "30005",
+      "vin": "52871BB140501",
+      "customer_id": "NULL",
+      "make": "GM",
+      "model": "Opala",
+      "year": "1972"
+    },
+    {
+      "id": "30006",
+      "vin": "B9672772",
+      "customer_id": "NULL",
+      "make": "VW",
+      "model": "Fusca",
+      "year": "1969"
+    },
+    {
+      "id": "30007",
+      "vin": "9C2RC1701JR100203",
+      "customer_id": "NULL",
+      "make": "Honda",
+      "model": "CBX 750 F",
+      "year": "1987"
+    },
+    {
+      "id": "30008",
+      "vin": "9BWZZZ30ZFP003230",
+      "customer_id": "NULL",
+      "make": "VW",
+      "model": "Voyage LS",
+      "year": "1985"
+    },
+    {
+      "id": "30009",
+      "vin": "9BGTC11JKKC153234",
+      "customer_id": "NULL",
+      "make": "GM",
+      "model": "Chevette SL",
+      "year": "1989"
+    },
+    {
+      "id": "30010",
+      "vin": "9BGJK19BVVB596206",
+      "customer_id": "NULL",
+      "make": "GM",
+      "model": "Vectra GLS",
+      "year": "1997"
+    },
+    {
+      "id": "30011",
+      "vin": "210716",
+      "customer_id": "1",
+      "make": "AM General",
+      "model": "GM M1123 Humvee H1",
+      "year": "1990"
+    },
+    {
+      "id": "30012",
+      "vin": "1FTEX15H6MKA92716",
+      "customer_id": "1",
+      "make": "Ford",
+      "model": "F150 Pickup Cabine Estendida",
+      "year": "1991"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tvin\tcustomer_id\tmake\tmodel\tyear\n1\tWBADA110X0EB56026\tNULL\tBMW\t320i E30\t1986\n2\tBJ487579\tNULL\tVW\tFusca\tNULL\n30001\tB8457749\tNULL\tVW\tFusca 1300\t1968\n30002\t9BFFF25L81B060580\tNULL\tFord\tF250 XL L\t2000\n30003\tBH328258\tNULL\tVW\tKombi\t1974\n30004\t9BD159000S9123467\tNULL\tFiat\tTempra Ouro 16V\t1995\n30005\t52871BB140501\tNULL\tGM\tOpala\t1972\n30006\tB9672772\tNULL\tVW\tFusca\t1969\n30007\t9C2RC1701JR100203\tNULL\tHonda\tCBX 750 F\t1987\n30008\t9BWZZZ30ZFP003230\tNULL\tVW\tVoyage LS\t1985\n30009\t9BGTC11JKKC153234\tNULL\tGM\tChevette SL\t1989\n30010\t9BGJK19BVVB596206\tNULL\tGM\tVectra GLS\t1997\n30011\t210716\t1\tAM General\tGM M1123 Humvee H1\t1990\n30012\t1FTEX15H6MKA92716\t1\tFord\tF150 Pickup Cabine Estendida\t1991\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

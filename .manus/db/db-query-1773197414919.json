@@ -1,0 +1,73 @@
+{
+  "query": "SELECT id, name, status, tipo_operacao, data_source, created_at, deleted_at FROM customers ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, name, status, tipo_operacao, data_source, created_at, deleted_at FROM customers ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andre Luiz Miranda Simas",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "manual",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "Paulo Sergio Carvalho dos Santos Junior",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "Huber Mastelari",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "4",
+      "name": "Sandoval Gonçalves Pereira",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "5",
+      "name": "André Francisco Junqueira Merino Teles",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "6",
+      "name": "Roberto Nunes Fortaleza Neto",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    },
+    {
+      "id": "7",
+      "name": "Fabricio Oliveira Menezes",
+      "status": "aguardando_embarque",
+      "tipo_operacao": "importacao",
+      "data_source": "clicksign",
+      "created_at": "2026-03-11 02:40:33",
+      "deleted_at": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tstatus\ttipo_operacao\tdata_source\tcreated_at\tdeleted_at\n1\tAndre Luiz Miranda Simas\taguardando_embarque\timportacao\tmanual\t2026-03-11 02:40:33\tNULL\n2\tPaulo Sergio Carvalho dos Santos Junior\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n3\tHuber Mastelari\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n4\tSandoval Gonçalves Pereira\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n5\tAndré Francisco Junqueira Merino Teles\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n6\tRoberto Nunes Fortaleza Neto\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n7\tFabricio Oliveira Menezes\taguardando_embarque\timportacao\tclicksign\t2026-03-11 02:40:33\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

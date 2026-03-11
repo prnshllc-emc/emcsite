@@ -1,0 +1,130 @@
+{
+  "query": "DESCRIBE customers;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute DESCRIBE customers;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "cpf",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cpf_hash",
+      "Type": "varchar(64)",
+      "Null": "NO",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(500)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "phone",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "created_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updated_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "deleted_at",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('aguardando_embarque','aguardando_li','em_processo','concluido','cancelado')",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "aguardando_embarque",
+      "Extra": ""
+    },
+    {
+      "Field": "tipo_operacao",
+      "Type": "enum('importacao','exportacao')",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "clicksign_envelope_id",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "clicksign_signer_id",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "data_source",
+      "Type": "enum('manual','clicksign','agent')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "manual",
+      "Extra": ""
+    },
+    {
+      "Field": "manual_overrides",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\ncpf\tvarchar(255)\tNO\t\tNULL\t\ncpf_hash\tvarchar(64)\tNO\tUNI\tNULL\t\nname\tvarchar(255)\tNO\t\tNULL\t\nemail\tvarchar(500)\tYES\t\tNULL\t\nphone\tvarchar(255)\tYES\t\tNULL\t\ncreated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ndeleted_at\ttimestamp\tYES\tMUL\tNULL\t\nstatus\tenum('aguardando_embarque','aguardando_li','em_processo','concluido','cancelado')\tNO\tMUL\taguardando_embarque\t\ntipo_operacao\tenum('importacao','exportacao')\tYES\tMUL\tNULL\t\nclicksign_envelope_id\tvarchar(100)\tYES\tMUL\tNULL\t\nclicksign_signer_id\tvarchar(100)\tYES\t\tNULL\t\ndata_source\tenum('manual','clicksign','agent')\tNO\t\tmanual\t\nmanual_overrides\tjson\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}
