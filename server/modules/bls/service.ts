@@ -4,6 +4,7 @@
  */
 import * as repo from "./repository";
 import { logAudit } from "../../shared/audit";
+import { autoGenerateTrackingCode } from "../tracking/service";
 import type { PaginatedQuery, PaginatedResult } from "../../shared/pagination";
 
 // ── Status transition rules ──────────────────────────────────
@@ -122,6 +123,13 @@ export async function updateBl(
     });
   }
 
+  // 🔑 Auto-generate tracking code when customer is newly linked to this BL
+  if (updated && data.customerId && data.customerId !== before.customerId) {
+    triggerAutoTrackingCode(id, data.customerId).catch((err) =>
+      console.error("[BL Service] Auto-tracking code generation error:", err)
+    );
+  }
+
   return updated;
 }
 
@@ -203,13 +211,14 @@ export async function deactivateTracking(
   return updated;
 }
 
-// ── Link BL to vehicle and customer ──────────────────────────
+// ── Link BL to vehicle and customer ──────────────────────────────
 export async function linkBlToVehicleAndCustomer(
   blId: number,
   vehicleId: number,
   customerId: number,
   adminUserId?: number
 ): Promise<repo.BlRecord | null> {
+  const before = await repo.findBlById(blId);
   const updated = await repo.linkBlToVehicleAndCustomer(blId, vehicleId, customerId);
 
   await logAudit({
@@ -218,10 +227,17 @@ export async function linkBlToVehicleAndCustomer(
     entity: "bl",
     entityId: blId,
     changes: {
-      vehicleId: { before: null, after: vehicleId },
-      customerId: { before: null, after: customerId },
+      vehicleId: { before: before?.vehicleId ?? null, after: vehicleId },
+      customerId: { before: before?.customerId ?? null, after: customerId },
     },
   });
+
+  // 🔑 Auto-generate tracking code when customer is linked
+  if (customerId && (!before || before.customerId !== customerId)) {
+    triggerAutoTrackingCode(blId, customerId).catch((err) =>
+      console.error("[BL Service] Auto-tracking code generation error:", err)
+    );
+  }
 
   return updated;
 }
@@ -337,7 +353,30 @@ export async function countBlsByStatus(): Promise<Record<string, number>> {
   return repo.countBlsByStatus();
 }
 
-// ── Count active ─────────────────────────────────────────────
+// ── Count active ─────────────────────────────────────────────────
 export async function countActiveBls(): Promise<number> {
   return repo.countActiveBls();
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-GENERATE TRACKING CODE (internal helper)
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Trigger auto-generation of a tracking code for a BL+Customer pair.
+ * Called when a customer is linked to a BL (via update or linkBlToVehicleAndCustomer).
+ * The code is created with status "pending" and the admin must approve before it's active.
+ */
+async function triggerAutoTrackingCode(blId: number, customerId: number): Promise<void> {
+  try {
+    const code = await autoGenerateTrackingCode(blId, customerId);
+    if (code) {
+      console.log(
+        `[BL Service] Auto-generated tracking code ${code.code} (${code.approvalStatus}) for BL ${blId} / Customer ${customerId}`
+      );
+    }
+  } catch (err) {
+    // Don't fail the BL update if tracking code generation fails
+    console.error("[BL Service] Failed to auto-generate tracking code:", err);
+  }
 }

@@ -34,17 +34,54 @@ export const trackingRouter = router({
       );
     }),
 
-  // ── List tracking codes (paginated) ─────────────────────────
+   // ── List tracking codes (paginated) ─────────────────────
   listCodes: adminProcedure
     .input(
       PaginatedQuerySchema.extend({
         blId: z.number().int().positive().optional(),
         customerId: z.number().int().positive().optional(),
         activeOnly: z.boolean().default(false),
+        approvalStatus: z.enum(["pending", "approved", "rejected"]).optional(),
       })
     )
     .query(async ({ input }) => {
       return service.listTrackingCodes(input);
+    }),
+
+  // ── List pending codes (approval queue) ─────────────────
+  listPendingCodes: adminProcedure.query(async () => {
+    return service.listPendingCodes();
+  }),
+
+  // ── Count pending codes (for badge) ──────────────────────
+  countPendingCodes: adminProcedure.query(async () => {
+    return service.countPendingCodes();
+  }),
+
+  // ── Approve a pending tracking code ──────────────────────
+  approveCode: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input, ctx }) => {
+      return service.approveCode(input.id, ctx.user.id);
+    }),
+
+  // ── Reject a pending tracking code ───────────────────────
+  rejectCode: adminProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        reason: z.string().max(500).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return service.rejectCode(input.id, input.reason, ctx.user.id);
+    }),
+
+  // ── Get approval notification templates (email + WhatsApp preview) ──
+  getApprovalPreview: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      return service.getApprovalPreview(input.id);
     }),
 
   // ── Deactivate tracking code ────────────────────────────────

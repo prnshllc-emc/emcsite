@@ -273,7 +273,7 @@
 - [ ] Build reconciliation logic: cross-reference Clicksign customers with BL vehicles (VIN-a-VIN)
 - [x] Auto-set status to em_processo when VIN matches existing BL — done for Fabricio
 - [x] Admin UI: Customer management tab with status flags and manual override — done in Phase 30
-- [ ] Auto-generate tracking codes when customer+BL are linked
+- [x] Auto-generate tracking codes when customer+BL are linked (with admin approval layer)
 - [ ] Write tests for Clicksign integration and reconciliation
 
 ## Phase 30: Customer Management with Manual Override Protection
@@ -346,3 +346,34 @@
 - [x] Update Fabricio status to em_processo (BL is in_transit)
 - [x] Verify André Simas (customer_id:1) vehicles (210716, 1FTEX15H6MKA92716) — confirmed linked
 - [ ] Review remaining 4 BLs and link customers where identifiable (MAEU266742227, MAEU265399692, MAEU266742326, BUE105691RCN)
+
+## Phase 31: Auto-Generate Tracking Codes on Customer-BL Link
+- [x] Analyze existing tracking code generation flow (service, repository, router)
+- [x] Implement auto-generation in BL service when customer_id is set on a BL
+- [x] Prevent duplicate codes: skip if customer+BL already has an active code
+- [x] Send notification to owner when tracking code is auto-generated
+- [x] Update admin BlsPanel to show linked tracking codes
+- [x] Write vitest tests for auto-generation logic (48 tests)
+- [x] Verify end-to-end: link customer → code generated → code visible in admin
+
+## Phase 31: Auto-Generate Tracking Codes on Customer-BL Link (with Admin Approval)
+- [x] Analyze existing tracking code generation flow (service, repository, schema)
+- [x] Add approval_status enum (pending/approved/rejected) to tracking_codes schema
+- [x] Implement auto-generation in BL service when customer_id is set (code created as pending)
+- [x] Prevent duplicate codes: skip if customer+BL already has a pending/approved code
+- [x] Build admin approval UI: pending codes queue with Approve/Reject buttons
+- [x] On Approve: activate code + send notification to owner
+- [x] On Reject: mark code as rejected with reason
+- [x] Notify owner when new pending codes are generated
+- [x] Write vitest tests for auto-generation and approval flow (48 tests, 256 total)
+- [x] Verify end-to-end: link customer → pending code → admin approves → code active
+
+## Phase 31 Addition: Email + WhatsApp on Tracking Code Approval
+- [x] Build email template for customer when tracking code is approved
+- [x] Build WhatsApp message template for customer when tracking code is approved
+- [x] On admin approval: preview dialog shows email + WhatsApp templates
+- [x] Admin notification: notify owner immediately when new pending code is auto-generated
+- [x] Admin can preview email/WhatsApp before sending (opt-in confirmation via preview dialog)
+- [x] Copy-to-clipboard for email body and WhatsApp message
+- [x] Direct WhatsApp link (wa.me) with pre-filled message
+- [x] Direct mailto: link with pre-filled subject and body
