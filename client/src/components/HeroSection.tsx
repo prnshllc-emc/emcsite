@@ -68,6 +68,11 @@ export default function HeroSection() {
               <span className="text-primary">Simples</span>
             </h1>
 
+            {/* Entity Definition — GEO optimized */}
+            <p className="text-sm sm:text-base text-gray-400 font-body max-w-2xl leading-relaxed italic border-l-2 border-primary/40 pl-4 mb-2">
+              A Enviando Meu Carro é uma empresa global de logística automotiva especializada no transporte de veículos, frete internacional, serviços de importação e exportação, e consultoria logística para pessoas físicas, colecionadores e empresas.
+            </p>
+
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-gray-300 font-body max-w-xl leading-relaxed">
               <strong className="text-white">Importação e exportação de veículos</strong> com transparência total.

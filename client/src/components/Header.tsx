@@ -3,19 +3,28 @@ import { useState, useEffect } from "react";
 import { Menu, Truck, X } from "lucide-react";
 import { LOGO_URL } from "@/lib/contact";
 import { trackNavClick } from "@/lib/analytics";
+import { Link, useLocation } from "wouter";
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  anchor?: string;
+  href?: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Início", anchor: "#inicio" },
   { label: "Sobre Nós", anchor: "#about" },
   { label: "Serviços", anchor: "#services" },
   { label: "Depoimentos", anchor: "#testimonials" },
   { label: "Escritórios", anchor: "#offices" },
   { label: "FAQ", anchor: "#faq" },
+  { label: "Conhecimento", href: "/centro-de-conhecimento" },
 ];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [location] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -26,13 +35,59 @@ export default function Header() {
   function scrollTo(anchor: string, label: string) {
     trackNavClick(label, anchor);
     if (anchor === "#inicio") {
+      // If not on homepage, navigate first
+      if (location !== "/") {
+        window.location.href = "/#inicio";
+        return;
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
       setMobileOpen(false);
+      return;
+    }
+    // If not on homepage, navigate to homepage with anchor
+    if (location !== "/") {
+      window.location.href = `/${anchor}`;
       return;
     }
     const el = document.querySelector(anchor);
     if (el) el.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
+  }
+
+  function renderNavItem(item: NavItem, mobile = false) {
+    const baseClass = mobile
+      ? "text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all uppercase tracking-wider text-left py-3 px-3 rounded-md"
+      : "whitespace-nowrap px-3 py-2 rounded-md text-[13px] xl:text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all uppercase tracking-wider";
+
+    if (item.href) {
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={baseClass}
+          onClick={() => {
+            trackNavClick(item.label, item.href!);
+            setMobileOpen(false);
+          }}
+        >
+          {item.label}
+        </Link>
+      );
+    }
+
+    return (
+      <a
+        key={item.anchor}
+        href={item.anchor}
+        onClick={(e) => {
+          e.preventDefault();
+          scrollTo(item.anchor!, item.label);
+        }}
+        className={baseClass}
+      >
+        {item.label}
+      </a>
+    );
   }
 
   return (
@@ -53,6 +108,10 @@ export default function Header() {
           onClick={(e) => {
             e.preventDefault();
             trackNavClick("Logo", "#inicio");
+            if (location !== "/") {
+              window.location.href = "/";
+              return;
+            }
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         >
@@ -67,19 +126,7 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Navegação principal">
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.anchor}
-              href={item.anchor}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo(item.anchor, item.label);
-              }}
-              className="whitespace-nowrap px-3 py-2 rounded-md text-[13px] xl:text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all uppercase tracking-wider"
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => renderNavItem(item))}
 
           {/* Tracking Button — Active link to /rastrear */}
           <a
@@ -107,19 +154,7 @@ export default function Header() {
       {mobileOpen && (
         <div className="lg:hidden bg-background/98 backdrop-blur-lg border-t border-white/10 absolute top-[4.5rem] left-0 right-0 z-40 shadow-xl shadow-black/30">
           <nav className="container py-4 flex flex-col gap-1" aria-label="Navegação mobile">
-            {NAV_ITEMS.map((item) => (
-              <a
-                key={item.anchor}
-                href={item.anchor}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollTo(item.anchor, item.label);
-                }}
-                className="text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all uppercase tracking-wider text-left py-3 px-3 rounded-md"
-              >
-                {item.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map((item) => renderNavItem(item, true))}
             <a
               href="/rastrear"
               className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2 border border-primary/40 px-4 py-2.5 rounded-full bg-primary/10 hover:bg-primary/20 w-fit mt-2"

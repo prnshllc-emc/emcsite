@@ -377,3 +377,46 @@
 - [x] Copy-to-clipboard for email body and WhatsApp message
 - [x] Direct WhatsApp link (wa.me) with pre-filled message
 - [x] Direct mailto: link with pre-filled subject and body
+
+## Phase 32: SEO/GEO Restructuring Plan
+
+### FASE 1: Core Positioning e Definição de Entidade (GEO)
+- [x] Add entity definition paragraph to Hero section below H1
+- [x] Ensure entity definition matches JSON-LD schema markup
+
+### FASE 2: Arquitetura Semântica — Deep Service Pages (1500+ words each)
+- [x] Create /importacao-de-veiculos page (1867 words)
+- [x] Create /exportacao-de-veiculos page (1900+ words)
+- [x] Create /despacho-aduaneiro page (2100+ words)
+- [x] Create /transporte-internacional-de-veiculos page (2000+ words)
+- [x] Create /importacao-de-carros-classicos page (3613 words)
+- [x] Create /admissao-temporaria page (2000+ words)
+- [x] Each page: definition, process steps, cost factors, timelines, documentation, comparison table, FAQ with schema
+- [x] Create reusable ServicePageLayout component with JSON-LD FAQ schema
+- [x] Register all 6 routes in App.tsx with lazy loading
+- [x] Update ServicesSection cards to link to deep pages
+- [x] Update Footer service links to point to deep pages
+- [x] Add related services cross-links in each service page
+
+### FASE 3: Knowledge Center (Hub de Conteúdo)
+- [x] Create /centro-de-conhecimento route and listing page with search
+- [x] Create category routes (6 categories with icons and descriptions)
+- [x] Build article system with 12 seeded articles, JSON-LD schema, and related articles
+- [x] Add Knowledge Center link to Header and Footer navigation
+
+### FASE 4: Páginas de Alta Intenção (Rotas e Preços)
+- [x] Create /rotas/enviar-carro-brasil-estados-unidos page (2217 words)
+- [x] Create /rotas/enviar-carro-brasil-europa page (2171 words)
+- [x] Create /rotas/importar-carro-estados-unidos-brasil page (2156 words)
+- [x] Create /custos/quanto-custa-importar-veiculo page (1800 words)
+- [x] Create /custos/quanto-custa-exportar-carro page (1600 words)
+- [x] Create RoutePageLayout reusable component with FAQ JSON-LD schema
+- [x] Register all 5 routes in App.tsx with lazy loading
+- [ ] Add prominent CTAs linking to calculator subdomain
+
+### FASE 5: Ajustes Técnicos Finais
+- [x] Update sitemap.xml with all 22 URLs (services, routes, costs, knowledge center, tracking, legal)
+- [x] Implement internal linking: Footer has Serviços + Rotas & Custos sections, Header has Centro de Conhecimento
+- [x] JSON-LD FAQ schema on all service and route pages
+- [ ] Validate SSR/prerendering for Googlebot and AI crawlers (deferred — requires production deploy)
+- [x] All 256 tests passing (10 test files, no regressions from SEO changes)

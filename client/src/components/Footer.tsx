@@ -18,15 +18,24 @@ const QUICK_LINKS = [
   { label: "Escritórios", href: "#offices" },
   { label: "FAQ", href: "#faq" },
   { label: "Calculadora de Importação", href: "https://calculadora.enviandomeucarro.com", external: true },
+  { label: "Centro de Conhecimento", href: "/centro-de-conhecimento" },
 ];
 
 const SERVICE_LINKS = [
-  { label: "Importação de Veículos", href: "#services" },
-  { label: "Exportação de Veículos", href: "#services" },
-  { label: "Despacho Aduaneiro", href: "#services" },
-  { label: "Peças e Acessórios", href: "#services" },
-  { label: "Envios Aéreos", href: "#services" },
-  { label: "Admissão Temporária", href: "#services" },
+  { label: "Importação de Veículos", href: "/importacao-de-veiculos" },
+  { label: "Exportação de Veículos", href: "/exportacao-de-veiculos" },
+  { label: "Despacho Aduaneiro", href: "/despacho-aduaneiro" },
+  { label: "Transporte Internacional", href: "/transporte-internacional-de-veiculos" },
+  { label: "Importação de Clássicos", href: "/importacao-de-carros-classicos" },
+  { label: "Admissão Temporária", href: "/admissao-temporaria" },
+];
+
+const ROUTE_LINKS = [
+  { label: "Brasil → EUA", href: "/rotas/enviar-carro-brasil-estados-unidos" },
+  { label: "Brasil → Europa", href: "/rotas/enviar-carro-brasil-europa" },
+  { label: "EUA → Brasil", href: "/rotas/importar-carro-estados-unidos-brasil" },
+  { label: "Custo de Importação", href: "/custos/quanto-custa-importar-veiculo" },
+  { label: "Custo de Exportação", href: "/custos/quanto-custa-exportar-carro" },
 ];
 
 export default function Footer() {
@@ -165,6 +174,13 @@ export default function Footer() {
                     >
                       {link.label}
                     </a>
+                  ) : link.href.startsWith("/") ? (
+                    <Link
+                      href={link.href}
+                      className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
+                    >
+                      {link.label}
+                    </Link>
                   ) : (
                     <a
                       href={link.href}
@@ -185,16 +201,26 @@ export default function Footer() {
             <ul className="space-y-2 list-none">
               {SERVICE_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <Link
                     href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      scrollTo(link.href);
-                    }}
                     className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
                   >
                     {link.label}
-                  </a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h4 className="text-white font-display font-bold mt-6 mb-3">Rotas & Custos</h4>
+            <ul className="space-y-2 list-none">
+              {ROUTE_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-400 hover:text-primary transition-colors text-sm font-body"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
