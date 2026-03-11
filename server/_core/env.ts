@@ -10,4 +10,5 @@ export const ENV = {
   hubspotAccessToken: process.env.HUBSPOT_ACCESS_TOKEN ?? "",
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY ?? "",
   clicksignApiToken: process.env.CLICKSIGN_API_TOKEN ?? "",
+  cmsApiKey: process.env.CMS_API_KEY ?? "",
 };

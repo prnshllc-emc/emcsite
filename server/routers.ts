@@ -21,6 +21,7 @@ import { customersRouter } from "./modules/customers/router";
 import { vehiclesRouter } from "./modules/vehicles/router";
 import { blsRouter } from "./modules/bls/router";
 import { trackingRouter } from "./modules/tracking/router";
+import { cmsRouter } from "./modules/cms/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -38,6 +39,7 @@ export const appRouter = router({
   vehicles: vehiclesRouter,
   bls: blsRouter,
   tracking: trackingRouter,
+  cms: cmsRouter,
 
   // ===== Admin Dashboard Stats =====
   dashboard: router({

@@ -1,196 +1,124 @@
-/* KnowledgeCenter — Hub de Conteúdo em Logística Automotiva */
+/* KnowledgeCenter — Hub de Conteúdo em Logística Automotiva
+ * Now powered by CMS database via tRPC (no more hardcoded articles).
+ * Falls back to a placeholder if CMS data is not yet available.
+ */
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Link, useRoute } from "wouter";
-import { Search, BookOpen, ArrowRight, Ship, Globe, FileText, Plane, Car, Scale } from "lucide-react";
+import {
+  Search,
+  BookOpen,
+  ArrowRight,
+  Ship,
+  Globe,
+  FileText,
+  Plane,
+  Car,
+  Scale,
+  Loader2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { openContact } from "@/lib/contact";
+import { trpc } from "@/lib/trpc";
 
-/* ── Category definitions ─────────────────────────────────── */
-export interface Article {
+/* ── Icon map — maps DB icon name to Lucide component ──── */
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Ship,
+  Globe,
+  FileText,
+  Plane,
+  Car,
+  Scale,
+};
+
+/* ── Color map — maps DB color to Tailwind class ──────── */
+const DEFAULT_COLORS: Record<string, string> = {
+  "text-blue-400": "text-blue-400",
+  "text-emerald-400": "text-emerald-400",
+  "text-amber-400": "text-amber-400",
+  "text-purple-400": "text-purple-400",
+  "text-red-400": "text-red-400",
+  "text-cyan-400": "text-cyan-400",
+};
+
+/* ── Types ─────────────────────────────────────────────── */
+interface CmsArticle {
+  id: number;
   slug: string;
   title: string;
-  description: string;
-  category: string;
-  date: string;
-  readTime: string;
+  description: string | null;
+  content?: string | null;
+  author: string | null;
+  readTime: string | null;
   tags: string[];
+  featuredImage: string | null;
+  categoryId: number | null;
+  categorySlug?: string | null;
+  status: string;
+  publishedAt: Date | string | null;
+  createdAt: Date | string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
 }
 
-export const CATEGORIES = [
-  {
-    slug: "transporte-de-veiculos",
-    label: "Transporte de Veículos",
-    icon: Ship,
-    description: "Guias completos sobre transporte marítimo, aéreo e terrestre de veículos nacionais e internacionais.",
-    color: "text-blue-400",
-  },
-  {
-    slug: "importacao",
-    label: "Importação",
-    icon: Globe,
-    description: "Tudo sobre importação de veículos: legislação, custos, documentação e processos alfandegários.",
-    color: "text-emerald-400",
-  },
-  {
-    slug: "exportacao",
-    label: "Exportação",
-    icon: Plane,
-    description: "Guias sobre exportação de veículos do Brasil para qualquer destino no mundo.",
-    color: "text-amber-400",
-  },
-  {
-    slug: "frete-internacional",
-    label: "Frete Internacional",
-    icon: FileText,
-    description: "Comparações de modalidades, custos de frete, seguros e rotas internacionais.",
-    color: "text-purple-400",
-  },
-  {
-    slug: "carros-classicos",
-    label: "Carros Clássicos",
-    icon: Car,
-    description: "Importação de veículos antigos, laudo ACB, placa preta e feiras internacionais.",
-    color: "text-red-400",
-  },
-  {
-    slug: "regulamentacoes",
-    label: "Regulamentações",
-    icon: Scale,
-    description: "Legislação aduaneira, normas do DENATRAN, IBAMA, INMETRO e acordos internacionais.",
-    color: "text-cyan-400",
-  },
-];
-
-/* ── Article database (will be expanded as articles are created) ─── */
-export const ARTICLES: Article[] = [
-  // Transporte de Veículos
-  {
-    slug: "como-funciona-transporte-maritimo-veiculos",
-    title: "Como Funciona o Transporte Marítimo de Veículos: Guia Completo 2026",
-    description: "Entenda as modalidades RoRo e Container, prazos, custos e como escolher a melhor opção para transportar seu veículo por via marítima.",
-    category: "transporte-de-veiculos",
-    date: "2026-03-01",
-    readTime: "12 min",
-    tags: ["transporte marítimo", "RoRo", "container", "frete"],
-  },
-  {
-    slug: "roro-vs-container-qual-melhor",
-    title: "RoRo vs Container: Qual a Melhor Opção para Transportar Seu Veículo?",
-    description: "Comparação detalhada entre as duas principais modalidades de transporte marítimo de veículos, com tabela de custos e prazos.",
-    category: "transporte-de-veiculos",
-    date: "2026-02-20",
-    readTime: "10 min",
-    tags: ["RoRo", "container", "comparação", "custos"],
-  },
-  // Importação
-  {
-    slug: "guia-completo-importacao-veiculos-brasil",
-    title: "Guia Completo de Importação de Veículos para o Brasil em 2026",
-    description: "Passo a passo detalhado para importar carros, motos e utilitários: documentação, impostos, prazos e dicas para economizar.",
-    category: "importacao",
-    date: "2026-03-05",
-    readTime: "15 min",
-    tags: ["importação", "veículos", "Brasil", "guia"],
-  },
-  {
-    slug: "impostos-importacao-veiculos-brasil",
-    title: "Impostos na Importação de Veículos: II, IPI, ICMS, PIS e COFINS Explicados",
-    description: "Entenda cada imposto cobrado na importação de veículos, como são calculados e estratégias legais para otimizar custos.",
-    category: "importacao",
-    date: "2026-02-15",
-    readTime: "11 min",
-    tags: ["impostos", "II", "IPI", "ICMS", "tributação"],
-  },
-  {
-    slug: "como-importar-carro-dos-eua",
-    title: "Como Importar um Carro dos EUA para o Brasil: Passo a Passo",
-    description: "Guia específico para importação de veículos americanos: leilões, dealers, documentação e logística EUA-Brasil.",
-    category: "importacao",
-    date: "2026-02-10",
-    readTime: "13 min",
-    tags: ["EUA", "importação", "leilões", "Copart", "IAAI"],
-  },
-  // Exportação
-  {
-    slug: "como-exportar-veiculo-do-brasil",
-    title: "Como Exportar um Veículo do Brasil: Guia Completo",
-    description: "Processo completo de exportação de veículos brasileiros: documentação, desembaraço, logística e mercados internacionais.",
-    category: "exportacao",
-    date: "2026-03-03",
-    readTime: "12 min",
-    tags: ["exportação", "Brasil", "documentação", "logística"],
-  },
-  // Frete Internacional
-  {
-    slug: "quanto-custa-frete-internacional-veiculo",
-    title: "Quanto Custa o Frete Internacional de um Veículo em 2026?",
-    description: "Tabela atualizada de custos de frete marítimo e aéreo para as principais rotas: EUA-Brasil, Europa-Brasil e Brasil-mundo.",
-    category: "frete-internacional",
-    date: "2026-03-08",
-    readTime: "9 min",
-    tags: ["frete", "custos", "tabela", "rotas"],
-  },
-  {
-    slug: "seguro-transporte-internacional-veiculos",
-    title: "Seguro para Transporte Internacional de Veículos: O Que Você Precisa Saber",
-    description: "Tipos de seguro, coberturas All Risks, como acionar em caso de sinistro e quanto custa proteger seu veículo no transporte.",
-    category: "frete-internacional",
-    date: "2026-02-25",
-    readTime: "8 min",
-    tags: ["seguro", "All Risks", "transporte", "cobertura"],
-  },
-  // Carros Clássicos
-  {
-    slug: "importar-carro-classico-brasil-guia",
-    title: "Importar Carro Clássico para o Brasil: Guia Definitivo 2026",
-    description: "Tudo sobre importação de veículos antigos (+30 anos): isenção de IPI, laudo ACB, placa preta e feiras internacionais.",
-    category: "carros-classicos",
-    date: "2026-03-06",
-    readTime: "14 min",
-    tags: ["clássicos", "antigos", "ACB", "placa preta", "isenção"],
-  },
-  {
-    slug: "feiras-internacionais-carros-classicos",
-    title: "Principais Feiras Internacionais de Carros Clássicos para Compradores Brasileiros",
-    description: "Calendário e guia das melhores feiras de veículos antigos nos EUA e Europa: Barrett-Jackson, Mecum, Retromobile e mais.",
-    category: "carros-classicos",
-    date: "2026-02-18",
-    readTime: "10 min",
-    tags: ["feiras", "Barrett-Jackson", "Mecum", "Retromobile"],
-  },
-  // Regulamentações
-  {
-    slug: "legislacao-importacao-veiculos-brasil-2026",
-    title: "Legislação de Importação de Veículos no Brasil: Atualização 2026",
-    description: "Resumo atualizado das normas do DENATRAN, IBAMA, INMETRO e Receita Federal para importação de veículos.",
-    category: "regulamentacoes",
-    date: "2026-03-10",
-    readTime: "11 min",
-    tags: ["legislação", "DENATRAN", "IBAMA", "INMETRO", "normas"],
-  },
-  {
-    slug: "admissao-temporaria-veiculos-regras",
-    title: "Admissão Temporária de Veículos: Regras, Prazos e Procedimentos",
-    description: "Guia completo sobre o regime de admissão temporária: quem pode usar, documentação, prazos e obrigações fiscais.",
-    category: "regulamentacoes",
-    date: "2026-02-28",
-    readTime: "9 min",
-    tags: ["admissão temporária", "regime especial", "tributos", "prazos"],
-  },
-];
+interface CmsCategory {
+  id: number;
+  slug: string;
+  label: string;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  articleCount: number;
+}
 
 /* ── Category Page ────────────────────────────────────────── */
 function CategoryPage({ categorySlug }: { categorySlug: string }) {
-  const category = CATEGORIES.find((c) => c.slug === categorySlug);
-  const categoryArticles = ARTICLES.filter((a) => a.category === categorySlug);
+  const { data: categories = [], isLoading: catLoading } = trpc.cms.listCategories.useQuery();
+  const { data: articlesData, isLoading: artLoading } = trpc.cms.listArticles.useQuery({
+    categorySlug,
+    limit: 50,
+  });
 
-  if (!category) return null;
+  const category = categories.find((c: CmsCategory) => c.slug === categorySlug);
+  const articles = articlesData?.articles ?? [];
+  const isLoading = catLoading || artLoading;
 
-  const Icon = category.icon;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!category) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-white mb-4">Categoria não encontrada</h1>
+            <Link href="/centro-de-conhecimento" className="text-primary hover:underline">
+              Voltar ao Centro de Conhecimento
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const IconComp = ICON_MAP[category.icon ?? ""] ?? BookOpen;
+  const colorClass = category.color && DEFAULT_COLORS[category.color] ? DEFAULT_COLORS[category.color] : "text-primary";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -203,8 +131,8 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
               &larr; Centro de Conhecimento
             </Link>
             <div className="flex items-center gap-3 mb-4">
-              <div className={`w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${category.color}`}>
-                <Icon className="w-6 h-6" />
+              <div className={`w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${colorClass}`}>
+                <IconComp className="w-6 h-6" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold font-display text-white">
                 {category.label}
@@ -217,15 +145,15 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
         {/* Articles */}
         <section className="py-12">
           <div className="container">
-            {categoryArticles.length === 0 ? (
+            {articles.length === 0 ? (
               <div className="text-center py-16">
                 <BookOpen className="w-12 h-12 text-gray-500 mx-auto mb-4" />
                 <p className="text-gray-400 text-lg">Artigos desta categoria serão publicados em breve.</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                {categoryArticles.map((article) => (
-                  <ArticleCard key={article.slug} article={article} />
+                {articles.map((article: CmsArticle) => (
+                  <ArticleCard key={article.slug} article={article} categories={categories} />
                 ))}
               </div>
             )}
@@ -253,17 +181,31 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
 }
 
 /* ── Article Card Component ───────────────────────────────── */
-function ArticleCard({ article }: { article: Article }) {
-  const category = CATEGORIES.find((c) => c.slug === article.category);
+function ArticleCard({ article, categories }: { article: CmsArticle; categories: CmsCategory[] }) {
+  const category = categories.find((c: CmsCategory) => c.id === article.categoryId);
+  const catSlug = article.categorySlug ?? category?.slug ?? "geral";
+  const colorClass = category?.color && DEFAULT_COLORS[category.color] ? DEFAULT_COLORS[category.color] : "text-primary";
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" })
+    : article.createdAt
+      ? new Date(article.createdAt).toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" })
+      : "";
+
   return (
-    <Link href={`/centro-de-conhecimento/${article.category}/${article.slug}`}>
+    <Link href={`/centro-de-conhecimento/${catSlug}/${article.slug}`}>
       <article className="group p-6 rounded-xl border border-white/8 bg-card/80 hover:border-primary/25 transition-all duration-300 cursor-pointer h-full">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`text-xs font-semibold uppercase tracking-wider ${category?.color || "text-primary"}`}>
-            {category?.label}
+          <span className={`text-xs font-semibold uppercase tracking-wider ${colorClass}`}>
+            {category?.label ?? "Geral"}
           </span>
           <span className="text-gray-500 text-xs">&middot;</span>
-          <span className="text-gray-500 text-xs">{article.readTime} de leitura</span>
+          <span className="text-gray-500 text-xs">{article.readTime ?? "5 min"} de leitura</span>
+          {article.status === "draft" && (
+            <>
+              <span className="text-gray-500 text-xs">&middot;</span>
+              <span className="text-amber-400/80 text-xs font-medium">Em preparação</span>
+            </>
+          )}
         </div>
         <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors mb-2 font-display leading-tight">
           {article.title}
@@ -271,21 +213,43 @@ function ArticleCard({ article }: { article: Article }) {
         <p className="text-gray-400 text-sm font-body leading-relaxed mb-4">
           {article.description}
         </p>
-        <div className="flex items-center gap-2 text-primary text-sm font-semibold">
-          Ler artigo
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-primary text-sm font-semibold">
+            Ler artigo
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+          {dateStr && <span className="text-gray-500 text-xs">{dateStr}</span>}
         </div>
       </article>
     </Link>
   );
 }
 
-/* ── Article Placeholder Page ─────────────────────────────── */
+/* ── Article Page ─────────────────────────────────────────── */
 function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; articleSlug: string }) {
-  const article = ARTICLES.find((a) => a.slug === articleSlug && a.category === categorySlug);
-  const category = CATEGORIES.find((c) => c.slug === categorySlug);
+  const { data: article, isLoading } = trpc.cms.getArticle.useQuery({ slug: articleSlug });
+  const { data: categories = [] } = trpc.cms.listCategories.useQuery();
+  const { data: relatedData } = trpc.cms.listArticles.useQuery({
+    categorySlug,
+    limit: 4,
+  });
 
-  if (!article || !category) {
+  const category = categories.find((c: CmsCategory) => c.slug === categorySlug);
+  const related = (relatedData?.articles ?? []).filter((a: CmsArticle) => a.slug !== articleSlug).slice(0, 3);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!article) {
     return (
       <div className="min-h-screen flex flex-col bg-background text-foreground">
         <Header />
@@ -302,8 +266,12 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
     );
   }
 
-  // Related articles from same category
-  const related = ARTICLES.filter((a) => a.category === categorySlug && a.slug !== articleSlug).slice(0, 3);
+  const hasContent = article.status === "published" && article.content;
+  const articleDate = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })
+    : article.createdAt
+      ? new Date(article.createdAt).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })
+      : "";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -315,29 +283,52 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
             <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6 font-body">
               <Link href="/centro-de-conhecimento" className="hover:text-primary transition-colors">Centro de Conhecimento</Link>
               <span>/</span>
-              <Link href={`/centro-de-conhecimento/${categorySlug}`} className="hover:text-primary transition-colors">{category.label}</Link>
+              <Link href={`/centro-de-conhecimento/${categorySlug}`} className="hover:text-primary transition-colors">{category?.label ?? categorySlug}</Link>
             </nav>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white font-display leading-tight mb-4">
               {article.title}
             </h1>
             <p className="text-gray-300 text-lg font-body mb-4">{article.description}</p>
             <div className="flex items-center gap-4 text-sm text-gray-400">
-              <span>{new Date(article.date).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</span>
-              <span>&middot;</span>
-              <span>{article.readTime} de leitura</span>
+              {articleDate && <span>{articleDate}</span>}
+              {article.readTime && (
+                <>
+                  <span>&middot;</span>
+                  <span>{article.readTime} de leitura</span>
+                </>
+              )}
+              {article.author && (
+                <>
+                  <span>&middot;</span>
+                  <span>Por {article.author}</span>
+                </>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Article Body — placeholder for Markdown content */}
+        {/* Article Body */}
         <section className="py-12">
           <div className="container max-w-4xl">
-            <div className="prose prose-invert prose-lg max-w-none">
+            {hasContent ? (
+              <div
+                className="prose prose-invert prose-lg max-w-none
+                  prose-headings:font-display prose-headings:text-white
+                  prose-p:text-gray-300 prose-p:font-body prose-p:leading-relaxed
+                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-white
+                  prose-li:text-gray-300
+                  prose-table:border-white/10
+                  prose-th:text-white prose-th:border-white/10
+                  prose-td:text-gray-300 prose-td:border-white/10"
+                dangerouslySetInnerHTML={{ __html: article.content! }}
+              />
+            ) : (
               <div className="bg-card/50 border border-white/10 rounded-xl p-8 text-center">
                 <BookOpen className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h2 className="text-xl font-bold text-white mb-2">Conteúdo em preparação</h2>
                 <p className="text-gray-400 font-body">
-                  Este artigo está sendo finalizado por nossa equipe de especialistas. 
+                  Este artigo está sendo finalizado por nossa equipe de especialistas.
                   Enquanto isso, entre em contato para tirar suas dúvidas.
                 </p>
                 <Button
@@ -347,7 +338,7 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
                   Falar com Especialista
                 </Button>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
@@ -357,16 +348,19 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
             <div className="container max-w-4xl">
               <h2 className="text-2xl font-bold text-white mb-6 font-display">Artigos Relacionados</h2>
               <div className="grid md:grid-cols-3 gap-4">
-                {related.map((a) => (
-                  <Link key={a.slug} href={`/centro-de-conhecimento/${a.category}/${a.slug}`}>
-                    <div className="p-4 rounded-lg border border-white/8 hover:border-primary/25 transition-all cursor-pointer">
-                      <h3 className="text-sm font-bold text-white mb-2 font-display leading-tight hover:text-primary transition-colors">
-                        {a.title}
-                      </h3>
-                      <span className="text-xs text-gray-500">{a.readTime}</span>
-                    </div>
-                  </Link>
-                ))}
+                {related.map((a: CmsArticle) => {
+                  const relCatSlug = a.categorySlug ?? categorySlug;
+                  return (
+                    <Link key={a.slug} href={`/centro-de-conhecimento/${relCatSlug}/${a.slug}`}>
+                      <div className="p-4 rounded-lg border border-white/8 hover:border-primary/25 transition-all cursor-pointer">
+                        <h3 className="text-sm font-bold text-white mb-2 font-display leading-tight hover:text-primary transition-colors">
+                          {a.title}
+                        </h3>
+                        <span className="text-xs text-gray-500">{a.readTime ?? "5 min"}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -398,10 +392,10 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Article",
-            headline: article.title,
-            description: article.description,
-            datePublished: article.date,
+            "@type": article.schemaData?.["@type"] ?? "Article",
+            headline: article.metaTitle ?? article.title,
+            description: article.metaDescription ?? article.description,
+            datePublished: article.publishedAt ?? article.createdAt,
             author: {
               "@type": "Organization",
               name: "Enviando Meu Carro",
@@ -444,22 +438,26 @@ export default function KnowledgeCenter() {
 
 function KnowledgeCenterListing() {
   const [search, setSearch] = useState("");
+  const { data: categories = [], isLoading: catLoading } = trpc.cms.listCategories.useQuery();
+  const { data: articlesData, isLoading: artLoading } = trpc.cms.listArticles.useQuery({
+    limit: 50,
+    search: search.trim() || undefined,
+  });
 
-  const filteredArticles = useMemo(() => {
-    if (!search.trim()) return ARTICLES;
-    const q = search.toLowerCase();
-    return ARTICLES.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.description.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [search]);
+  const articles = articlesData?.articles ?? [];
+  const isLoading = catLoading || artLoading;
 
   // Latest articles (sorted by date)
   const latestArticles = useMemo(
-    () => [...ARTICLES].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6),
-    []
+    () =>
+      [...articles]
+        .sort((a, b) => {
+          const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        })
+        .slice(0, 6),
+    [articles]
   );
 
   return (
@@ -493,19 +491,28 @@ function KnowledgeCenterListing() {
           </div>
         </section>
 
+        {/* Loading state */}
+        {isLoading && (
+          <section className="py-12">
+            <div className="container flex justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          </section>
+        )}
+
         {/* Search results */}
-        {search.trim() && (
+        {!isLoading && search.trim() && (
           <section className="py-12">
             <div className="container">
               <h2 className="text-xl font-bold text-white mb-6 font-display">
-                {filteredArticles.length} resultado{filteredArticles.length !== 1 ? "s" : ""} para "{search}"
+                {articles.length} resultado{articles.length !== 1 ? "s" : ""} para &ldquo;{search}&rdquo;
               </h2>
-              {filteredArticles.length === 0 ? (
+              {articles.length === 0 ? (
                 <p className="text-gray-400 font-body">Nenhum artigo encontrado. Tente outro termo de busca.</p>
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
-                  {filteredArticles.map((article) => (
-                    <ArticleCard key={article.slug} article={article} />
+                  {articles.map((article: CmsArticle) => (
+                    <ArticleCard key={article.slug} article={article} categories={categories} />
                   ))}
                 </div>
               )}
@@ -513,28 +520,28 @@ function KnowledgeCenterListing() {
           </section>
         )}
 
-        {/* Categories */}
-        {!search.trim() && (
+        {/* Categories + Latest Articles */}
+        {!isLoading && !search.trim() && (
           <>
             <section className="py-12">
               <div className="container">
                 <h2 className="text-2xl font-bold text-white mb-8 font-display">Categorias</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {CATEGORIES.map((cat) => {
-                    const Icon = cat.icon;
-                    const count = ARTICLES.filter((a) => a.category === cat.slug).length;
+                  {categories.map((cat: CmsCategory) => {
+                    const IconComp = ICON_MAP[cat.icon ?? ""] ?? BookOpen;
+                    const colorClass = cat.color && DEFAULT_COLORS[cat.color] ? DEFAULT_COLORS[cat.color] : "text-primary";
                     return (
                       <Link key={cat.slug} href={`/centro-de-conhecimento/${cat.slug}`}>
                         <div className="group p-5 rounded-xl border border-white/8 bg-card/80 hover:border-primary/25 transition-all duration-300 cursor-pointer">
                           <div className="flex items-center gap-3 mb-3">
-                            <div className={`w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${cat.color}`}>
-                              <Icon className="w-5 h-5" />
+                            <div className={`w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${colorClass}`}>
+                              <IconComp className="w-5 h-5" />
                             </div>
                             <div>
                               <h3 className="font-bold text-white group-hover:text-primary transition-colors font-display">
                                 {cat.label}
                               </h3>
-                              <span className="text-xs text-gray-500">{count} artigo{count !== 1 ? "s" : ""}</span>
+                              <span className="text-xs text-gray-500">{cat.articleCount} artigo{cat.articleCount !== 1 ? "s" : ""}</span>
                             </div>
                           </div>
                           <p className="text-gray-400 text-sm font-body leading-relaxed">{cat.description}</p>
@@ -547,16 +554,18 @@ function KnowledgeCenterListing() {
             </section>
 
             {/* Latest Articles */}
-            <section className="py-12 bg-card">
-              <div className="container">
-                <h2 className="text-2xl font-bold text-white mb-8 font-display">Artigos Recentes</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {latestArticles.map((article) => (
-                    <ArticleCard key={article.slug} article={article} />
-                  ))}
+            {latestArticles.length > 0 && (
+              <section className="py-12 bg-card">
+                <div className="container">
+                  <h2 className="text-2xl font-bold text-white mb-8 font-display">Artigos Recentes</h2>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {latestArticles.map((article: CmsArticle) => (
+                      <ArticleCard key={article.slug} article={article} categories={categories} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
           </>
         )}
 

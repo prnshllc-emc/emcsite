@@ -501,3 +501,127 @@ export const systemConfig = mysqlTable("system_config", {
 
 export type SystemConfigEntry = typeof systemConfig.$inferSelect;
 export type InsertSystemConfigEntry = typeof systemConfig.$inferInsert;
+
+
+// ─────────────────────────────────────────────────────────────
+// 15. CMS CATEGORIES — Content categories for Knowledge Center
+// ─────────────────────────────────────────────────────────────
+export const cmsCategories = mysqlTable(
+  "cms_categories",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 128 }).notNull().unique(),
+    label: varchar("label", { length: 255 }).notNull(),
+    description: text("description"),
+    icon: varchar("icon", { length: 50 }), // lucide icon name e.g. "Ship", "Globe"
+    color: varchar("color", { length: 50 }), // tailwind class e.g. "text-blue-400"
+    sortOrder: int("sort_order").default(0).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => [
+    index("idx_cms_cat_active").on(table.isActive),
+    index("idx_cms_cat_sort").on(table.sortOrder),
+  ]
+);
+
+export type CmsCategory = typeof cmsCategories.$inferSelect;
+export type InsertCmsCategory = typeof cmsCategories.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// 16. CMS ARTICLES — Blog posts / Knowledge Center articles
+// ─────────────────────────────────────────────────────────────
+export const cmsArticles = mysqlTable(
+  "cms_articles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 256 }).notNull().unique(),
+    title: varchar("title", { length: 500 }).notNull(),
+    description: text("description"), // meta description / excerpt
+    content: text("content"), // full Markdown body
+    categoryId: int("category_id"), // FK → cms_categories
+    // SEO fields
+    metaTitle: varchar("meta_title", { length: 120 }), // override for <title>
+    metaDescription: varchar("meta_description", { length: 320 }), // override for <meta description>
+    metaKeywords: varchar("meta_keywords", { length: 500 }), // comma-separated
+    canonicalUrl: varchar("canonical_url", { length: 500 }),
+    ogImage: varchar("og_image", { length: 1000 }), // Open Graph image URL
+    // Content metadata
+    author: varchar("author", { length: 255 }).default("Enviando Meu Carro"),
+    readTime: varchar("read_time", { length: 20 }), // e.g. "12 min"
+    tags: text("tags"), // JSON array of tag strings
+    featuredImage: varchar("featured_image", { length: 1000 }), // hero image URL
+    // Publishing
+    status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+    publishedAt: timestamp("published_at"),
+    // Schema.org structured data
+    schemaType: varchar("schema_type", { length: 50 }).default("Article"), // Article, HowTo, FAQPage, etc.
+    schemaData: text("schema_data"), // JSON-LD override (optional)
+    // Tracking
+    viewCount: int("view_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+    deletedAt: timestamp("deleted_at"), // soft delete
+  },
+  (table) => [
+    index("idx_cms_art_category").on(table.categoryId),
+    index("idx_cms_art_status").on(table.status),
+    index("idx_cms_art_published").on(table.publishedAt),
+    index("idx_cms_art_deleted").on(table.deletedAt),
+  ]
+);
+
+export type CmsArticle = typeof cmsArticles.$inferSelect;
+export type InsertCmsArticle = typeof cmsArticles.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// 17. CMS MEDIA — Uploaded images, videos, documents
+// ─────────────────────────────────────────────────────────────
+export const cmsMedia = mysqlTable(
+  "cms_media",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    fileName: varchar("file_name", { length: 255 }).notNull(),
+    fileUrl: varchar("file_url", { length: 1000 }).notNull(), // S3 CDN URL
+    fileKey: varchar("file_key", { length: 500 }).notNull(), // S3 key
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    fileSize: int("file_size").notNull(), // bytes
+    altText: varchar("alt_text", { length: 500 }), // SEO alt text
+    caption: varchar("caption", { length: 500 }),
+    width: int("width"),
+    height: int("height"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_cms_media_mime").on(table.mimeType),
+  ]
+);
+
+export type CmsMedia = typeof cmsMedia.$inferSelect;
+export type InsertCmsMedia = typeof cmsMedia.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// 18. CMS NAVIGATION — Menu items for header/footer
+// ─────────────────────────────────────────────────────────────
+export const cmsNavigation = mysqlTable(
+  "cms_navigation",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    location: mysqlEnum("location", ["header", "footer_services", "footer_routes", "footer_quick"]).notNull(),
+    label: varchar("label", { length: 128 }).notNull(),
+    href: varchar("href", { length: 500 }).notNull(),
+    sortOrder: int("sort_order").default(0).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    parentId: int("parent_id"), // FK → self (for dropdowns)
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => [
+    index("idx_cms_nav_location").on(table.location),
+    index("idx_cms_nav_sort").on(table.sortOrder),
+  ]
+);
+
+export type CmsNavItem = typeof cmsNavigation.$inferSelect;
+export type InsertCmsNavItem = typeof cmsNavigation.$inferInsert;

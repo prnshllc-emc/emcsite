@@ -420,3 +420,39 @@
 - [x] JSON-LD FAQ schema on all service and route pages
 - [ ] Validate SSR/prerendering for Googlebot and AI crawlers (deferred — requires production deploy)
 - [x] All 256 tests passing (10 test files, no regressions from SEO changes)
+
+## Phase 33: Google Search Console Sitemap Submission
+- [x] Submit sitemap.xml to Google Search Console (done by user manually)
+- [ ] Verify indexing status of new pages (ongoing — Google will crawl over next days)
+
+## Phase 34: Content Management API for External SEO/GEO Task
+- [x] Design CMS API schema: articles, categories, metatags, media
+- [x] Create articles table in database (title, slug, content, excerpt, category, status, seo_title, seo_description, seo_keywords, author, published_at, featured_image)
+- [x] Create categories table in database (name, slug, description, parent_id)
+- [x] Create media table in database (url, alt_text, caption, mime_type, file_key)
+- [x] Implement API key authentication middleware for CMS endpoints
+- [x] Generate dedicated CMS API key
+- [x] Build REST endpoints: POST/GET/PUT/DELETE /api/cms/articles
+- [x] Build REST endpoints: POST/GET/PUT/DELETE /api/cms/categories
+- [x] Build REST endpoints: POST/GET/PUT/DELETE /api/cms/media
+- [x] Build REST endpoints: GET/PUT /api/cms/menus
+- [x] Build REST endpoints: GET/PUT /api/cms/seo (global SEO settings)
+- [x] Write comprehensive API documentation (Swagger/OpenAPI style)
+- [x] Test all endpoints with curl examples
+- [x] Write vitest tests for CMS API (3 tests)
+- [x] Deliver API key + docs to user for external Manus task
+
+## Phase 35: CMS Integration — Seed Data + Frontend Migration
+- [x] Seed 6 CMS categories via REST API (transporte, importacao, exportacao, frete, classicos, regulamentacoes)
+- [x] Seed 12 CMS article stubs via REST API (draft status, with SEO metadata)
+- [x] Create CMS tRPC router with listCategories, listArticles, getArticle endpoints
+- [x] listArticles: pagination, categorySlug filter, text search, draft+published support
+- [x] getArticle: returns single article by slug with category slug
+- [x] Migrate KnowledgeCenter.tsx from hardcoded data to tRPC-powered (categories, articles, article detail)
+- [x] Category page: loads articles filtered by category from DB
+- [x] Article page: loads single article with related articles, JSON-LD schema
+- [x] Search functionality: live search across title, description, tags
+- [x] Draft articles show "Em preparação" badge and placeholder content
+- [x] Write 11 vitest tests for CMS tRPC router (listCategories, listArticles, getArticle)
+- [x] All 270 tests passing (12 test files, no regressions)
+- [x] Visual verification: categories, articles, article detail pages all rendering from DB

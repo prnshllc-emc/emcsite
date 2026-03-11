@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { createAgentRouter } from "../modules/agent/ingestion";
+import { createCmsRouter } from "../modules/cms/api";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -38,6 +39,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Agent Ingestion API (REST, API-key authenticated)
   app.use("/api/agent", createAgentRouter());
+  // CMS Content API (REST, API-key authenticated)
+  app.use("/api/cms", createCmsRouter());
   // tRPC API
   app.use(
     "/api/trpc",
