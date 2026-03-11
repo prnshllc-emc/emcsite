@@ -505,3 +505,21 @@
 - [x] Audit all CTAs in Tracking page
 - [x] Audit all CTAs in service pages (ServicePageLayout already tracked, RoutePageLayout fixed, ImportCalculator fixed)
 - [x] Add missing tracking to 16 untracked CTAs across 6 files
+
+## Phase 41: Analytics Improvements (3 Suggestions)
+
+### 41a: UTM Tracking on WhatsApp Links
+- [x] Update openContact() in contact.ts to append UTM parameters (source, medium, campaign) to WhatsApp URLs
+- [x] Pass source/campaign context from each CTA caller to openContact() — 14 callers updated across 10 files
+- [x] Verify UTM params appear in WhatsApp link URLs (appended as [Ref: source/medium/campaign] tag)
+
+### 41b: GTM DataLayer Event Triggers & Custom Conversions
+- [x] Create GTM container configuration JSON (GTM_CONTAINER_CONFIG.json) with 12 triggers, 18 tags, 18 variables
+- [x] Define 6 custom conversion tags for Google Ads (cta_click, whatsapp_click, whatsapp_open, newsletter_subscribe, phone_call, calculator_interaction)
+- [x] Verified: gtag.js already captures dataLayer events; GTM container JSON ready for import
+- [x] Created comprehensive GTM_SETUP_GUIDE.md with step-by-step instructions
+
+### 41c: GA4 Conversion Dashboard Configuration
+- [x] Create GA4 custom event configuration with 16 custom dimensions and conversion marking guide
+- [x] Create GA4_DASHBOARD_CONFIG.md with 5 explorations, Looker Studio dashboard spec, and automated alerts
+- [x] Document recommended GA4 Explorations setup (included in GA4_DASHBOARD_CONFIG.md)

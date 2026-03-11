@@ -140,7 +140,7 @@ export default function ServicesSection() {
                     onClick={() => {
                       trackCTAClick(`WhatsApp - ${service.title}`, "services_section", "whatsapp", service.title);
                       trackWhatsAppClick(`service_${service.title.toLowerCase().replace(/\s+/g, '_')}`, service.message);
-                      openContact(service.message);
+                      openContact(service.message, "site", "whatsapp", `servico_${service.title.toLowerCase().replace(/\s+/g, '_')}`);
                     }}
                     className="text-gray-400 hover:text-primary text-xs"
                     aria-label={`Falar sobre ${service.title} no WhatsApp`}
@@ -160,7 +160,7 @@ export default function ServicesSection() {
             onClick={() => {
               trackCTAClick("Assessoria Completa", "services_section_bottom", "whatsapp", "Quero uma Assessoria Completa");
               trackWhatsAppClick("services_section_bottom_cta", "Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.");
-              openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.");
+              openContact("Olá! Gostaria de uma assessoria completa para importação/exportação de veículo.", "site", "whatsapp", "assessoria_completa");
             }}
             className="cta-whatsapp"
             aria-label="Solicitar assessoria completa de importação e exportação de veículos"

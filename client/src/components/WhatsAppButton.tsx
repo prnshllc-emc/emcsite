@@ -13,7 +13,7 @@ export default function WhatsAppButton() {
   function handleClick() {
     trackCTAClick("WhatsApp Flutuante", "floating_button", "whatsapp", "Fale Conosco");
     trackWhatsAppClick("botao_flutuante");
-    openContactWithNumber(whatsappNumber);
+    openContactWithNumber(whatsappNumber, undefined, "site", "whatsapp", "botao_flutuante");
   }
 
   return (

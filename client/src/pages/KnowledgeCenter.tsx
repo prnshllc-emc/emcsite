@@ -170,7 +170,7 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
               onClick={() => {
                 trackCTAClick("Falar com Especialista", `knowledge_category_${category.slug}`, "whatsapp", "Falar com Especialista");
                 trackWhatsAppClick(`knowledge_category_${category.slug}`, `Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`);
-                openContact(`Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`);
+                openContact(`Olá! Tenho dúvidas sobre ${category.label.toLowerCase()}.`, "site", "whatsapp", `conhecimento_categoria_${category.slug}`);
               }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >
@@ -340,7 +340,7 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
                   onClick={() => {
                     trackCTAClick("Falar com Especialista", `knowledge_article_${article.slug}`, "whatsapp", "Falar com Especialista");
                     trackWhatsAppClick(`knowledge_article_${article.slug}`, `Olá! Gostaria de saber mais sobre: ${article.title}`);
-                    openContact(`Olá! Gostaria de saber mais sobre: ${article.title}`);
+                    openContact(`Olá! Gostaria de saber mais sobre: ${article.title}`, "site", "whatsapp", `conhecimento_artigo_${article.slug}`);
                   }}
                   className="mt-4 bg-primary hover:bg-primary/90"
                 >
@@ -386,7 +386,7 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
               onClick={() => {
                 trackCTAClick("Assessoria Personalizada", "knowledge_article_bottom", "whatsapp", "Solicitar Assessoria");
                 trackWhatsAppClick("knowledge_article_bottom", "Olá! Gostaria de uma assessoria personalizada.");
-                openContact("Olá! Gostaria de uma assessoria personalizada.");
+                openContact("Olá! Gostaria de uma assessoria personalizada.", "site", "whatsapp", "conhecimento_assessoria");
               }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >
@@ -593,7 +593,7 @@ function KnowledgeCenterListing() {
               onClick={() => {
                 trackCTAClick("Falar com Especialista", "knowledge_main_bottom", "whatsapp", "Falar com Especialista");
                 trackWhatsAppClick("knowledge_main_bottom", "Olá! Tenho uma dúvida sobre logística automotiva.");
-                openContact("Olá! Tenho uma dúvida sobre logística automotiva.");
+                openContact("Olá! Tenho uma dúvida sobre logística automotiva.", "site", "whatsapp", "conhecimento_duvida");
               }}
               className="bg-primary hover:bg-primary/90 font-bold"
             >

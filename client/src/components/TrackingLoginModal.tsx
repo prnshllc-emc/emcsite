@@ -129,7 +129,7 @@ export default function TrackingLoginModal({ open, onOpenChange }: Props) {
               const msg = "Olá! Não tenho meu código de rastreamento. Pode me ajudar?";
               trackCTAClick("Sem código rastreamento", "tracking_modal", "whatsapp", "Fale Conosco");
               trackWhatsAppClick("tracking_modal_help", msg);
-              openContact(msg);
+              openContact(msg, "site", "whatsapp", "tracking_login_modal");
             }}
             className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 mx-auto"
           >

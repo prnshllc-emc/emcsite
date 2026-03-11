@@ -28,7 +28,7 @@ export default function CTASection({ title, description, buttonText, variant }: 
       const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
       trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
       trackWhatsAppClick(`cta_section_${variant}`, msg);
-      openContactWithNumber(whatsappNumber, msg);
+      openContactWithNumber(whatsappNumber, msg, "site", "whatsapp", `cta_section_${variant}`);
     }
   }
 

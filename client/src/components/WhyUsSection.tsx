@@ -67,7 +67,7 @@ export default function WhyUsSection() {
                   const msg = "Olá! Gostaria de falar com um consultor sobre os serviços da EMC.";
                   trackCTAClick("Falar com Consultor", "whyus_section", "whatsapp", "Falar com Consultor");
                   trackWhatsAppClick("whyus_cta", msg);
-                  openContact(msg);
+                  openContact(msg, "site", "whatsapp", "whyus_consultor");
                 }}
                 className="cta-whatsapp"
                 aria-label="Falar com um consultor especialista em importação de veículos"

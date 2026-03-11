@@ -14,7 +14,7 @@ export default function HeroSection() {
     const msg = "Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro.";
     trackCTAClick("Fale com Especialista", "hero", "whatsapp", "Fale com um Especialista");
     trackWhatsAppClick("hero_cta_principal", msg);
-    openContactWithNumber(whatsappNumber, msg);
+    openContactWithNumber(whatsappNumber, msg, "site", "whatsapp", "hero_cta_principal");
   }
 
   function handleCalculator() {

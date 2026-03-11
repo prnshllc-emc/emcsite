@@ -73,7 +73,7 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
                 onClick={() => {
                   trackCTAClick("Solicitar Cotação", `route_hero_${data.origin}_${data.destination}`, "whatsapp", "Solicitar Cotação");
                   trackWhatsAppClick(`route_hero_${data.origin}_${data.destination}`, data.ctaText);
-                  openContact(data.ctaText);
+                  openContact(data.ctaText, "site", "whatsapp", `rota_${data.origin}_${data.destination}_hero`);
                 }}
                 className="bg-primary hover:bg-primary/90 font-bold"
                 size="lg"
@@ -323,7 +323,7 @@ export default function RoutePageLayout({ data }: { data: RoutePageData }) {
               onClick={() => {
                 trackCTAClick("Solicitar Cotação Gratuita", `route_bottom_${data.origin}_${data.destination}`, "whatsapp", "Solicitar Cotação Gratuita");
                 trackWhatsAppClick(`route_bottom_${data.origin}_${data.destination}`, data.ctaText);
-                openContact(data.ctaText);
+                openContact(data.ctaText, "site", "whatsapp", `rota_${data.origin}_${data.destination}_bottom`);
               }}
               className="bg-primary hover:bg-primary/90 font-bold"
               size="lg"

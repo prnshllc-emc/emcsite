@@ -96,7 +96,7 @@ export default function FAQSection() {
     const msg = "Olá! Tenho algumas dúvidas sobre os serviços da Enviando Meu Carro. Pode me ajudar?";
     trackCTAClick("Tirar Dúvidas no WhatsApp", "faq_section", "whatsapp", "Tirar Dúvidas no WhatsApp");
     trackWhatsAppClick("faq_cta", msg);
-    openContact(msg);
+    openContact(msg, "site", "whatsapp", "faq_duvidas");
   }
 
   return (

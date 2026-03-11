@@ -108,7 +108,7 @@ export default function Footer() {
   function handleWhatsApp() {
     trackWhatsAppClick("footer_phone");
     trackCTAClick("Telefone Footer", "footer_contact", "whatsapp", "Telefone");
-    openContactWithNumber(whatsappNumber);
+    openContactWithNumber(whatsappNumber, undefined, "site", "whatsapp", "footer_telefone");
   }
 
   return (
