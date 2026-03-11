@@ -47,6 +47,7 @@ import {
   QrCode,
   LayoutDashboard,
   Megaphone,
+  GitBranch,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -55,6 +56,7 @@ import BlsPanel from "@/components/admin/BlsPanel";
 import TrackingPanel from "@/components/admin/TrackingPanel";
 import DashboardPanel from "@/components/admin/DashboardPanel";
 import CustomersPanel from "@/components/admin/CustomersPanel";
+import PipelinePanel from "@/components/admin/PipelinePanel";
 
 // ============================================================
 // TYPES
@@ -245,7 +247,7 @@ export default function Admin() {
             </h2>
           </div>
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-3xl grid-cols-5">
+            <TabsList className="grid w-full max-w-4xl grid-cols-6">
               <TabsTrigger value="dashboard" className="font-display text-xs">
                 <LayoutDashboard className="mr-1.5 h-4 w-4" />
                 Dashboard
@@ -261,6 +263,10 @@ export default function Admin() {
               <TabsTrigger value="tracking" className="font-display text-xs">
                 <QrCode className="mr-1.5 h-4 w-4" />
                 Rastreamento
+              </TabsTrigger>
+              <TabsTrigger value="pipeline" className="font-display text-xs">
+                <GitBranch className="mr-1.5 h-4 w-4" />
+                Pipeline
               </TabsTrigger>
               <TabsTrigger value="settings" className="font-display text-xs">
                 <Settings className="mr-1.5 h-4 w-4" />
@@ -282,6 +288,10 @@ export default function Admin() {
 
             <TabsContent value="tracking">
               <TrackingPanel />
+            </TabsContent>
+
+            <TabsContent value="pipeline">
+              <PipelinePanel />
             </TabsContent>
 
             <TabsContent value="settings">

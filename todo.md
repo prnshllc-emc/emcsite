@@ -529,3 +529,26 @@
 - [x] Register plugin in index.css via @plugin directive (Tailwind 4)
 - [x] Apply comprehensive prose classes to article content container in KnowledgeCenter
 - [x] Verify visual result with published articles (H2 borders, H3 spacing, tables, lists, bold all rendering correctly)
+
+## Phase 43: Clicksign → BL Reconciliation Fix
+- [ ] Investigate current Clicksign integration code and why clicksign_contracts table is empty
+- [ ] Fix Clicksign sync to fetch contracts and extract VINs from contract content
+- [ ] Implement VIN matching: Clicksign VIN → bl_vehicles VIN → link customer (CPF) to BL
+- [ ] Run reconciliation and verify customer-vehicle-BL links
+- [ ] Generate tracking codes for reconciled customer-BL pairs
+
+## Phase 43: State Machine Reconciliation System
+- [x] State machine reconciliation service: detect process stage for each contract/customer
+- [x] Stage detection logic: Clicksign→VIN→BL→Tracking chain (each false = stage indicator, not error)
+- [x] Process stages: aguardando_assinatura → contrato_ativo → fase_documental → aguardando_embarque → em_transito → desembaraco → concluido
+- [x] Admin dashboard: process pipeline view showing each customer's current stage
+- [x] Admin actions per stage: force sync, manual insert, override stage
+- [ ] Clicksign sync: populate clicksign_contracts table from API
+- [x] Auto-reconciliation: run chain detection and set correct customer status
+- [x] Tests for state machine reconciliation logic (14 tests passing)
+- [x] Non-blocking stages: absence of any phase does NOT prevent next phases from occurring
+- [x] Admin can advance/retrocede stages manually (no validation blocking)
+- [x] BL without client is valid (recurring export operations without per-operation contracts)
+- [x] Manual client insertion for tracking delivery (no Clicksign required)
+- [x] Tracking code absence is not a fatal error (beta/sandbox phase)
+- [x] Stage detection is informative only, never blocking
