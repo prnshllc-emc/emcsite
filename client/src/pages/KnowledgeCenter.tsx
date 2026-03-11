@@ -318,14 +318,20 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
             {hasContent ? (
               <div
                 className="prose prose-invert prose-lg max-w-none
-                  prose-headings:font-display prose-headings:text-white
-                  prose-p:text-gray-300 prose-p:font-body prose-p:leading-relaxed
-                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                  prose-strong:text-white
-                  prose-li:text-gray-300
-                  prose-table:border-white/10
-                  prose-th:text-white prose-th:border-white/10
-                  prose-td:text-gray-300 prose-td:border-white/10"
+                  prose-headings:font-bold prose-headings:tracking-tight prose-headings:font-display
+                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-white/20 prose-h2:pb-2
+                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                  prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4 prose-p:font-body
+                  prose-strong:text-white prose-strong:font-semibold
+                  prose-table:w-full prose-table:border-collapse
+                  prose-th:bg-white/10 prose-th:text-left prose-th:p-3 prose-th:border prose-th:border-white/20 prose-th:font-semibold prose-th:text-white
+                  prose-td:p-3 prose-td:border prose-td:border-white/20 prose-td:text-gray-300
+                  prose-li:text-gray-300 prose-li:leading-relaxed
+                  prose-ul:list-disc prose-ul:pl-6
+                  prose-ol:list-decimal prose-ol:pl-6
+                  prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-300
+                  prose-blockquote:border-l-primary prose-blockquote:bg-white/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+                  prose-img:rounded-lg prose-img:shadow-lg"
                 dangerouslySetInnerHTML={{ __html: article.content! }}
               />
             ) : (

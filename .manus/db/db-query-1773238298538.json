@@ -1,0 +1,55 @@
+{
+  "query": "SELECT bl.id, bl.bl_number, bl.status, bl.origin_port, bl.destination_port, bl.customer_id, c.name as customer_name FROM bills_of_lading bl LEFT JOIN customers c ON bl.customer_id = c.id ORDER BY bl.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT bl.id, bl.bl_number, bl.status, bl.origin_port, bl.destination_port, bl.customer_id, c.name as customer_name FROM bills_of_lading bl LEFT JOIN customers c ON bl.customer_id = c.id ORDER BY bl.id;",
+  "rows": [
+    {
+      "id": "1",
+      "bl_number": "MAEU266193682",
+      "status": "in_transit",
+      "origin_port": "Bremerhaven, Germany",
+      "destination_port": "Porto de Santos, SP, Brasil",
+      "customer_id": "7",
+      "customer_name": "Fabricio Oliveira Menezes"
+    },
+    {
+      "id": "2",
+      "bl_number": "MAEU266742227",
+      "status": "in_transit",
+      "origin_port": "Porto de Santos, SP, Brasil",
+      "destination_port": "Port Newark, NJ, USA",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "id": "3",
+      "bl_number": "MAEU265399692",
+      "status": "customs",
+      "origin_port": "Porto de Santos, SP, Brasil",
+      "destination_port": "Port Everglades, FL, USA",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "id": "4",
+      "bl_number": "MAEU266742326",
+      "status": "in_transit",
+      "origin_port": "Porto de Santos, SP, Brasil",
+      "destination_port": "Port Everglades, FL, USA",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "id": "5",
+      "bl_number": "BUE105691RCN",
+      "status": "customs",
+      "origin_port": "Buenos Aires, Argentina",
+      "destination_port": "Porto de Santos, SP, Brasil",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbl_number\tstatus\torigin_port\tdestination_port\tcustomer_id\tcustomer_name\n1\tMAEU266193682\tin_transit\tBremerhaven, Germany\tPorto de Santos, SP, Brasil\t7\tFabricio Oliveira Menezes\n2\tMAEU266742227\tin_transit\tPorto de Santos, SP, Brasil\tPort Newark, NJ, USA\tNULL\tNULL\n3\tMAEU265399692\tcustoms\tPorto de Santos, SP, Brasil\tPort Everglades, FL, USA\tNULL\tNULL\n4\tMAEU266742326\tin_transit\tPorto de Santos, SP, Brasil\tPort Everglades, FL, USA\tNULL\tNULL\n5\tBUE105691RCN\tcustoms\tBuenos Aires, Argentina\tPorto de Santos, SP, Brasil\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

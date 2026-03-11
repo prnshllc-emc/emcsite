@@ -1,0 +1,136 @@
+{
+  "query": "SELECT id, vin, make, model, year, color, customer_id FROM vehicles ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, vin, make, model, year, color, customer_id FROM vehicles ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "vin": "WBABA110X0EB56026",
+      "make": "BMW",
+      "model": "320i Series 3 E30",
+      "year": "1992",
+      "color": "NULL",
+      "customer_id": "7"
+    },
+    {
+      "id": "2",
+      "vin": "BJ487579",
+      "make": "VW",
+      "model": "Fusca",
+      "year": "NULL",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30001",
+      "vin": "B8457749",
+      "make": "VW",
+      "model": "Fusca 1300",
+      "year": "1968",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30002",
+      "vin": "9BFFF25L81B060580",
+      "make": "Ford",
+      "model": "F250 XL L",
+      "year": "2000",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30003",
+      "vin": "BH328258",
+      "make": "VW",
+      "model": "Kombi",
+      "year": "1974",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30004",
+      "vin": "9BD159000S9123467",
+      "make": "Fiat",
+      "model": "Tempra Ouro 16V",
+      "year": "1995",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30005",
+      "vin": "52871BB140501",
+      "make": "GM",
+      "model": "Opala",
+      "year": "1972",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30006",
+      "vin": "B9672772",
+      "make": "VW",
+      "model": "Fusca",
+      "year": "1969",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30007",
+      "vin": "9C2RC1701JR100203",
+      "make": "Honda",
+      "model": "CBX 750 F",
+      "year": "1987",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30008",
+      "vin": "9BWZZZ30ZFP003230",
+      "make": "VW",
+      "model": "Voyage LS",
+      "year": "1985",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30009",
+      "vin": "9BGTC11JKKC153234",
+      "make": "GM",
+      "model": "Chevette SL",
+      "year": "1989",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30010",
+      "vin": "9BGJK19BVVB596206",
+      "make": "GM",
+      "model": "Vectra GLS",
+      "year": "1997",
+      "color": "NULL",
+      "customer_id": "NULL"
+    },
+    {
+      "id": "30011",
+      "vin": "210716",
+      "make": "AM General",
+      "model": "GM M1123 Humvee H1",
+      "year": "1990",
+      "color": "Verde",
+      "customer_id": "1"
+    },
+    {
+      "id": "30012",
+      "vin": "1FTEX15H6MKA92716",
+      "make": "Ford",
+      "model": "F150 Pickup Cabine Estendida",
+      "year": "1991",
+      "color": "Branca",
+      "customer_id": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tvin\tmake\tmodel\tyear\tcolor\tcustomer_id\n1\tWBABA110X0EB56026\tBMW\t320i Series 3 E30\t1992\tNULL\t7\n2\tBJ487579\tVW\tFusca\tNULL\tNULL\tNULL\n30001\tB8457749\tVW\tFusca 1300\t1968\tNULL\tNULL\n30002\t9BFFF25L81B060580\tFord\tF250 XL L\t2000\tNULL\tNULL\n30003\tBH328258\tVW\tKombi\t1974\tNULL\tNULL\n30004\t9BD159000S9123467\tFiat\tTempra Ouro 16V\t1995\tNULL\tNULL\n30005\t52871BB140501\tGM\tOpala\t1972\tNULL\tNULL\n30006\tB9672772\tVW\tFusca\t1969\tNULL\tNULL\n30007\t9C2RC1701JR100203\tHonda\tCBX 750 F\t1987\tNULL\tNULL\n30008\t9BWZZZ30ZFP003230\tVW\tVoyage LS\t1985\tNULL\tNULL\n30009\t9BGTC11JKKC153234\tGM\tChevette SL\t1989\tNULL\tNULL\n30010\t9BGJK19BVVB596206\tGM\tVectra GLS\t1997\tNULL\tNULL\n30011\t210716\tAM General\tGM M1123 Humvee H1\t1990\tVerde\t1\n30012\t1FTEX15H6MKA92716\tFord\tF150 Pickup Cabine Estendida\t1991\tBranca\t1\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

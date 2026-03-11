@@ -523,3 +523,9 @@
 - [x] Create GA4 custom event configuration with 16 custom dimensions and conversion marking guide
 - [x] Create GA4_DASHBOARD_CONFIG.md with 5 explorations, Looker Studio dashboard spec, and automated alerts
 - [x] Document recommended GA4 Explorations setup (included in GA4_DASHBOARD_CONFIG.md)
+
+## Phase 42: Article Typography (prose) Styling
+- [x] Install @tailwindcss/typography plugin
+- [x] Register plugin in index.css via @plugin directive (Tailwind 4)
+- [x] Apply comprehensive prose classes to article content container in KnowledgeCenter
+- [x] Verify visual result with published articles (H2 borders, H3 spacing, tables, lists, bold all rendering correctly)
