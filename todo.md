@@ -456,3 +456,15 @@
 - [x] Write 11 vitest tests for CMS tRPC router (listCategories, listArticles, getArticle)
 - [x] All 270 tests passing (12 test files, no regressions)
 - [x] Visual verification: categories, articles, article detail pages all rendering from DB
+
+## Phase 36: Logo Replacement — Two Versions (Dark/Light Background)
+- [x] Upload IMG_8091 (dark bg version, light subtitle) to CDN
+- [x] Upload IMG_8092 (light bg version, dark subtitle) to CDN
+- [x] Identify all logo references across the project (Header, Footer, Tracking, JSON-LD schemas)
+- [x] Replace logo in Header (dark background → IMG_8091 via LOGO_URL = LOGO_DARK_BG_URL)
+- [x] Replace logo in Footer (dark background → IMG_8091 via LOGO_URL = LOGO_DARK_BG_URL)
+- [x] Replace logo in Admin panel (no direct logo img, uses text only)
+- [x] Replace logo in Tracking page (dark bg → IMG_8091 via LOGO_URL)
+- [x] Replace logo in JSON-LD schemas (4 instances in index.html → IMG_8092 light bg for Google)
+- [x] VITE_APP_LOGO is built-in and cannot be changed via secrets (not used in code)
+- [x] Visual verification across all sections (Header, Footer, Tracking page, JSON-LD schemas)
