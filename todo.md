@@ -263,3 +263,35 @@
 
 ## Bug Fix: forceUpdateStatus not working
 - [x] Fix: admin status buttons calling updateStatus instead of forceUpdateStatus — removed status from generic update mutation, status changes now exclusively via forceUpdateStatus/updateStatus
+
+## Phase 29: Clicksign Integration + Customer Status Flags
+- [ ] Research Clicksign API (endpoints, auth, contract data structure)
+- [ ] Update DB schema: customer status enum (aguardando_embarque, aguardando_li, em_processo, concluido, cancelado)
+- [ ] Update DB schema: tipo_operacao field (importacao/exportacao) on customers
+- [ ] Update DB schema: clicksign fields on clicksign_contracts table
+- [ ] Build Clicksign API service (fetch contracts, parse VIN/CPF/Name/Email from contract text)
+- [ ] Build reconciliation logic: cross-reference Clicksign customers with BL vehicles (VIN-a-VIN)
+- [ ] Auto-set status to em_processo when VIN matches existing BL
+- [ ] Admin UI: Customer management tab with status flags and manual override
+- [ ] Auto-generate tracking codes when customer+BL are linked
+- [ ] Write tests for Clicksign integration and reconciliation
+
+## Phase 30: Customer Management with Manual Override Protection
+- [x] Add `manual_overrides` JSON field to customers table (tracks which fields were manually edited)
+- [x] Add `data_source` field to customers (manual/clicksign/agent)
+- [x] Add `status` enum (aguardando_embarque, aguardando_li, em_processo, concluido, cancelado) to customers
+- [x] Add `tipo_operacao` enum (importacao/exportacao) to customers
+- [x] Schema migration applied and synced
+- [x] Build CustomersPanel admin component with full CRUD
+- [x] Customer status flags: aguardando_embarque, aguardando_li, em_processo, concluido, cancelado
+- [x] Tipo operação: importacao/exportacao
+- [x] Implement merge logic: manual fields protected from auto-sync overwrite
+- [x] Build Clicksign sync as complementary data source (not primary)
+- [ ] Wire customer-vehicle-BL linking in admin UI (deferred to next phase)
+- [ ] Support CNPJ-based imports (EMC as importer, customer as beneficiary) (deferred)
+- [x] Write tests for merge logic and customer CRUD (25 tests, 208 total passing)
+- [x] 7 active clients identified with full names and emails from Clicksign API
+- [x] Extract Paulo Jr data from Clicksign (CPF: 039.401.701-35, Email: paulo.mns@hotmail.com)
+- [x] Process André Simas contract PDF (VINs: 210716, 1FTEX15H6MKA92716, CPF: 289.916.178-40)
+- [x] Extract Huber Mastelari from Clicksign (Email: hubermastelari@gmail.com)
+- [x] Add VinOrIdSchema for legacy/military VINs (e.g. Humvee 210716)

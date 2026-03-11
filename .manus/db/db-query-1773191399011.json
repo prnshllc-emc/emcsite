@@ -1,0 +1,42 @@
+{
+  "query": "\nSELECT 'bills_of_lading' as tabela, COUNT(*) as total FROM bills_of_lading\nUNION ALL SELECT 'customers', COUNT(*) FROM customers\nUNION ALL SELECT 'vehicles', COUNT(*) FROM vehicles\nUNION ALL SELECT 'bl_vehicles', COUNT(*) FROM bl_vehicles\nUNION ALL SELECT 'tracking_codes', COUNT(*) FROM tracking_codes\nUNION ALL SELECT 'tracking_history', COUNT(*) FROM tracking_history\nUNION ALL SELECT 'processed_emails', COUNT(*) FROM processed_emails\nUNION ALL SELECT 'audit_log', COUNT(*) FROM audit_log;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute \nSELECT 'bills_of_lading' as tabela, COUNT(*) as total FROM bills_of_lading\nUNION ALL SELECT 'customers', COUNT(*) FROM customers\nUNION ALL SELECT 'vehicles', COUNT(*) FROM vehicles\nUNION ALL SELECT 'bl_vehicles', COUNT(*) FROM bl_vehicles\nUNION ALL SELECT 'tracking_codes', COUNT(*) FROM tracking_codes\nUNION ALL SELECT 'tracking_history', COUNT(*) FROM tracking_history\nUNION ALL SELECT 'processed_emails', COUNT(*) FROM processed_emails\nUNION ALL SELECT 'audit_log', COUNT(*) FROM audit_log;\n",
+  "rows": [
+    {
+      "tabela": "customers",
+      "total": "0"
+    },
+    {
+      "tabela": "bills_of_lading",
+      "total": "5"
+    },
+    {
+      "tabela": "tracking_codes",
+      "total": "0"
+    },
+    {
+      "tabela": "vehicles",
+      "total": "12"
+    },
+    {
+      "tabela": "bl_vehicles",
+      "total": "12"
+    },
+    {
+      "tabela": "processed_emails",
+      "total": "0"
+    },
+    {
+      "tabela": "audit_log",
+      "total": "100"
+    },
+    {
+      "tabela": "tracking_history",
+      "total": "25"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\ncustomers\t0\nbills_of_lading\t5\ntracking_codes\t0\nvehicles\t12\nbl_vehicles\t12\nprocessed_emails\t0\naudit_log\t100\ntracking_history\t25\n",
+  "stderr": "",
+  "execution_time_ms": 90
+}

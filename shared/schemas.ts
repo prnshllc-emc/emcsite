@@ -11,11 +11,19 @@ export const CpfSchema = z
   .refine((v) => !/^(\d)\1{10}$/.test(v), "CPF inválido");
 
 // ── VIN Validation ───────────────────────────────────────────
+// Standard 17-char VIN (post-1981)
 export const VinSchema = z
   .string()
   .min(17, "VIN deve ter 17 caracteres")
   .max(17, "VIN deve ter 17 caracteres")
   .refine((v) => /^[A-HJ-NPR-Z0-9]{17}$/i.test(v), "VIN inválido");
+
+// Flexible VIN/ID: supports legacy, military, and short IDs (e.g. Humvee 210716)
+export const VinOrIdSchema = z
+  .string()
+  .min(1, "VIN/ID é obrigatório")
+  .max(30, "VIN/ID muito longo")
+  .transform((v) => v.toUpperCase().trim());
 
 // ── Tracking Code Validation ─────────────────────────────────
 export const TrackingCodeSchema = z
@@ -31,15 +39,38 @@ export const BlNumberSchema = z
   .min(1, "Número do BL é obrigatório")
   .max(50, "Número do BL muito longo");
 
-// ── Customer Data ────────────────────────────────────────────
+/// ── Customer Status ──────────────────────────────────────
+export const CustomerStatusEnum = z.enum([
+  "aguardando_embarque",
+  "aguardando_li",
+  "em_processo",
+  "concluido",
+  "cancelado",
+]);
+
+export const TipoOperacaoEnum = z.enum(["importacao", "exportacao"]);
+
+export const DataSourceEnum = z.enum(["manual", "clicksign", "agent"]);
+
+// ── Customer Data ────────────────────────────────────────
 export const CustomerCreateSchema = z.object({
   fullName: z.string().min(2, "Nome deve ter ao menos 2 caracteres").max(200),
   cpf: CpfSchema,
   email: z.string().email("Email inválido").optional().nullable(),
   phone: z.string().optional().nullable(),
+  status: CustomerStatusEnum.default("aguardando_embarque"),
+  tipoOperacao: TipoOperacaoEnum.optional().nullable(),
+  dataSource: DataSourceEnum.default("manual"),
 });
 
-export const CustomerUpdateSchema = CustomerCreateSchema.partial();
+export const CustomerUpdateSchema = z.object({
+  fullName: z.string().min(2).max(200).optional(),
+  cpf: CpfSchema.optional(),
+  email: z.string().email().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  status: CustomerStatusEnum.optional(),
+  tipoOperacao: TipoOperacaoEnum.optional().nullable(),
+});
 
 // ── Vehicle Data ─────────────────────────────────────────────
 export const VehicleCreateSchema = z.object({
@@ -146,3 +177,6 @@ export type BlUpdate = z.infer<typeof BlUpdateSchema>;
 export type TrackingEventType = z.infer<typeof TrackingEventTypeEnum>;
 export type TrackingHistoryCreate = z.infer<typeof TrackingHistoryCreateSchema>;
 export type TrackingCodeGenerate = z.infer<typeof TrackingCodeGenerateSchema>;
+export type CustomerStatus = z.infer<typeof CustomerStatusEnum>;
+export type TipoOperacao = z.infer<typeof TipoOperacaoEnum>;
+export type DataSource = z.infer<typeof DataSourceEnum>;

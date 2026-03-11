@@ -2,10 +2,11 @@
  * Customers Repository — Data access layer with PII encryption.
  * CPF is stored encrypted (AES-256-GCM) + hashed (HMAC-SHA256) for search.
  * Name is stored plaintext; email/phone encrypted.
+ * Supports status, tipoOperacao, dataSource, and manualOverrides fields.
  */
 import { getDb } from "../../db";
 import { customers } from "../../../drizzle/schema";
-import { eq, desc, count, isNull, and } from "drizzle-orm";
+import { eq, desc, count, isNull, and, sql } from "drizzle-orm";
 import {
   encryptSensitiveData,
   decryptSensitiveData,
@@ -17,7 +18,7 @@ import {
   type PaginatedQuery,
   type PaginatedResult,
 } from "../../shared/pagination";
-import type { CustomerCreate, CustomerUpdate } from "../../../shared/schemas";
+import type { CustomerCreate, CustomerUpdate, CustomerStatus, TipoOperacao, DataSource } from "../../../shared/schemas";
 
 // ── Types ────────────────────────────────────────────────────
 export interface CustomerRecord {
@@ -26,9 +27,14 @@ export interface CustomerRecord {
   cpf: string;
   email: string | null;
   phone: string | null;
-  status: "active" | "inactive";
+  status: CustomerStatus;
+  tipoOperacao: TipoOperacao | null;
+  dataSource: DataSource;
+  manualOverrides: string[];
+  clicksignEnvelopeId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 // ── Decrypt a raw DB row into a CustomerRecord ───────────────
@@ -60,15 +66,28 @@ function decryptCustomer(row: typeof customers.$inferSelect): CustomerRecord {
     cpf: cpfDecrypted,
     email: emailDecrypted,
     phone: phoneDecrypted,
-    status: row.deletedAt ? "inactive" : "active",
+    status: (row.status as CustomerStatus) ?? "aguardando_embarque",
+    tipoOperacao: (row.tipoOperacao as TipoOperacao | null) ?? null,
+    dataSource: (row.dataSource as DataSource) ?? "manual",
+    manualOverrides: (row.manualOverrides as string[]) ?? [],
+    clicksignEnvelopeId: row.clicksignEnvelopeId ?? null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    deletedAt: row.deletedAt ?? null,
   };
 }
 
 // ── Create ───────────────────────────────────────────────────
 export async function createCustomer(
-  data: CustomerCreate
+  data: {
+    fullName: string;
+    cpf: string;
+    email?: string | null;
+    phone?: string | null;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
+    dataSource?: DataSource;
+  }
 ): Promise<CustomerRecord> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -81,6 +100,10 @@ export async function createCustomer(
     cpfHash: hashCpfForSearch(cpfDigits),
     email: data.email ? encryptSensitiveData(data.email) : null,
     phone: data.phone ? encryptSensitiveData(data.phone) : null,
+    status: data.status ?? "aguardando_embarque",
+    tipoOperacao: data.tipoOperacao ?? null,
+    dataSource: data.dataSource ?? "manual",
+    manualOverrides: [],
   }).$returningId();
 
   return {
@@ -89,9 +112,14 @@ export async function createCustomer(
     cpf: cpfDigits,
     email: data.email ?? null,
     phone: data.phone ?? null,
-    status: "active",
+    status: data.status ?? "aguardando_embarque",
+    tipoOperacao: data.tipoOperacao ?? null,
+    dataSource: data.dataSource ?? "manual",
+    manualOverrides: [],
+    clicksignEnvelopeId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    deletedAt: null,
   };
 }
 
@@ -119,7 +147,8 @@ export async function findCustomerByCpf(
   const db = await getDb();
   if (!db) return null;
 
-  const hash = hashCpfForSearch(cpf);
+  const cpfDigits = cpf.replace(/\D/g, "");
+  const hash = hashCpfForSearch(cpfDigits);
   const [row] = await db
     .select()
     .from(customers)
@@ -132,24 +161,29 @@ export async function findCustomerByCpf(
 
 // ── List with pagination (active only) ───────────────────────
 export async function listCustomers(
-  query: PaginatedQuery
+  query: PaginatedQuery & { statusFilter?: CustomerStatus }
 ): Promise<PaginatedResult<CustomerRecord>> {
   const db = await getDb();
   if (!db) return paginatedResponse([], 0, query);
 
-  const activeCondition = isNull(customers.deletedAt);
+  const conditions = [isNull(customers.deletedAt)];
+  if (query.statusFilter) {
+    conditions.push(eq(customers.status, query.statusFilter));
+  }
 
-  // Count total active
+  const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions);
+
+  // Count total
   const [totalResult] = await db
     .select({ count: count() })
     .from(customers)
-    .where(activeCondition);
+    .where(whereClause);
 
   // Fetch page
   const rows = await db
     .select()
     .from(customers)
-    .where(activeCondition)
+    .where(whereClause)
     .orderBy(desc(customers.createdAt))
     .limit(query.limit)
     .offset(calcOffset(query));
@@ -172,10 +206,32 @@ export async function listCustomers(
   return paginatedResponse(filtered, totalResult?.count ?? 0, query);
 }
 
+// ── List all active (no pagination) ──────────────────────────
+export async function listAllActiveCustomers(): Promise<CustomerRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(customers)
+    .where(isNull(customers.deletedAt))
+    .orderBy(desc(customers.createdAt));
+
+  return rows.map(decryptCustomer);
+}
+
 // ── Update ───────────────────────────────────────────────────
 export async function updateCustomer(
   id: number,
-  data: CustomerUpdate
+  data: {
+    fullName?: string;
+    cpf?: string;
+    email?: string | null;
+    phone?: string | null;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
+    manualOverrides?: string[];
+  }
 ): Promise<CustomerRecord | null> {
   const db = await getDb();
   if (!db) return null;
@@ -200,10 +256,33 @@ export async function updateCustomer(
       ? encryptSensitiveData(data.phone)
       : null;
   }
+  if (data.status !== undefined) {
+    updateValues.status = data.status;
+  }
+  if (data.tipoOperacao !== undefined) {
+    updateValues.tipoOperacao = data.tipoOperacao;
+  }
+  if (data.manualOverrides !== undefined) {
+    updateValues.manualOverrides = data.manualOverrides;
+  }
 
   await db.update(customers).set(updateValues).where(eq(customers.id, id));
 
   return findCustomerById(id);
+}
+
+// ── Update status only ───────────────────────────────────────
+export async function updateCustomerStatus(
+  id: number,
+  status: CustomerStatus
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(customers)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(customers.id, id));
 }
 
 // ── Soft delete (set deletedAt) ──────────────────────────────
@@ -239,4 +318,25 @@ export async function countActiveCustomers(): Promise<number> {
     .where(isNull(customers.deletedAt));
 
   return result?.count ?? 0;
+}
+
+// ── Count by status ──────────────────────────────────────────
+export async function countByStatus(): Promise<Record<string, number>> {
+  const db = await getDb();
+  if (!db) return {};
+
+  const rows = await db
+    .select({
+      status: customers.status,
+      count: count(),
+    })
+    .from(customers)
+    .where(isNull(customers.deletedAt))
+    .groupBy(customers.status);
+
+  const result: Record<string, number> = {};
+  for (const row of rows) {
+    result[row.status] = row.count;
+  }
+  return result;
 }

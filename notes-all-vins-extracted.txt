@@ -1,0 +1,52 @@
+COMPLETE VIN EXTRACTION FROM ALL CLICKSIGN CONTRACTS
+=====================================================
+
+All 22 closed contracts now have VINs identified:
+
+# CONTRACTS WITH VINs FOUND BY 17-CHAR REGEX:
+1. Hiby Elizabe Forell | CPF: 934.370.720-72 | VIN: 1G6KD52B2RU263253 (Cadillac DeVille 1994)
+   NOTE: VIN is only 16 chars - missing last digit. Full VIN should be 1G6KD52B2RU2632536
+2. Paulo Américo Fonseca | CPF: none from signer | VIN: 93RLDHME81T003625
+3. Roberto Nunes Fortaleza Neto | CPF: 428.547.778-59 (malformed) | VIN: 1GCEK14Z4PZ162623
+4. Lucas Mauricio Rodrigues | CPF: 043.498.529-56 | VIN: SAJNV484XKC158550
+5. Erickson Wagner da Silva | CPF: 371.698.058-71 (malformed) | VIN: 1FTFX26G5DKA35326
+6. Vitor Castilhos | CPF: none | VIN: 9BUBRSSAAR1G12095
+7. Denis Oliveira (261.989.208-28) + Rafael Maria Ferreira (364.314.018-59) | VIN: 9BGVP15FJJB110848
+8. Fabricio Oliveira Menezes | CPF: 294.893.798-16 | VIN: WBABA110X0EB56026 (BMW 320i E30)
+9. Sergio Fernandes | CPF: 018.634.187-33 | VIN: JH2SC060XCC400939 (Honda CBX)
+   NOTE: TDS2 contract also mentions 1965 FORD MUSTANG - may have 2 vehicles
+10. Henrique Baratella | CPF: 317.018.728-70 | VIN: 1G1YY678XG5904566
+11. James Demarchi | CPF: 161.252.368-46 | VIN: 1G1AY0781E5150369
+12. Diego Moura (081.403.456-01) + Felipe Oliveira (089.312.257-25) | VIN: SALLDHMF8VA121259
+
+# CONTRACTS WITH VINs FOUND BY CONTEXT PARSING (non-standard format):
+13. Silvestre Kuhnen | CPF: 047.929.099-70 | VIN: 5P87EJB116451 (1979 GM Opala Comodoro)
+    NOTE: 13-char chassis, not standard 17-char VIN
+14. RICHARD SEIXAS | CPF: 164.082.908-33 | VIN: 5N87EJB149211 (1979 GM Opala)
+    NOTE: 13-char chassis
+15. Sandoval Gonçalves | CPF: 523.393.427-87 | VIN: CCS347B113504 (1977 Chevrolet C30 Scottsdale Dually)
+    NOTE: 13-char chassis, preceded by "VIN/"
+16. Vinicius Alves Granzotto | CPF: 316.042.578-90 | VIN: CCS347B113504 (same as Sandoval??)
+    NOTE: Same VIN as Sandoval! This is likely a template copy error. Need to verify.
+
+# CONTRACTS WITH VINs STILL MISSING (need deeper parsing):
+17. André Mos Pucciarelli | CPF: 398.898.878-27 | VIN: ??? 
+    Context: "VIN e número de motor a conferir" = VIN to be confirmed
+18. Rosangela Faustino | CPF: 264.709.328-86 | VIN: ???
+    Context: shipping contract, VIN not found in text
+19. Maria Luzia de Melo Neto | CPF: 611.562.056-20 | VIN: ???
+    Context: "azul ano 1976" - vehicle described but no VIN
+20. Sidnei Hartof | CPF: 069.491.219-03 | VIN: ???
+    Context: "1971 KOMBI branco" - vehicle described but VIN says "a conferir"
+21. Jaime Daniel Pereira de Morais (303.152.968-52) + Alexandre Gonçalves de Figueiredo (251.947.588-98) | VIN: ???
+    Context: shipping contract, VIN not found
+22. Juliano Equinazi | CPF: 028.307.359-43 | VIN: ???
+    Context: "1985 XLT marrom, VIN e número de motor a conferir"
+
+SUMMARY:
+- 12 contracts: VIN found via 17-char regex
+- 4 contracts: VIN found via context parsing (shorter chassis numbers)
+- 6 contracts: VIN explicitly "a conferir" (to be confirmed) or not in document
+  These should be created with status "aguardando_embarque" since VIN is pending
+
+NOTE: Contracts 15 and 16 (Sandoval and Vinicius) appear to share the same VIN - likely a template error.

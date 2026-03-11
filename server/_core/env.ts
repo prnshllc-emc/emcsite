@@ -9,4 +9,5 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   hubspotAccessToken: process.env.HUBSPOT_ACCESS_TOKEN ?? "",
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY ?? "",
+  clicksignApiToken: process.env.CLICKSIGN_API_TOKEN ?? "",
 };

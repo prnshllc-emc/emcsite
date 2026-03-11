@@ -1,0 +1,30 @@
+Clicksign Complete Client Data Analysis
+=========================================
+
+OWNER (filter out): Frederico Junqueira | CPF: 337.381.238-06 | Email: prnsh.llc@gmail.com
+
+CLIENTS FOUND IN CLICKSIGN:
+1. Hiby Elizabe Forell | CPF: null | Email: hforell@outlook.com | Doc: d9cbdb76 (closed)
+2. Henrique Baratella | CPF: 341.483.498-01 | Email: henriquebaratella@gmail.com | Doc: 4e5e5e2c (closed)
+3. Richard (unknown last name) | CPF: ??? | Email: ??? | Doc: fa49eb4d (closed) - CAR SHIPPING CONTRACT RICHARD
+4. James Demarchi | CPF: 161.252.368-46 | Email: james.demarchi@hotmail.com | Doc: 18f2b691 (closed)
+5. Diego Moura | CPF: 081.403.456-01 | Email: dlmmoura90@gmail.com | Doc: dda83a34 (closed)
+6. Felipe Oliveira | CPF: 089.312.257-25 | Email: felipeavellar30@gmail.com | Doc: dda83a34 (closed) - same contract as Diego
+7. Sandoval Gonçalves | CPF: 525.393.427-87 | Email: samboston14@gmail.com | Doc: a88c42a2 (closed)
+8. André Francisco Junqueira Merino Teles | CPF: null | Email: Afteles@hotmail.com | Doc: 95f614f4 (canceled)
+9. Vinicius Alves Granzotto | CPF: 316.042.578-90 | Email: Viniciusgranzotto@hotmail.com | Doc: f3acfc7b (closed)
+
+NOTES:
+- Document dda83a34 (CAR SHIPPING CONTRACT DIEGO) has TWO clients: Diego Moura + Felipe Oliveira
+- Document 5c15da32 (JAMES DMEARCHI) is canceled, replaced by 18f2b691 (JAMES DERMACHI) which is closed
+- Document 95f614f4 (ANDRE JUNQUEIRA) is canceled
+- Some clients have no CPF (Hiby, André)
+- VINs are NOT in structured Clicksign fields — must parse from PDF content
+- Downloads URLs available for PDF extraction
+
+STRATEGY:
+1. For each closed document, extract client data from signers (filter out owner)
+2. Download PDF and parse for VIN patterns
+3. Create customer records with CPF (where available)
+4. Cross-reference VINs with existing vehicles in bl_vehicles table
+5. Auto-set status to "em_processo" if VIN found in BL, else "aguardando_embarque"

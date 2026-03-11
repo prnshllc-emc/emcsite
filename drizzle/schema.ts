@@ -83,12 +83,36 @@ export const customers = mysqlTable(
     name: varchar("name", { length: 255 }).notNull(), // plaintext
     email: varchar("email", { length: 500 }), // AES-256-GCM encrypted
     phone: varchar("phone", { length: 255 }), // AES-256-GCM encrypted
+    // ── Clicksign integration ──
+    status: mysqlEnum("status", [
+      "aguardando_embarque", // Contract signed, awaiting shipping start
+      "aguardando_li",       // Import to Brazil, awaiting Import License
+      "em_processo",         // VIN found in existing BL (automatic)
+      "concluido",           // Vehicle delivered
+      "cancelado",           // Contract canceled
+    ]).default("aguardando_embarque").notNull(),
+    tipoOperacao: mysqlEnum("tipo_operacao", [
+      "importacao",
+      "exportacao",
+    ]),
+    clicksignEnvelopeId: varchar("clicksign_envelope_id", { length: 100 }),
+    clicksignSignerId: varchar("clicksign_signer_id", { length: 100 }),
+    // ── Data source & manual override tracking ──
+    dataSource: mysqlEnum("data_source", [
+      "manual",     // Created/edited by admin in the panel
+      "clicksign",  // Imported from Clicksign contract
+      "agent",      // Created by AI agent via API
+    ]).default("manual").notNull(),
+    manualOverrides: json("manual_overrides").$type<string[]>(), // Array of field names manually edited, e.g. ["name", "email"]
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
     deletedAt: timestamp("deleted_at"), // soft delete — NULL = active
   },
   (table) => [
     index("idx_customer_deleted").on(table.deletedAt),
+    index("idx_customer_status").on(table.status),
+    index("idx_customer_tipo_op").on(table.tipoOperacao),
+    index("idx_customer_clicksign").on(table.clicksignEnvelopeId),
   ]
 );
 
@@ -102,7 +126,7 @@ export const vehicles = mysqlTable(
   "vehicles",
   {
     id: int("id").autoincrement().primaryKey(),
-    vin: varchar("vin", { length: 17 }).notNull().unique(), // Vehicle Identification Number
+    vin: varchar("vin", { length: 30 }).notNull().unique(), // Vehicle Identification Number (17 standard, up to 30 for legacy/BR chassis)
     customerId: int("customer_id"), // FK → customers (nullable until reconciled)
     make: varchar("make", { length: 50 }), // e.g. Ford
     model: varchar("model", { length: 100 }), // e.g. Mustang GT
@@ -264,20 +288,40 @@ export const clicksignContracts = mysqlTable(
   "clicksign_contracts",
   {
     id: int("id").autoincrement().primaryKey(),
-    documentKey: varchar("document_key", { length: 100 }).notNull().unique(),
+    // Clicksign identifiers
+    envelopeId: varchar("envelope_id", { length: 100 }).notNull(), // Clicksign envelope UUID
+    documentKey: varchar("document_key", { length: 100 }), // Clicksign document UUID (nullable)
+    // Signer data extracted from Clicksign
+    signerName: varchar("signer_name", { length: 255 }),
+    signerCpf: varchar("signer_cpf", { length: 20 }), // raw CPF from Clicksign (123.456.789-00)
+    signerEmail: varchar("signer_email", { length: 320 }),
+    signerPhone: varchar("signer_phone", { length: 50 }),
+    // VINs extracted from document content (parsed)
+    extractedVins: text("extracted_vins"), // JSON array of VIN strings ["VIN1", "VIN2"]
+    // Reconciliation links
     customerId: int("customer_id"), // FK → customers (filled after processing)
-    vehicleId: int("vehicle_id"), // FK → vehicles (filled after processing)
-    status: mysqlEnum("status", ["pending", "signed", "processed", "error"])
-      .default("pending")
-      .notNull(),
-    rawPayload: text("raw_payload"), // Full webhook JSON (Zod-validated)
+    // Processing state
+    status: mysqlEnum("status", [
+      "pending",    // fetched from Clicksign, not yet processed
+      "signed",     // contract is signed in Clicksign
+      "processed",  // customer+vehicles reconciled in our system
+      "error",      // processing failed
+      "ignored",    // manually marked as irrelevant
+    ]).default("pending").notNull(),
+    envelopeStatus: varchar("envelope_status", { length: 50 }), // Clicksign envelope status
+    envelopeName: varchar("envelope_name", { length: 500 }), // Clicksign envelope name
+    rawPayload: text("raw_payload"), // Full API response JSON
     processedAt: timestamp("processed_at"),
     errorMessage: text("error_message"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
   },
   (table) => [
     index("idx_cs_status").on(table.status),
     index("idx_cs_created").on(table.createdAt),
+    index("idx_cs_envelope").on(table.envelopeId),
+    index("idx_cs_cpf").on(table.signerCpf),
+    index("idx_cs_customer").on(table.customerId),
   ]
 );
 

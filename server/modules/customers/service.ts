@@ -1,18 +1,27 @@
 /**
  * Customers Service — Business logic for customer management.
- * Handles validation, deduplication, and audit logging.
+ * Handles validation, deduplication, audit logging, and manual override protection.
+ *
+ * Manual Override Logic:
+ * - When an admin edits a field in the UI, that field name is added to `manualOverrides[]`
+ * - When auto-sync (Clicksign/Agent) tries to update, fields in `manualOverrides` are SKIPPED
+ * - This ensures manual admin edits are never overwritten by automated processes
  */
 import * as repo from "./repository";
-import { logAudit, computeDiff } from "../../shared/audit";
+import { logAudit } from "../../shared/audit";
 import type { PaginatedQuery, PaginatedResult } from "../../shared/pagination";
+import type { CustomerStatus, TipoOperacao, DataSource } from "../../../shared/schemas";
 
 // ── Create ───────────────────────────────────────────────────
 export async function createCustomer(
   data: {
     cpf: string;
     fullName: string;
-    email?: string;
-    phone?: string;
+    email?: string | null;
+    phone?: string | null;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
+    dataSource?: DataSource;
   },
   adminUserId?: number
 ): Promise<repo.CustomerRecord> {
@@ -25,8 +34,11 @@ export async function createCustomer(
   const customer = await repo.createCustomer({
     cpf: data.cpf,
     fullName: data.fullName,
-    email: data.email,
-    phone: data.phone,
+    email: data.email ?? undefined,
+    phone: data.phone ?? undefined,
+    status: data.status,
+    tipoOperacao: data.tipoOperacao,
+    dataSource: data.dataSource ?? "manual",
   });
 
   await logAudit({
@@ -56,38 +68,60 @@ export async function getCustomerByCpf(
 
 // ── List ─────────────────────────────────────────────────────
 export async function listCustomers(
-  query: PaginatedQuery
+  query: PaginatedQuery & { statusFilter?: CustomerStatus }
 ): Promise<PaginatedResult<repo.CustomerRecord>> {
   return repo.listCustomers(query);
 }
 
-// ── Update ───────────────────────────────────────────────────
+// ── List all active ──────────────────────────────────────────
+export async function listAllActiveCustomers(): Promise<repo.CustomerRecord[]> {
+  return repo.listAllActiveCustomers();
+}
+
+// ── Manual Update (admin UI) ─────────────────────────────────
+// When admin edits fields, those fields are added to manualOverrides
 export async function updateCustomer(
   id: number,
   data: {
     fullName?: string;
-    email?: string;
-    phone?: string;
+    email?: string | null;
+    phone?: string | null;
     cpf?: string;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
   },
   adminUserId?: number
 ): Promise<repo.CustomerRecord | null> {
   const before = await repo.findCustomerById(id);
   if (!before) throw new Error("Cliente não encontrado.");
 
-  const updated = await repo.updateCustomer(id, data);
-
-  // Build changes diff
+  // Track which fields are being manually edited
+  const newOverrides = new Set(before.manualOverrides || []);
   const changes: Record<string, { before: unknown; after: unknown }> = {};
-  if (data.fullName && data.fullName !== before.fullName) {
+
+  if (data.fullName !== undefined && data.fullName !== before.fullName) {
+    newOverrides.add("fullName");
     changes.fullName = { before: before.fullName, after: data.fullName };
   }
   if (data.email !== undefined && data.email !== before.email) {
+    newOverrides.add("email");
     changes.email = { before: before.email, after: data.email };
   }
   if (data.phone !== undefined && data.phone !== before.phone) {
+    newOverrides.add("phone");
     changes.phone = { before: "[encrypted]", after: "[encrypted]" };
   }
+  if (data.status !== undefined && data.status !== before.status) {
+    changes.status = { before: before.status, after: data.status };
+  }
+  if (data.tipoOperacao !== undefined && data.tipoOperacao !== before.tipoOperacao) {
+    changes.tipoOperacao = { before: before.tipoOperacao, after: data.tipoOperacao };
+  }
+
+  const updated = await repo.updateCustomer(id, {
+    ...data,
+    manualOverrides: Array.from(newOverrides),
+  });
 
   if (Object.keys(changes).length > 0) {
     await logAudit({
@@ -100,6 +134,111 @@ export async function updateCustomer(
   }
 
   return updated;
+}
+
+// ── Auto-Sync Update (Clicksign/Agent) ───────────────────────
+// Respects manualOverrides: fields that were manually edited are NOT overwritten
+export async function mergeCustomerData(
+  id: number,
+  data: {
+    fullName?: string;
+    email?: string | null;
+    phone?: string | null;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
+  },
+  source: DataSource
+): Promise<repo.CustomerRecord | null> {
+  const existing = await repo.findCustomerById(id);
+  if (!existing) throw new Error("Cliente não encontrado.");
+
+  const overrides = new Set(existing.manualOverrides || []);
+  const safeData: Record<string, unknown> = {};
+
+  // Only update fields that are NOT in manualOverrides
+  if (data.fullName !== undefined && !overrides.has("fullName")) {
+    safeData.fullName = data.fullName;
+  }
+  if (data.email !== undefined && !overrides.has("email")) {
+    safeData.email = data.email;
+  }
+  if (data.phone !== undefined && !overrides.has("phone")) {
+    safeData.phone = data.phone;
+  }
+  if (data.status !== undefined && !overrides.has("status")) {
+    safeData.status = data.status;
+  }
+  if (data.tipoOperacao !== undefined && !overrides.has("tipoOperacao")) {
+    safeData.tipoOperacao = data.tipoOperacao;
+  }
+
+  if (Object.keys(safeData).length === 0) {
+    return existing; // Nothing to update (all fields are manually overridden)
+  }
+
+  const updated = await repo.updateCustomer(id, safeData as any);
+
+  await logAudit({
+    userId: null,
+    action: "update",
+    entity: "customer",
+    entityId: id,
+    changes: {
+      autoSync: {
+        before: source,
+        after: `Updated ${Object.keys(safeData).join(", ")} (skipped: ${Array.from(overrides).join(", ") || "none"})`,
+      },
+    },
+  });
+
+  return updated;
+}
+
+// ── Create or Merge by CPF ───────────────────────────────────
+// Used by auto-sync: if customer exists, merge; if not, create
+export async function upsertCustomerByCpf(
+  data: {
+    cpf: string;
+    fullName: string;
+    email?: string | null;
+    phone?: string | null;
+    status?: CustomerStatus;
+    tipoOperacao?: TipoOperacao | null;
+  },
+  source: DataSource
+): Promise<repo.CustomerRecord> {
+  const existing = await repo.findCustomerByCpf(data.cpf);
+
+  if (existing) {
+    const merged = await mergeCustomerData(existing.id, data, source);
+    return merged!;
+  }
+
+  // Create new customer
+  return createCustomer({
+    ...data,
+    dataSource: source,
+  });
+}
+
+// ── Update Status ────────────────────────────────────────────
+export async function updateCustomerStatus(
+  id: number,
+  status: CustomerStatus,
+  adminUserId?: number
+): Promise<void> {
+  const before = await repo.findCustomerById(id);
+  if (!before) throw new Error("Cliente não encontrado.");
+
+  await repo.updateCustomerStatus(id, status);
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "update",
+    entity: "customer",
+    entityId: id,
+    changes: { status: { before: before.status, after: status } },
+  });
 }
 
 // ── Deactivate (soft delete) ─────────────────────────────────
@@ -140,4 +279,9 @@ export async function reactivateCustomer(
 // ── Count ────────────────────────────────────────────────────
 export async function countActiveCustomers(): Promise<number> {
   return repo.countActiveCustomers();
+}
+
+// ── Count by status ──────────────────────────────────────────
+export async function countByStatus(): Promise<Record<string, number>> {
+  return repo.countByStatus();
 }

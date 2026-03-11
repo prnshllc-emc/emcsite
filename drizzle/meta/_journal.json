@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1773076650978,
-      "tag": "0000_brown_scrambler",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1773076731843,
-      "tag": "0001_absent_doorman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1773149117556,
-      "tag": "0002_large_karnak",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1773152938780,
-      "tag": "0003_greedy_nova",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1773188974599,
-      "tag": "0004_reflective_chronomancer",
+      "when": 1773195405810,
+      "tag": "0000_nappy_thena",
       "breakpoints": true
     }
   ]

@@ -1,0 +1,51 @@
+Clicksign Full Extraction Summary (30 documents)
+===================================================
+
+CLOSED contracts (active) with VINs found:
+1. Hiby Elizabe Forell | CPF: 934.370.720-72 (from text) | VIN: 1G6KD52B2RU263253 (Cadillac DeVille 1994)
+2. Paulo Américo Fonseca | CPF: none | VIN: 93RLDHME81T003625
+3. Roberto Nunes Fortaleza Neto | CPF: 428.547.77859 (malformed) | VIN: 1GCEK14Z4PZ162623
+4. Lucas Mauricio Rodrigues | CPF: 043.498.529-56 | VIN: SAJNV484XKC158550
+5. Erickson Wagner da Silva | CPF: 371.698.05871 (malformed) | VIN: 1FTFX26G5DKA35326
+6. Vitor Castilhos | CPF: none | VIN: 9BUBRSSAAR1G12095
+7. Denis Oliveira (261.989.208-28) + Rafael Maria Ferreira (364.314.018-59) | VIN: 9BGVP15FJJB110848
+8. Fabricio Oliveira Menezes | CPF: 294.893.798-16 | VIN: WBABA110X0EB56026 *** MATCH with BL vehicle!
+9. Sergio Fernandes | CPF: 018.634.187-33 | VIN: JH2SC060XCC400939
+10. Henrique Baratella | CPF: 317.018.728-70 | VIN: 1G1YY678XG5904566
+11. James Demarchi | CPF: 161.252.368-46 | VIN: 1G1AY0781E5150369
+12. Diego Moura (081.403.456-01) + Felipe Oliveira (089.312.257-25) | VIN: SALLDHMF8VA121259
+
+CLOSED contracts WITHOUT VINs:
+13. André Mos Pucciarelli | CPF: 398.898.878-27 | VIN: none
+14. Rosangela Faustino | CPF: 264.709.328-86 | VIN: none
+15. Maria Luzia de Melo Neto | CPF: 611.562.056-20 | VIN: none
+16. Sidnei Hartof | CPF: 069.491.219-03 | VIN: none
+17. Jaime Daniel Pereira de Morais (303.152.968-52) + Alexandre Gonçalves de Figueiredo (251.947.588-98) | VIN: none
+18. Juliano Equinazi | CPF: 028.307.359-43 | VIN: none
+19. Silvestre Kuhnen | CPF: 047.929.099-70 | VIN: none
+20. RICHARD SEIXAS | CPF: 164.082.908-33 | VIN: none
+21. Sandoval Gonçalves | CPF: 525.393.427-87 (or 523.393.427-87 from text) | VIN: none
+22. Vinicius Alves Granzotto | CPF: 316.042.578-90 | VIN: none
+
+CANCELED contracts (ignore):
+- Hiby Forell (canceled version)
+- André Mos Pucciarelli (canceled version)
+- Maria Luiza (2 canceled versions)
+- Fabricio (canceled version)
+- Juliano (canceled version)
+- André Junqueira (canceled) - VIN: 1FTEF15N9GNB36753
+
+CROSS-REFERENCE WITH EXISTING BL VEHICLES:
+Our DB has these VINs in bl_vehicles:
+- WBADA110X0EB56026 (BMW 320i E30 1986) → close to WBABA110X0EB56026 from Fabricio's contract!
+  Actually checking: WBADA vs WBABA — these are DIFFERENT VINs (one char diff)
+  Need to verify with user
+
+KEY OBSERVATIONS:
+1. 30 documents total, ~22 unique closed contracts
+2. 12 contracts have VINs extracted from PDF
+3. 10 contracts have NO VIN in PDF (need manual entry or different parsing)
+4. Some CPFs are malformed in text extraction (missing dashes)
+5. CPF from Clicksign signer field is more reliable than text extraction
+6. Some contracts have 2 clients (shared vehicle or joint contract)
+7. VIN WBABA110X0EB56026 (Fabricio) is very similar to WBADA110X0EB56026 (in our DB) — possible typo

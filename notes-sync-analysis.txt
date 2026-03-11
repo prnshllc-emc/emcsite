@@ -1,0 +1,43 @@
+DATABASE SYNC ANALYSIS — 2026-03-11
+=====================================
+
+TOTALS:
+- bills_of_lading: 5
+- customers: 0 (nenhum cliente foi criado — agente não tinha CPFs)
+- vehicles: 12
+- bl_vehicles: 12 (todos os veículos vinculados aos BLs)
+- tracking_codes: 0 (nenhum código gerado — sem clientes)
+- tracking_history: 25 eventos (5 BLs × ~5 eventos cada)
+- audit_log: 100 registros
+
+BLs:
+1. MAEU266193682 — in_transit — Bremerhaven→Santos — 1 veículo (BMW 320i E30 1986)
+2. MAEU266742227 — in_transit — Santos→Port Newark — 3 veículos (Fusca, F250, Kombi)
+3. MAEU265399692 — customs — Santos→Port Everglades — 4 veículos (Tempra, Opala, Fusca, CBX 750)
+4. MAEU266742326 — in_transit — Santos→Port Everglades — 3 veículos (Voyage, Chevette, Vectra)
+5. BUE105691RCN — customs — Buenos Aires→Santos — 1 veículo (Fusca)
+
+VEHICLES (12 total):
+- WBADA110X0EB56026 (BMW 320i E30 1986) → BL1
+- B8457749 (VW Fusca 1300 1968) → BL2
+- 9BFFF25L81B060580 (Ford F250 XL L 2000) → BL2
+- BH328258 (VW Kombi 1974) → BL2
+- 9BD159000S9123467 (Fiat Tempra Ouro 16V 1995) → BL3
+- 52871BB140501 (GM Opala 1972) → BL3
+- B9672772 (VW Fusca 1969) → BL3
+- 9C2RC1701JR100203 (Honda CBX 750 F 1987) → BL3
+- 9BWZZZ30ZFP003230 (VW Voyage LS 1985) → BL4
+- 9BGTC11JKKC153234 (GM Chevette SL 1989) → BL4
+- 9BGJK19BVVB596206 (GM Vectra GLS 1997) → BL4
+- BJ487579 (VW Fusca) → BL5
+
+BL_VEHICLES JUNCTION: 12 links (all vehicles correctly linked to their BLs)
+
+TRACKING EVENTS: 25 events across 5 BLs
+- Each BL has a full lifecycle: draft → final → in_transit → arrived → customs (where applicable)
+- Events have rich descriptions from the agent (HBL numbers, container numbers, seals, DU-Es)
+
+ISSUES:
+- customers: 0 — The agent didn't have CPF data for the vehicle owners
+- tracking_codes: 0 — Can't generate without customers
+- Some VINs are shorter than 17 chars (older Brazilian vehicles) — this is expected for classic cars

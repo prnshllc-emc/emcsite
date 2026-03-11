@@ -53,6 +53,7 @@ import { Link } from "wouter";
 import BlsPanel from "@/components/admin/BlsPanel";
 import TrackingPanel from "@/components/admin/TrackingPanel";
 import DashboardPanel from "@/components/admin/DashboardPanel";
+import CustomersPanel from "@/components/admin/CustomersPanel";
 
 // ============================================================
 // TYPES
@@ -236,7 +237,7 @@ export default function Admin() {
       {/* Main Content */}
       <main className="container py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full max-w-3xl grid-cols-5">
+          <TabsList className="grid w-full max-w-4xl grid-cols-6">
             <TabsTrigger value="dashboard" className="font-display text-xs">
               <LayoutDashboard className="mr-1.5 h-4 w-4" />
               Dashboard
@@ -252,6 +253,10 @@ export default function Admin() {
             <TabsTrigger value="bls" className="font-display text-xs">
               <FileText className="mr-1.5 h-4 w-4" />
               BLs
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="font-display text-xs">
+              <Users className="mr-1.5 h-4 w-4" />
+              Clientes
             </TabsTrigger>
             <TabsTrigger value="tracking" className="font-display text-xs">
               <QrCode className="mr-1.5 h-4 w-4" />
@@ -273,6 +278,10 @@ export default function Admin() {
 
           <TabsContent value="bls">
             <BlsPanel />
+          </TabsContent>
+
+          <TabsContent value="customers">
+            <CustomersPanel />
           </TabsContent>
 
           <TabsContent value="tracking">
