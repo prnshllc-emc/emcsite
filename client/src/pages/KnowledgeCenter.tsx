@@ -367,11 +367,11 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
                   const relCatSlug = a.categorySlug ?? categorySlug;
                   return (
                     <Link key={a.slug} href={`/centro-de-conhecimento/${relCatSlug}/${a.slug}`}>
-                      <div className="p-4 rounded-lg border border-white/8 hover:border-primary/25 transition-all cursor-pointer">
-                        <h3 className="text-sm font-bold text-white mb-2 font-display leading-tight hover:text-primary transition-colors">
+                      <div className="p-4 rounded-lg border border-white/8 hover:border-primary/25 transition-all cursor-pointer flex flex-col h-full min-h-[120px]">
+                        <h3 className="text-sm font-bold text-white mb-2 font-display leading-tight hover:text-primary transition-colors flex-grow">
                           {a.title}
                         </h3>
-                        <span className="text-xs text-gray-500">{a.readTime ?? "5 min"}</span>
+                        <span className="text-xs text-gray-500 mt-auto">{a.readTime ?? "5 min"}</span>
                       </div>
                     </Link>
                   );
@@ -551,7 +551,7 @@ function KnowledgeCenterListing() {
                     const colorClass = cat.color && DEFAULT_COLORS[cat.color] ? DEFAULT_COLORS[cat.color] : "text-primary";
                     return (
                       <Link key={cat.slug} href={`/centro-de-conhecimento/${cat.slug}`}>
-                        <div className="group p-5 rounded-xl border border-white/8 bg-card/80 hover:border-primary/25 transition-all duration-300 cursor-pointer">
+                        <div className="group p-5 rounded-xl border border-white/8 bg-card/80 hover:border-primary/25 transition-all duration-300 cursor-pointer flex flex-col h-full min-h-[180px]">
                           <div className="flex items-center gap-3 mb-3">
                             <div className={`w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${colorClass}`}>
                               <IconComp className="w-5 h-5" />
@@ -563,7 +563,7 @@ function KnowledgeCenterListing() {
                               <span className="text-xs text-gray-500">{cat.articleCount} artigo{cat.articleCount !== 1 ? "s" : ""}</span>
                             </div>
                           </div>
-                          <p className="text-gray-400 text-sm font-body leading-relaxed">{cat.description}</p>
+                          <p className="text-gray-400 text-sm font-body leading-relaxed flex-grow">{cat.description}</p>
                         </div>
                       </Link>
                     );

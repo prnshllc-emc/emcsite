@@ -583,3 +583,7 @@
 ## Phase 46: Footer Fixes
 - [x] Change footer email from atendimento@ to info@enviandomeucarro.com
 - [x] Fix footer layout overlap between columns
+
+## Phase 47: Card Height Equalization
+- [x] Equalize category card heights in /centro-de-conhecimento (flex-col, min-h, flex-grow on description)
+- [x] Equalize related articles card heights in article sidebar (flex-col, min-h, flex-grow on title)
