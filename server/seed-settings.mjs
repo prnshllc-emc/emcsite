@@ -17,7 +17,7 @@ const defaultSettings = [
   // Contact
   { key: "phone_primary", value: "+55 11 99244-8920", label: "Telefone Principal", category: "contact" },
   { key: "phone_secondary", value: "+1 (786) 600-0430", label: "Telefone Secundário", category: "contact" },
-  { key: "email_primary", value: "atendimento@enviandomeucarro.com", label: "E-mail Principal", category: "contact" },
+  { key: "email_primary", value: "info@enviandomeucarro.com", label: "E-mail Principal", category: "contact" },
   { key: "email_secondary", value: "contato@enviandomeucarro.com", label: "E-mail Secundário", category: "contact" },
   { key: "whatsapp_url", value: "https://wa.me/5511992448920", label: "WhatsApp URL", category: "contact" },
   { key: "whatsapp_number", value: "+55 11 99244-8920", label: "WhatsApp Número", category: "contact" },

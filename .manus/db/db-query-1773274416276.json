@@ -1,0 +1,138 @@
+{
+  "query": "SELECT * FROM site_settings LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT * FROM site_settings LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "key": "phone_primary",
+      "value": "+55 11 99244-8920",
+      "label": "Telefone Principal",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "2",
+      "key": "phone_secondary",
+      "value": "+1 (786) 600-0430",
+      "label": "Telefone Secundário",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "3",
+      "key": "email_primary",
+      "value": "atendimento@enviandomeucarro.com",
+      "label": "E-mail Principal",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "4",
+      "key": "email_secondary",
+      "value": "contato@enviandomeucarro.com",
+      "label": "E-mail Secundário",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "5",
+      "key": "whatsapp_url",
+      "value": "https://wa.me/5511992448920",
+      "label": "WhatsApp URL",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "6",
+      "key": "whatsapp_number",
+      "value": "+55 11 99244-8920",
+      "label": "WhatsApp Número",
+      "category": "contact",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "7",
+      "key": "address_miami",
+      "value": "1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126",
+      "label": "Escritório Miami",
+      "category": "address",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "8",
+      "key": "address_sp",
+      "value": "Vila Olímpia, São Paulo, SP",
+      "label": "Escritório São Paulo",
+      "category": "address",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "9",
+      "key": "address_itajai",
+      "value": "Próximo ao Porto de Itajaí, SC",
+      "label": "Escritório Itajaí",
+      "category": "address",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "10",
+      "key": "instagram_url",
+      "value": "https://www.instagram.com/enviandomeucarro",
+      "label": "Instagram",
+      "category": "social",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "11",
+      "key": "facebook_url",
+      "value": "https://www.facebook.com/enviandomeucarro",
+      "label": "Facebook",
+      "category": "social",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "12",
+      "key": "youtube_url",
+      "value": "https://www.youtube.com/@enviandomeucarro",
+      "label": "YouTube",
+      "category": "social",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "13",
+      "key": "tiktok_url",
+      "value": "",
+      "label": "TikTok",
+      "category": "social",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "14",
+      "key": "calculator_url",
+      "value": "https://calculadora.enviandomeucarro.com",
+      "label": "Calculadora de Importação",
+      "category": "links",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "15",
+      "key": "tracking_url",
+      "value": "https://rastreamento.enviandomeucarro.com",
+      "label": "Rastreamento de Veículos",
+      "category": "links",
+      "updatedAt": "2026-03-09 17:25:14"
+    },
+    {
+      "id": "16",
+      "key": "google_reviews_url",
+      "value": "https://g.page/r/CfOy3RBqPbMVEBM/review",
+      "label": "Google Reviews",
+      "category": "links",
+      "updatedAt": "2026-03-09 17:25:14"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tkey\tvalue\tlabel\tcategory\tupdatedAt\n1\tphone_primary\t+55 11 99244-8920\tTelefone Principal\tcontact\t2026-03-09 17:25:14\n2\tphone_secondary\t+1 (786) 600-0430\tTelefone Secundário\tcontact\t2026-03-09 17:25:14\n3\temail_primary\tatendimento@enviandomeucarro.com\tE-mail Principal\tcontact\t2026-03-09 17:25:14\n4\temail_secondary\tcontato@enviandomeucarro.com\tE-mail Secundário\tcontact\t2026-03-09 17:25:14\n5\twhatsapp_url\thttps://wa.me/5511992448920\tWhatsApp URL\tcontact\t2026-03-09 17:25:14\n6\twhatsapp_number\t+55 11 99244-8920\tWhatsApp Número\tcontact\t2026-03-09 17:25:14\n7\taddress_miami\t1150 NW 72nd Ave, Tower 1, Ste 455, Miami, FL 33126\tEscritório Miami\taddress\t2026-03-09 17:25:14\n8\taddress_sp\tVila Olímpia, São Paulo, SP\tEscritório São Paulo\taddress\t2026-03-09 17:25:14\n9\taddress_itajai\tPróximo ao Porto de Itajaí, SC\tEscritório Itajaí\taddress\t2026-03-09 17:25:14\n10\tinstagram_url\thttps://www.instagram.com/enviandomeucarro\tInstagram\tsocial\t2026-03-09 17:25:14\n11\tfacebook_url\thttps://www.facebook.com/enviandomeucarro\tFacebook\tsocial\t2026-03-09 17:25:14\n12\tyoutube_url\thttps://www.youtube.com/@enviandomeucarro\tYouTube\tsocial\t2026-03-09 17:25:14\n13\ttiktok_url\t\tTikTok\tsocial\t2026-03-09 17:25:14\n14\tcalculator_url\thttps://calculadora.enviandomeucarro.com\tCalculadora de Importação\tlinks\t2026-03-09 17:25:14\n15\ttracking_url\thttps://rastreamento.enviandomeucarro.com\tRastreamento de Veículos\tlinks\t2026-03-09 17:25:14\n16\tgoogle_reviews_url\thttps://g.page/r/CfOy3RBqPbMVEBM/review\tGoogle Reviews\tlinks\t2026-03-09 17:25:14\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

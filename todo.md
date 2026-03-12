@@ -587,3 +587,6 @@
 ## Phase 47: Card Height Equalization
 - [x] Equalize category card heights in /centro-de-conhecimento (flex-col, min-h, flex-grow on description)
 - [x] Equalize related articles card heights in article sidebar (flex-col, min-h, flex-grow on title)
+
+## Phase 48: Footer Email Fix (all pages)
+- [x] Ensure footer email is info@enviandomeucarro.com everywhere (code + database + seed file)

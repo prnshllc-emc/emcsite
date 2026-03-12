@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE site_settings SET value = 'info@enviandomeucarro.com' WHERE `key` = 'email_primary';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute UPDATE site_settings SET value = 'info@enviandomeucarro.com' WHERE `key` = 'email_primary';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 65
+}
