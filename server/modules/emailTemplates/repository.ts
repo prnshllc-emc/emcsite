@@ -19,6 +19,7 @@ export type CreateEmailTemplateInput = {
   description?: string | null;
   subject: string;
   bodyHtml: string;
+  designJson?: string | null; // Unlayer visual editor design JSON
   bodyText?: string | null;
   whatsappMessage?: string | null;
   category: "stage_change" | "tracking" | "onboarding" | "system" | "marketing";
@@ -76,6 +77,7 @@ export async function createEmailTemplate(input: CreateEmailTemplateInput): Prom
     description: input.description ?? null,
     subject: input.subject,
     bodyHtml: input.bodyHtml,
+    designJson: input.designJson ?? null,
     bodyText: input.bodyText ?? null,
     whatsappMessage: input.whatsappMessage ?? null,
     category: input.category,
@@ -108,6 +110,7 @@ export async function updateEmailTemplate(
   if (input.description !== undefined) updateData.description = input.description;
   if (input.subject !== undefined) updateData.subject = input.subject;
   if (input.bodyHtml !== undefined) updateData.bodyHtml = input.bodyHtml;
+  if (input.designJson !== undefined) updateData.designJson = input.designJson;
   if (input.bodyText !== undefined) updateData.bodyText = input.bodyText;
   if (input.whatsappMessage !== undefined) updateData.whatsappMessage = input.whatsappMessage;
   if (input.category !== undefined) updateData.category = input.category;

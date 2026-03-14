@@ -40,6 +40,7 @@ const createSchema = z.object({
   description: z.string().max(500).optional().nullable(),
   subject: z.string().min(1).max(500),
   bodyHtml: z.string().min(1),
+  designJson: z.string().optional().nullable(), // Unlayer visual editor design JSON
   bodyText: z.string().optional().nullable(),
   whatsappMessage: z.string().optional().nullable(),
   category: categoryEnum,
@@ -53,6 +54,7 @@ const updateSchema = z.object({
   description: z.string().max(500).optional().nullable(),
   subject: z.string().min(1).max(500).optional(),
   bodyHtml: z.string().min(1).optional(),
+  designJson: z.string().optional().nullable(), // Unlayer visual editor design JSON
   bodyText: z.string().optional().nullable(),
   whatsappMessage: z.string().optional().nullable(),
   category: categoryEnum.optional(),

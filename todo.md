@@ -691,3 +691,13 @@
 - [x] Render preview in iframe with device-appropriate width
 - [x] Show device frame/chrome around the preview for realism
 - [x] Ensure preview works for both HTML body and WhatsApp message
+
+## Visual Drag-and-Drop Email Editor
+- [x] Research and select best React drag-and-drop email editor library (Unlayer react-email-editor)
+- [x] Install and configure the editor library
+- [x] Replace HTML textarea in Create Template dialog with visual editor
+- [x] Replace HTML textarea in Edit Template dialog with visual editor
+- [x] Export HTML + Design JSON from visual editor on save
+- [x] Support loading existing designJson into the editor on edit
+- [x] Keep HTML source tab as fallback for advanced users
+- [x] Ensure backward compatibility with existing templates (no designJson → HTML mode)

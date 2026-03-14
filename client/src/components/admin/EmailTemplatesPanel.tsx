@@ -1,6 +1,7 @@
 /**
  * EmailTemplatesPanel — Admin CRUD for email notification templates.
  * Supports create, edit, delete, preview, and toggle active/inactive.
+ * Uses Unlayer react-email-editor for visual drag-and-drop email building.
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
@@ -59,7 +60,10 @@ import {
   Monitor,
   Tablet,
   Smartphone,
+  Paintbrush,
+  AlertTriangle,
 } from "lucide-react";
+import EmailEditor, { type EditorRef, type EmailEditorProps } from "react-email-editor";
 
 // ══════════════════════════════════════════════════════════════
 // TYPES
@@ -72,6 +76,7 @@ type EmailTemplate = {
   description: string | null;
   subject: string;
   bodyHtml: string;
+  designJson: string | null;
   bodyText: string | null;
   whatsappMessage: string | null;
   category: string;
@@ -98,6 +103,76 @@ const CATEGORY_COLORS: Record<string, string> = {
   system: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
   marketing: "bg-pink-500/10 text-pink-500 border-pink-500/20",
 };
+
+// ══════════════════════════════════════════════════════════════
+// UNLAYER EDITOR WRAPPER
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Reusable Unlayer editor component.
+ * - If designJson is provided, loads it on ready.
+ * - Exposes exportHtml() via ref.
+ */
+function UnlayerEditorWrapper({
+  editorRef,
+  designJson,
+  minHeight = "500px",
+}: {
+  editorRef: React.RefObject<EditorRef | null>;
+  designJson?: string | null;
+  minHeight?: string;
+}) {
+  const onReady: EmailEditorProps["onReady"] = useCallback(
+    (unlayer: any) => {
+      if (designJson) {
+        try {
+          const design = JSON.parse(designJson);
+          unlayer.loadDesign(design);
+        } catch (err) {
+          console.warn("Failed to load design JSON:", err);
+        }
+      }
+    },
+    [designJson]
+  );
+
+  return (
+    <EmailEditor
+      ref={editorRef as any}
+      onReady={onReady}
+      minHeight={minHeight}
+      options={{
+        displayMode: "email",
+        locale: "pt-BR",
+        appearance: {
+          theme: "modern_light",
+        },
+        features: {
+          stockImages: {
+            enabled: true,
+            safeSearch: true,
+          },
+        },
+        tools: {
+          image: { enabled: true },
+          button: { enabled: true },
+          divider: { enabled: true },
+          heading: { enabled: true },
+          html: { enabled: true },
+          menu: { enabled: true },
+          social: { enabled: true },
+          text: { enabled: true },
+          video: { enabled: true },
+          timer: { enabled: true },
+        },
+      }}
+      style={{
+        border: "1px solid hsl(var(--border))",
+        borderRadius: "0.5rem",
+      }}
+    />
+  );
+}
 
 // ══════════════════════════════════════════════════════════════
 // MAIN PANEL
@@ -265,7 +340,7 @@ export default function EmailTemplatesPanel() {
                 <TableHead className="w-[250px]">Nome</TableHead>
                 <TableHead>Assunto</TableHead>
                 <TableHead className="w-[140px]">Categoria</TableHead>
-                <TableHead className="w-[80px] text-center">WhatsApp</TableHead>
+                <TableHead className="w-[80px] text-center">Editor</TableHead>
                 <TableHead className="w-[80px] text-center">Ativo</TableHead>
                 <TableHead className="w-[140px] text-right">Ações</TableHead>
               </TableRow>
@@ -292,23 +367,28 @@ export default function EmailTemplatesPanel() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`text-xs ${CATEGORY_COLORS[template.category] ?? ""}`}
+                        className={CATEGORY_COLORS[template.category] ?? ""}
                       >
                         {CATEGORY_LABELS[template.category] ?? template.category}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      {template.whatsappMessage ? (
-                        <MessageCircle className="h-4 w-4 text-green-500 mx-auto" />
+                      {template.designJson ? (
+                        <Badge variant="secondary" className="text-xs">
+                          <Paintbrush className="h-3 w-3 mr-1" />
+                          Visual
+                        </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
+                        <Badge variant="outline" className="text-xs">
+                          <Code className="h-3 w-3 mr-1" />
+                          HTML
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-center">
                       <Switch
                         checked={template.isActive}
                         onCheckedChange={() => handleToggleActive(template)}
-                        disabled={updateMutation.isPending}
                       />
                     </TableCell>
                     <TableCell className="text-right">
@@ -317,7 +397,7 @@ export default function EmailTemplatesPanel() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setPreviewTemplate(template)}
-                          title="Visualizar"
+                          title="Preview"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -384,7 +464,7 @@ export default function EmailTemplatesPanel() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// CREATE DIALOG
+// CREATE DIALOG — with Visual Editor + HTML Source tabs
 // ══════════════════════════════════════════════════════════════
 
 function CreateTemplateDialog({
@@ -395,6 +475,10 @@ function CreateTemplateDialog({
   onClose: () => void;
 }) {
   const utils = trpc.useUtils();
+  const emailEditorRef = useRef<EditorRef>(null);
+  const [editorMode, setEditorMode] = useState<"visual" | "html">("visual");
+  const [editorReady, setEditorReady] = useState(false);
+
   const [form, setForm] = useState({
     slug: "",
     name: "",
@@ -422,22 +506,41 @@ function CreateTemplateDialog({
       .map((v) => v.trim())
       .filter(Boolean);
 
-    createMutation.mutate({
-      slug: form.slug,
-      name: form.name,
-      description: form.description || null,
-      subject: form.subject,
-      bodyHtml: form.bodyHtml,
-      bodyText: form.bodyText || null,
-      whatsappMessage: form.whatsappMessage || null,
-      category: form.category as any,
-      availableVariables: JSON.stringify(vars),
-    });
+    if (editorMode === "visual" && emailEditorRef.current?.editor) {
+      emailEditorRef.current.editor.exportHtml((data: any) => {
+        const { design, html } = data;
+        createMutation.mutate({
+          slug: form.slug,
+          name: form.name,
+          description: form.description || null,
+          subject: form.subject,
+          bodyHtml: html,
+          designJson: JSON.stringify(design),
+          bodyText: form.bodyText || null,
+          whatsappMessage: form.whatsappMessage || null,
+          category: form.category as any,
+          availableVariables: JSON.stringify(vars),
+        });
+      });
+    } else {
+      createMutation.mutate({
+        slug: form.slug,
+        name: form.name,
+        description: form.description || null,
+        subject: form.subject,
+        bodyHtml: form.bodyHtml,
+        designJson: null,
+        bodyText: form.bodyText || null,
+        whatsappMessage: form.whatsappMessage || null,
+        category: form.category as any,
+        availableVariables: JSON.stringify(vars),
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] w-[1200px] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display">Criar Novo Template</DialogTitle>
           <DialogDescription>
@@ -446,6 +549,7 @@ function CreateTemplateDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Metadata fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Slug (identificador único)</Label>
@@ -473,13 +577,23 @@ function CreateTemplateDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Nome do Template</Label>
-            <Input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Ex: Notificação de embarque personalizada"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Nome do Template</Label>
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Ex: Notificação de embarque personalizada"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Assunto do Email</Label>
+              <Input
+                value={form.subject}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                placeholder="Ex: 🚢 Atualização do seu veículo"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -506,44 +620,88 @@ function CreateTemplateDialog({
 
           <Separator />
 
-          <div className="space-y-2">
-            <Label>Assunto do Email</Label>
-            <Input
-              value={form.subject}
-              onChange={(e) => setForm({ ...form, subject: e.target.value })}
-              placeholder="Ex: 🚢 Atualização do seu veículo — Enviando Meu Carro"
-            />
-          </div>
+          {/* Email body editor with tabs */}
+          <Tabs defaultValue="visual" onValueChange={(v) => setEditorMode(v as "visual" | "html")}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="visual">
+                <Paintbrush className="mr-1.5 h-3.5 w-3.5" />
+                Editor Visual
+              </TabsTrigger>
+              <TabsTrigger value="html">
+                <Code className="mr-1.5 h-3.5 w-3.5" />
+                HTML Source
+              </TabsTrigger>
+              <TabsTrigger value="text">
+                <FileText className="mr-1.5 h-3.5 w-3.5" />
+                Texto Puro
+              </TabsTrigger>
+              <TabsTrigger value="whatsapp">
+                <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+                WhatsApp
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="space-y-2">
-            <Label>Corpo do Email (HTML)</Label>
-            <Textarea
-              value={form.bodyHtml}
-              onChange={(e) => setForm({ ...form, bodyHtml: e.target.value })}
-              placeholder="<div>Olá {{name}}, ...</div>"
-              className="font-mono text-sm min-h-[200px]"
-            />
-          </div>
+            <TabsContent value="visual" className="mt-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label>Editor Visual (Arrastar e Soltar)</Label>
+                  <Badge variant="secondary" className="text-xs">
+                    <Paintbrush className="h-3 w-3 mr-1" />
+                    Drag & Drop
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Arraste elementos da barra lateral para montar seu email. O HTML será gerado automaticamente ao salvar.
+                </p>
+                <UnlayerEditorWrapper
+                  editorRef={emailEditorRef}
+                  minHeight="500px"
+                />
+              </div>
+            </TabsContent>
 
-          <div className="space-y-2">
-            <Label>Corpo do Email (Texto Puro — fallback)</Label>
-            <Textarea
-              value={form.bodyText}
-              onChange={(e) => setForm({ ...form, bodyText: e.target.value })}
-              placeholder="Olá {{name}}, ..."
-              className="min-h-[100px]"
-            />
-          </div>
+            <TabsContent value="html" className="mt-4 space-y-4">
+              <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                <p className="text-xs text-amber-700">
+                  O HTML editado aqui não será sincronizado com o editor visual. Use este modo apenas se preferir escrever HTML manualmente.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Corpo HTML</Label>
+                <Textarea
+                  value={form.bodyHtml}
+                  onChange={(e) => setForm({ ...form, bodyHtml: e.target.value })}
+                  placeholder="<div>Olá {{name}}, ...</div>"
+                  className="font-mono text-sm min-h-[300px]"
+                />
+              </div>
+            </TabsContent>
 
-          <div className="space-y-2">
-            <Label>Mensagem WhatsApp (opcional)</Label>
-            <Textarea
-              value={form.whatsappMessage}
-              onChange={(e) => setForm({ ...form, whatsappMessage: e.target.value })}
-              placeholder="Olá {{name}}! 🚢 ..."
-              className="min-h-[100px]"
-            />
-          </div>
+            <TabsContent value="text" className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label>Corpo do Email (Texto Puro — fallback)</Label>
+                <Textarea
+                  value={form.bodyText}
+                  onChange={(e) => setForm({ ...form, bodyText: e.target.value })}
+                  placeholder="Olá {{name}}, ..."
+                  className="min-h-[200px]"
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="whatsapp" className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label>Mensagem WhatsApp (opcional)</Label>
+                <Textarea
+                  value={form.whatsappMessage}
+                  onChange={(e) => setForm({ ...form, whatsappMessage: e.target.value })}
+                  placeholder="Olá {{name}}! 🚢 ..."
+                  className="min-h-[200px]"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
 
         <DialogFooter>
@@ -552,7 +710,7 @@ function CreateTemplateDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!form.slug || !form.name || !form.subject || !form.bodyHtml || createMutation.isPending}
+            disabled={!form.slug || !form.name || !form.subject || createMutation.isPending}
           >
             {createMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -568,7 +726,7 @@ function CreateTemplateDialog({
 }
 
 // ══════════════════════════════════════════════════════════════
-// EDIT DIALOG
+// EDIT DIALOG — with Visual Editor + HTML Source tabs
 // ══════════════════════════════════════════════════════════════
 
 function EditTemplateDialog({
@@ -581,6 +739,10 @@ function EditTemplateDialog({
   onClose: () => void;
 }) {
   const utils = trpc.useUtils();
+  const emailEditorRef = useRef<EditorRef>(null);
+  const hasDesign = !!template.designJson;
+  const [editorMode, setEditorMode] = useState<"visual" | "html">(hasDesign ? "visual" : "html");
+
   const availVars = template.availableVariables
     ? (() => { try { return JSON.parse(template.availableVariables).join(", "); } catch { return ""; } })()
     : "";
@@ -612,28 +774,54 @@ function EditTemplateDialog({
       .map((v: string) => v.trim())
       .filter(Boolean);
 
-    updateMutation.mutate({
-      id: template.id,
-      name: form.name,
-      description: form.description || null,
-      subject: form.subject,
-      bodyHtml: form.bodyHtml,
-      bodyText: form.bodyText || null,
-      whatsappMessage: form.whatsappMessage || null,
-      category: form.category as any,
-      availableVariables: JSON.stringify(vars),
-      isActive: form.isActive,
-    });
+    if (editorMode === "visual" && emailEditorRef.current?.editor) {
+      emailEditorRef.current.editor.exportHtml((data: any) => {
+        const { design, html } = data;
+        updateMutation.mutate({
+          id: template.id,
+          name: form.name,
+          description: form.description || null,
+          subject: form.subject,
+          bodyHtml: html,
+          designJson: JSON.stringify(design),
+          bodyText: form.bodyText || null,
+          whatsappMessage: form.whatsappMessage || null,
+          category: form.category as any,
+          availableVariables: JSON.stringify(vars),
+          isActive: form.isActive,
+        });
+      });
+    } else {
+      updateMutation.mutate({
+        id: template.id,
+        name: form.name,
+        description: form.description || null,
+        subject: form.subject,
+        bodyHtml: form.bodyHtml,
+        designJson: null, // Clear design JSON when editing raw HTML
+        bodyText: form.bodyText || null,
+        whatsappMessage: form.whatsappMessage || null,
+        category: form.category as any,
+        availableVariables: JSON.stringify(vars),
+        isActive: form.isActive,
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] w-[1200px] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">
+          <DialogTitle className="font-display flex items-center gap-2">
             Editar Template
             {template.isDefault && (
-              <Badge variant="outline" className="ml-2 text-xs">Padrão do Sistema</Badge>
+              <Badge variant="outline" className="text-xs">Padrão do Sistema</Badge>
+            )}
+            {hasDesign && (
+              <Badge variant="secondary" className="text-xs">
+                <Paintbrush className="h-3 w-3 mr-1" />
+                Editor Visual
+              </Badge>
             )}
           </DialogTitle>
           <DialogDescription>
@@ -642,6 +830,7 @@ function EditTemplateDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Metadata fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Nome do Template</Label>
@@ -667,12 +856,21 @@ function EditTemplateDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Descrição</Label>
-            <Input
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <Input
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Assunto do Email</Label>
+              <Input
+                value={form.subject}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -686,11 +884,16 @@ function EditTemplateDialog({
 
           <Separator />
 
-          <Tabs defaultValue="email">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="email">
-                <Mail className="mr-1.5 h-3.5 w-3.5" />
-                Email HTML
+          {/* Email body editor with tabs */}
+          <Tabs defaultValue={editorMode} onValueChange={(v) => setEditorMode(v as "visual" | "html")}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="visual">
+                <Paintbrush className="mr-1.5 h-3.5 w-3.5" />
+                Editor Visual
+              </TabsTrigger>
+              <TabsTrigger value="html">
+                <Code className="mr-1.5 h-3.5 w-3.5" />
+                HTML Source
               </TabsTrigger>
               <TabsTrigger value="text">
                 <FileText className="mr-1.5 h-3.5 w-3.5" />
@@ -702,14 +905,40 @@ function EditTemplateDialog({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="email" className="space-y-4 mt-4">
+            <TabsContent value="visual" className="mt-4">
               <div className="space-y-2">
-                <Label>Assunto do Email</Label>
-                <Input
-                  value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                <div className="flex items-center gap-2">
+                  <Label>Editor Visual (Arrastar e Soltar)</Label>
+                  <Badge variant="secondary" className="text-xs">
+                    <Paintbrush className="h-3 w-3 mr-1" />
+                    Drag & Drop
+                  </Badge>
+                </div>
+                {!hasDesign && (
+                  <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                    <p className="text-xs text-amber-700">
+                      Este template foi criado com HTML manual. O editor visual iniciará em branco. Se salvar pelo editor visual, o HTML atual será substituído.
+                    </p>
+                  </div>
+                )}
+                <UnlayerEditorWrapper
+                  editorRef={emailEditorRef}
+                  designJson={template.designJson}
+                  minHeight="500px"
                 />
               </div>
+            </TabsContent>
+
+            <TabsContent value="html" className="mt-4 space-y-4">
+              {hasDesign && (
+                <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                  <p className="text-xs text-amber-700">
+                    Este template usa o editor visual. Editar o HTML aqui irá desassociar o design visual. Use a aba "Editor Visual" para manter o design.
+                  </p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label>Corpo HTML</Label>
                 <Textarea
@@ -720,7 +949,7 @@ function EditTemplateDialog({
               </div>
             </TabsContent>
 
-            <TabsContent value="text" className="space-y-4 mt-4">
+            <TabsContent value="text" className="mt-4 space-y-4">
               <div className="space-y-2">
                 <Label>Corpo Texto Puro (fallback)</Label>
                 <Textarea
@@ -731,7 +960,7 @@ function EditTemplateDialog({
               </div>
             </TabsContent>
 
-            <TabsContent value="whatsapp" className="space-y-4 mt-4">
+            <TabsContent value="whatsapp" className="mt-4 space-y-4">
               <div className="space-y-2">
                 <Label>Mensagem WhatsApp</Label>
                 <Textarea
@@ -758,7 +987,7 @@ function EditTemplateDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!form.name || !form.subject || !form.bodyHtml || updateMutation.isPending}
+            disabled={!form.name || !form.subject || updateMutation.isPending}
           >
             {updateMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -876,7 +1105,6 @@ function PreviewTemplateDialog({
     if (!iframe) return;
     const handleLoad = () => {
       updateIframeHeight();
-      // Also observe resize inside iframe
       try {
         const observer = new ResizeObserver(() => updateIframeHeight());
         if (iframe.contentDocument?.body) {
@@ -910,6 +1138,12 @@ function PreviewTemplateDialog({
           <DialogTitle className="font-display flex items-center gap-2">
             <Eye className="h-5 w-5" />
             Preview: {template.name}
+            {template.designJson && (
+              <Badge variant="secondary" className="text-xs">
+                <Paintbrush className="h-3 w-3 mr-1" />
+                Visual
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
             Visualização com dados de exemplo. Slug:{" "}
@@ -980,7 +1214,6 @@ function PreviewTemplateDialog({
                 className="relative transition-all duration-300 ease-in-out"
                 style={{ width: Math.min(deviceCfg.width, 680) }}
               >
-                {/* Device chrome / bezel */}
                 <div
                   className={`rounded-2xl border-2 overflow-hidden shadow-xl transition-all duration-300 ${
                     device === "mobile"
@@ -990,7 +1223,6 @@ function PreviewTemplateDialog({
                       : "border-gray-300 bg-gray-200 p-1 pt-6 pb-1"
                   }`}
                 >
-                  {/* Top bar / notch */}
                   {device === "mobile" && (
                     <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full" />
                   )}
@@ -1008,7 +1240,6 @@ function PreviewTemplateDialog({
                     </div>
                   )}
 
-                  {/* Iframe with email content */}
                   <iframe
                     ref={iframeRef}
                     srcDoc={iframeDoc}
@@ -1022,7 +1253,6 @@ function PreviewTemplateDialog({
                     sandbox="allow-same-origin"
                   />
 
-                  {/* Bottom bar for mobile */}
                   {device === "mobile" && (
                     <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full" />
                   )}
@@ -1031,7 +1261,6 @@ function PreviewTemplateDialog({
                   )}
                 </div>
 
-                {/* Device label */}
                 <p className="text-center text-xs text-muted-foreground mt-3">
                   {deviceCfg.label} — {deviceCfg.width}px
                 </p>
@@ -1065,16 +1294,13 @@ function PreviewTemplateDialog({
           <TabsContent value="whatsapp" className="mt-4">
             {renderedWhatsApp && (
               <div className="flex justify-center">
-                {/* WhatsApp phone frame */}
                 <div
                   className="relative"
                   style={{ width: 320 }}
                 >
                   <div className="rounded-2xl border-2 border-gray-700 bg-gray-800 p-2 pt-6 pb-6 shadow-xl">
-                    {/* Notch */}
                     <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full" />
 
-                    {/* WhatsApp header */}
                     <div className="bg-[#075e54] rounded-t-sm px-3 py-2 flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center">
                         <MessageCircle className="h-4 w-4 text-[#075e54]" />
@@ -1085,7 +1311,6 @@ function PreviewTemplateDialog({
                       </div>
                     </div>
 
-                    {/* Chat area */}
                     <div
                       className="bg-[#ece5dd] px-3 py-4 min-h-[200px] max-h-[400px] overflow-y-auto"
                       style={{
@@ -1098,12 +1323,10 @@ function PreviewTemplateDialog({
                           {renderedWhatsApp}
                         </pre>
                         <p className="text-[10px] text-gray-500 text-right mt-1">10:30 AM ✓✓</p>
-                        {/* Message tail */}
                         <div className="absolute top-0 right-[-6px] w-0 h-0 border-l-[6px] border-l-[#dcf8c6] border-t-[6px] border-t-transparent" />
                       </div>
                     </div>
 
-                    {/* Input bar */}
                     <div className="bg-[#f0f0f0] rounded-b-sm px-2 py-2 flex items-center gap-2">
                       <div className="flex-1 bg-white rounded-full px-3 py-1.5">
                         <p className="text-gray-400 text-xs">Mensagem</p>
@@ -1113,7 +1336,6 @@ function PreviewTemplateDialog({
                       </div>
                     </div>
 
-                    {/* Bottom bar */}
                     <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full" />
                   </div>
 

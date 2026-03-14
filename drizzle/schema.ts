@@ -644,6 +644,7 @@ export const emailTemplates = mysqlTable(
     // Email fields
     subject: varchar("subject", { length: 500 }).notNull(),
     bodyHtml: text("body_html").notNull(), // HTML body with {{placeholders}}
+    designJson: text("design_json"), // Unlayer editor design JSON (for visual editor re-editing)
     bodyText: text("body_text"), // Plain text fallback
     // WhatsApp fields
     whatsappMessage: text("whatsapp_message"), // WhatsApp message with {{placeholders}}
