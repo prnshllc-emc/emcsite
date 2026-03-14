@@ -640,3 +640,48 @@
 - [ ] Tests for email sending service
 - [ ] Tests for Clicksign webhook
 - [x] Tests for CNPJ validation (included in cnpj-linking.test.ts)
+
+## Sprint: Full Phase 49 Completion
+
+### Email Template System
+- [x] Create email_templates table in schema (name, subject, htmlBody, variables, isActive)
+- [x] Build email templates CRUD backend (router + service + repository)
+- [x] Build Email Templates admin panel with rich editor
+- [x] Seed default templates (tracking code, stage change, welcome, admin notification)
+
+### Real Email Sending
+- [x] Create email sending service using built-in notification/forge API
+- [x] Wire email sending into stage notification service
+- [x] Send emails on tracking code approval (to customer)
+- [x] Send emails on stage changes (to customer)
+- [x] Admin notification email on new pending actions
+- [x] Use template system for all emails (variable interpolation)
+
+### Clicksign Webhook
+- [x] Create POST /api/webhooks/clicksign endpoint
+- [x] Validate webhook token
+- [x] Handle document_signed event → update contract status
+- [x] Handle document_canceled event → update contract status
+
+### Auto-Link & Auto-Trigger
+- [x] Auto-link script: cross-reference BL VINs with vehicles table
+- [x] Auto-trigger tracking code when customer linked to BL
+- [x] Auto-populate bl_vehicles junction for VIN matches
+
+### Public Tracking Vehicle Info
+- [x] Show vehicle details (make, model, year) on tracking result page
+- [x] Show multiple vehicles if BL has multiple linked vehicles
+- [x] Ensure NO personal data (CPF, CNPJ, name, email) is exposed
+
+### CNPJ in PDF Extraction
+- [x] Update contract extraction to detect CNPJ patterns
+- [x] Store detected CNPJ in customer record
+
+### Tests
+- [x] Tests for email template rendering (10 tests)
+- [x] Tests for Clicksign webhook event parsing (4 tests)
+- [x] Tests for auto-link VIN matching logic (5 tests)
+- [x] Tests for tracking page vehicle info safety (3 tests)
+- [x] Tests for CNPJ PDF extraction (4 tests)
+- [x] Tests for email template slug conventions (2 tests)
+- [x] Tests for notification service template integration (2 tests)

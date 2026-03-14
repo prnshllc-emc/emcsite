@@ -628,3 +628,45 @@ export const cmsNavigation = mysqlTable(
 
 export type CmsNavItem = typeof cmsNavigation.$inferSelect;
 export type InsertCmsNavItem = typeof cmsNavigation.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// 19. EMAIL TEMPLATES — Customizable notification templates
+// Admin can create/edit templates for each stage/event.
+// Templates use {{variable}} placeholders replaced at send time.
+// ─────────────────────────────────────────────────────────────
+export const emailTemplates = mysqlTable(
+  "email_templates",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 128 }).notNull().unique(), // e.g. "stage_em_transito", "tracking_code_approved"
+    name: varchar("name", { length: 255 }).notNull(), // Human-readable name
+    description: varchar("description", { length: 500 }), // Admin description of when this template is used
+    // Email fields
+    subject: varchar("subject", { length: 500 }).notNull(),
+    bodyHtml: text("body_html").notNull(), // HTML body with {{placeholders}}
+    bodyText: text("body_text"), // Plain text fallback
+    // WhatsApp fields
+    whatsappMessage: text("whatsapp_message"), // WhatsApp message with {{placeholders}}
+    // Metadata
+    category: mysqlEnum("category", [
+      "stage_change",      // Process stage notifications
+      "tracking",          // Tracking code notifications
+      "onboarding",        // Client invite/onboarding
+      "system",            // System notifications
+      "marketing",         // Marketing/promotional
+    ]).default("stage_change").notNull(),
+    availableVariables: text("available_variables"), // JSON array of variable names e.g. ["name", "blNumber", "trackingCode"]
+    isActive: boolean("is_active").default(true).notNull(),
+    isDefault: boolean("is_default").default(false).notNull(), // System-provided defaults (cannot delete)
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+    updatedBy: int("updated_by"), // FK → users (admin who last edited)
+  },
+  (table) => [
+    index("idx_et_category").on(table.category),
+    index("idx_et_active").on(table.isActive),
+  ]
+);
+
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;

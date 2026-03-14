@@ -59,6 +59,7 @@ import DashboardPanel from "@/components/admin/DashboardPanel";
 import CustomersPanel from "@/components/admin/CustomersPanel";
 import PipelinePanel from "@/components/admin/PipelinePanel";
 import ContractsPanel from "@/components/admin/ContractsPanel";
+import EmailTemplatesPanel from "@/components/admin/EmailTemplatesPanel";
 
 // ============================================================
 // TYPES
@@ -249,7 +250,7 @@ export default function Admin() {
             </h2>
           </div>
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-5xl grid-cols-8">
+            <TabsList className="grid w-full max-w-6xl grid-cols-9">
               <TabsTrigger value="dashboard" className="font-display text-xs">
                 <LayoutDashboard className="mr-1.5 h-4 w-4" />
                 Dashboard
@@ -278,9 +279,13 @@ export default function Admin() {
                 <Megaphone className="mr-1.5 h-4 w-4" />
                 Leads
               </TabsTrigger>
+              <TabsTrigger value="templates" className="font-display text-xs">
+                <Mail className="mr-1.5 h-4 w-4" />
+                Templates
+              </TabsTrigger>
               <TabsTrigger value="settings" className="font-display text-xs">
                 <Settings className="mr-1.5 h-4 w-4" />
-                Configurações
+                Config
               </TabsTrigger>
             </TabsList>
 
@@ -310,6 +315,10 @@ export default function Admin() {
 
             <TabsContent value="leads">
               <NewsletterPanel />
+            </TabsContent>
+
+            <TabsContent value="templates">
+              <EmailTemplatesPanel />
             </TabsContent>
 
             <TabsContent value="settings">

@@ -66,7 +66,16 @@ export const contractsRouter = router({
         cpf: z
           .string()
           .transform((v) => v.replace(/\D/g, ""))
-          .refine((v) => v.length === 11, "CPF deve ter 11 dígitos"),
+          .refine((v) => v.length === 11, "CPF deve ter 11 dígitos")
+          .optional()
+          .nullable(),
+        cnpj: z
+          .string()
+          .transform((v) => v.replace(/\D/g, ""))
+          .refine((v) => v.length === 14, "CNPJ deve ter 14 dígitos")
+          .optional()
+          .nullable(),
+        documentType: z.enum(["cpf", "cnpj"]).optional().nullable(),
         email: z.string().email().optional().nullable(),
         phone: z.string().optional().nullable(),
         vins: z.array(
@@ -87,6 +96,8 @@ export const contractsRouter = router({
         {
           name: input.name,
           cpf: input.cpf,
+          cnpj: input.cnpj,
+          documentType: input.documentType,
           email: input.email,
           phone: input.phone,
           vins: input.vins,

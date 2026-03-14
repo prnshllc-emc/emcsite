@@ -27,6 +27,7 @@ import {
   getSchedulerStatus,
   runScheduledReconciliation,
 } from "./scheduler";
+import { runAutoLink } from "./autoLink";
 
 export const reconciliationRouter = router({
   // ── Pipeline summary (grouped by stage) ────────────────────
@@ -101,5 +102,10 @@ export const reconciliationRouter = router({
   // ── Trigger scheduled reconciliation manually ───────────
   triggerScheduled: adminProcedure.mutation(async () => {
     return runScheduledReconciliation();
+  }),
+
+  // ── Auto-link existing data ─────────────────────────────
+  autoLink: adminProcedure.mutation(async ({ ctx }) => {
+    return runAutoLink(ctx.user.id);
   }),
 });

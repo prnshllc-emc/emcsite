@@ -25,6 +25,7 @@ import { cmsRouter } from "./modules/cms/router";
 import { reconciliationRouter } from "./modules/reconciliation/router";
 import { contractsRouter } from "./modules/contracts/router";
 import { notificationsRouter } from "./modules/notifications/router";
+import { emailTemplatesRouter } from "./modules/emailTemplates/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -46,6 +47,7 @@ export const appRouter = router({
   reconciliation: reconciliationRouter,
   contracts: contractsRouter,
   notifications: notificationsRouter,
+  emailTemplates: emailTemplatesRouter,
 
   // ===== Admin Dashboard Stats =====
   dashboard: router({

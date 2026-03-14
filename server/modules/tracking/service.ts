@@ -11,6 +11,7 @@
 import * as repo from "./repository";
 import * as blRepo from "../bls/repository";
 import * as customerRepo from "../customers/repository";
+import * as vehicleRepo from "../vehicles/repository";
 import { logAudit } from "../../shared/audit";
 import { hashCpfForSearch } from "../../shared/security";
 import { InMemoryCache } from "../../shared/cache";
@@ -26,6 +27,13 @@ import type { PaginatedQuery, PaginatedResult } from "../../shared/pagination";
 const trackingCache = new InMemoryCache<PublicTrackingResult>({ ttl: 300 });
 
 // ── Public result types ──────────────────────────────────────
+export interface PublicVehicleInfo {
+  make: string | null;
+  model: string | null;
+  year: number | null;
+  color: string | null;
+}
+
 export interface PublicTrackingResult {
   code: string;
   blNumber: string;
@@ -33,6 +41,8 @@ export interface PublicTrackingResult {
   originPort: string | null;
   destinationPort: string | null;
   vehicleDescription: string | null;
+  /** Detailed vehicle info from bl_vehicles (no personal data) */
+  vehicles: PublicVehicleInfo[];
   status: string;
   estimatedDeparture: Date | null;
   actualDeparture: Date | null;
@@ -425,6 +435,21 @@ export async function lookupByCode(
   // Get tracking history
   const history = await repo.getTrackingHistory(trackingCode.blId);
 
+  // Get linked vehicles via bl_vehicles junction (safe: no personal data)
+  const blVehicleLinks = await blRepo.getVehiclesForBl(trackingCode.blId);
+  const vehicleInfos: PublicVehicleInfo[] = [];
+  for (const link of blVehicleLinks) {
+    const vehicle = await vehicleRepo.findVehicleById(link.vehicleId);
+    if (vehicle) {
+      vehicleInfos.push({
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        color: vehicle.color,
+      });
+    }
+  }
+
   const result: PublicTrackingResult = {
     code: trackingCode.code,
     blNumber: bl.blNumber,
@@ -432,6 +457,7 @@ export async function lookupByCode(
     originPort: bl.originPort,
     destinationPort: bl.destinationPort,
     vehicleDescription: bl.vehicleDescription,
+    vehicles: vehicleInfos,
     status: bl.status,
     estimatedDeparture: bl.estimatedDeparture,
     actualDeparture: bl.actualDeparture,

@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { createAgentRouter } from "../modules/agent/ingestion";
 import { createCmsRouter } from "../modules/cms/api";
+import { createClicksignWebhookRouter } from "../modules/contracts/webhook";
 import { startReconciliationScheduler } from "../modules/reconciliation/scheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -42,6 +43,8 @@ async function startServer() {
   app.use("/api/agent", createAgentRouter());
   // CMS Content API (REST, API-key authenticated)
   app.use("/api/cms", createCmsRouter());
+  // Clicksign Webhook (public, no auth required)
+  app.use("/api/webhooks", createClicksignWebhookRouter());
   // tRPC API
   app.use(
     "/api/trpc",

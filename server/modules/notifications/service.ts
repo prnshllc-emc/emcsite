@@ -7,15 +7,21 @@
  * - Has both → send both
  * - Has neither → flag for admin to correct (NOT a blocking error)
  *
- * Never "only if both exist". Any available channel is used.
+ * Now uses DB-based email templates from the emailTemplates module.
+ * Falls back to hardcoded templates if DB template is not found.
  */
 
 import { getDb } from "../../db";
 import { customers } from "../../../drizzle/schema";
-import { eq, isNull, and, isNotNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { decryptSensitiveData } from "../../shared/security";
 import { notifyOwner } from "../../_core/notification";
 import { logAudit } from "../../shared/audit";
+import {
+  getActiveTemplateBySlug,
+  renderTemplate,
+  seedDefaultTemplates,
+} from "../emailTemplates/service";
 import type { ProcessStage } from "../reconciliation/service";
 
 // ══════════════════════════════════════════════════════════════
@@ -23,13 +29,6 @@ import type { ProcessStage } from "../reconciliation/service";
 // ══════════════════════════════════════════════════════════════
 
 export type NotificationChannel = "email" | "whatsapp" | "admin_flag";
-
-export interface StageNotificationTemplate {
-  stage: ProcessStage;
-  subject: string;
-  emailBody: string;
-  whatsappMessage: string;
-}
 
 export interface NotificationResult {
   customerId: number;
@@ -41,144 +40,15 @@ export interface NotificationResult {
 }
 
 // ══════════════════════════════════════════════════════════════
-// NOTIFICATION TEMPLATES PER STAGE
+// STAGE → TEMPLATE SLUG MAPPING
 // ══════════════════════════════════════════════════════════════
 
-const STAGE_TEMPLATES: Record<string, StageNotificationTemplate> = {
-  aguardando_embarque: {
-    stage: "aguardando_embarque",
-    subject: "🚢 Seu veículo está aguardando embarque — Enviando Meu Carro",
-    emailBody: `Olá {{name}},
-
-Temos uma atualização sobre o transporte do seu veículo!
-
-📋 Status atual: Aguardando Embarque
-O seu veículo já está na fase de preparação para embarque. Em breve ele será carregado no container e seguirá viagem.
-
-Acompanhe o status em tempo real pelo nosso sistema de rastreamento.
-
-Qualquer dúvida, estamos à disposição.
-
-Atenciosamente,
-Equipe Enviando Meu Carro
-📞 WhatsApp: +55 11 99244-8920`,
-    whatsappMessage: `Olá {{name}}! 🚢
-
-Atualização do seu veículo:
-📋 *Status: Aguardando Embarque*
-
-Seu veículo está em preparação para embarque. Em breve seguirá viagem!
-
-Acompanhe pelo nosso rastreamento.
-Equipe Enviando Meu Carro`,
-  },
-
-  fase_documental: {
-    stage: "fase_documental",
-    subject: "📄 Fase documental em andamento — Enviando Meu Carro",
-    emailBody: `Olá {{name}},
-
-Temos uma atualização sobre o transporte do seu veículo!
-
-📋 Status atual: Fase Documental (Licença de Importação)
-Estamos processando a documentação necessária para a importação do seu veículo. Esta fase inclui a obtenção da Licença de Importação (LI) e demais trâmites legais.
-
-Assim que a documentação for concluída, seu veículo seguirá para a próxima etapa.
-
-Qualquer dúvida, estamos à disposição.
-
-Atenciosamente,
-Equipe Enviando Meu Carro
-📞 WhatsApp: +55 11 99244-8920`,
-    whatsappMessage: `Olá {{name}}! 📄
-
-Atualização do seu veículo:
-📋 *Status: Fase Documental (LI)*
-
-Estamos processando a documentação de importação. Em breve seguiremos para a próxima etapa!
-
-Equipe Enviando Meu Carro`,
-  },
-
-  em_transito: {
-    stage: "em_transito",
-    subject: "🚢 Seu veículo está em trânsito! — Enviando Meu Carro",
-    emailBody: `Olá {{name}},
-
-Ótima notícia! Seu veículo está a caminho! 🎉
-
-📋 Status atual: Em Trânsito
-O container com seu veículo já embarcou e está navegando rumo ao destino. Você pode acompanhar o progresso em tempo real pelo nosso sistema de rastreamento.
-
-Assim que o navio chegar ao porto de destino, você será notificado sobre as próximas etapas.
-
-Qualquer dúvida, estamos à disposição.
-
-Atenciosamente,
-Equipe Enviando Meu Carro
-📞 WhatsApp: +55 11 99244-8920`,
-    whatsappMessage: `Olá {{name}}! 🚢🎉
-
-Ótima notícia!
-📋 *Status: Em Trânsito*
-
-Seu veículo já embarcou e está a caminho! Acompanhe pelo nosso rastreamento.
-
-Equipe Enviando Meu Carro`,
-  },
-
-  em_desembaraco: {
-    stage: "em_desembaraco",
-    subject: "🏗️ Seu veículo chegou ao porto! — Enviando Meu Carro",
-    emailBody: `Olá {{name}},
-
-Seu veículo chegou ao porto de destino! 🎉
-
-📋 Status atual: Desembaraço Aduaneiro
-O container já foi descarregado e estamos realizando o processo de desembaraço aduaneiro. Esta fase inclui a liberação alfandegária e inspeções necessárias.
-
-Assim que o veículo for liberado, entraremos em contato para agendar a entrega.
-
-Qualquer dúvida, estamos à disposição.
-
-Atenciosamente,
-Equipe Enviando Meu Carro
-📞 WhatsApp: +55 11 99244-8920`,
-    whatsappMessage: `Olá {{name}}! 🏗️🎉
-
-Seu veículo chegou ao porto!
-📋 *Status: Desembaraço Aduaneiro*
-
-Estamos realizando a liberação alfandegária. Em breve agendaremos a entrega!
-
-Equipe Enviando Meu Carro`,
-  },
-
-  concluido: {
-    stage: "concluido",
-    subject: "✅ Veículo entregue com sucesso! — Enviando Meu Carro",
-    emailBody: `Olá {{name}},
-
-Parabéns! Seu veículo foi entregue com sucesso! 🎉🚗
-
-📋 Status atual: Concluído
-O processo de transporte do seu veículo foi finalizado. Esperamos que tudo tenha atendido suas expectativas.
-
-Se precisar de qualquer suporte adicional ou quiser importar/exportar outro veículo, conte conosco!
-
-Obrigado por confiar na Enviando Meu Carro.
-
-Atenciosamente,
-Equipe Enviando Meu Carro
-📞 WhatsApp: +55 11 99244-8920`,
-    whatsappMessage: `Olá {{name}}! ✅🎉🚗
-
-*Parabéns! Seu veículo foi entregue!*
-
-Obrigado por confiar na Enviando Meu Carro. Precisando, conte conosco!
-
-Equipe Enviando Meu Carro`,
-  },
+const STAGE_TO_SLUG: Record<string, string> = {
+  aguardando_embarque: "stage_aguardando_embarque",
+  em_transito: "stage_em_transito",
+  fase_documental: "stage_fase_documental",
+  em_desembaraco: "stage_em_desembaraco",
+  concluido: "stage_concluido",
 };
 
 // ══════════════════════════════════════════════════════════════
@@ -217,10 +87,14 @@ export function determineChannels(
 export async function notifyCustomerStageChange(
   customerId: number,
   newStage: ProcessStage,
-  adminUserId?: number
+  adminUserId?: number,
+  extraVars?: Record<string, string>
 ): Promise<NotificationResult> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+
+  // Ensure default templates exist
+  await seedDefaultTemplates();
 
   // Get customer data
   const [customerRow] = await db
@@ -246,7 +120,6 @@ export async function notifyCustomerStageChange(
   // Determine channels
   const { channels, flagForAdmin, flagReason } = determineChannels(email, phone);
 
-  const template = STAGE_TEMPLATES[newStage];
   const sent: { channel: NotificationChannel; success: boolean; error?: string }[] = [];
 
   if (flagForAdmin) {
@@ -279,24 +152,48 @@ export async function notifyCustomerStageChange(
     };
   }
 
+  // Get the DB template for this stage
+  const slug = STAGE_TO_SLUG[newStage];
+  const dbTemplate = slug ? await getActiveTemplateBySlug(slug) : null;
+
+  // Build template variables
+  const variables: Record<string, string | undefined> = {
+    name: customerName,
+    ...(extraVars ?? {}),
+  };
+
   // Send to each available channel
   for (const channel of channels) {
     try {
-      if (channel === "email" && template) {
-        const emailBody = template.emailBody.replace(/\{\{name\}\}/g, customerName);
-        const subject = template.subject;
+      if (channel === "email") {
+        let subject: string;
+        let emailBody: string;
+
+        if (dbTemplate) {
+          subject = renderTemplate(dbTemplate.subject, variables);
+          emailBody = renderTemplate(dbTemplate.bodyHtml, variables);
+        } else {
+          subject = `Atualização do seu veículo — Estágio: ${newStage}`;
+          emailBody = `Olá ${customerName},\n\nSeu processo mudou para o estágio: ${newStage}.\n\nAtenciosamente,\nEquipe Enviando Meu Carro`;
+        }
 
         // Use the built-in notification service to send email
         // In production, this would integrate with an email service (SendGrid, SES, etc.)
         // For now, we notify the owner with the email content for manual forwarding
         const success = await notifyOwner({
           title: `📧 Email para ${customerName}: ${subject}`,
-          content: `Destinatário: ${email}\n\n${emailBody}`,
+          content: `Destinatário: ${email}\n\nAssunto: ${subject}\n\n${dbTemplate ? "[Template DB: " + dbTemplate.slug + "]\n\n" : ""}${emailBody}`,
         });
 
         sent.push({ channel: "email", success });
-      } else if (channel === "whatsapp" && template) {
-        const whatsappMsg = template.whatsappMessage.replace(/\{\{name\}\}/g, customerName);
+      } else if (channel === "whatsapp") {
+        let whatsappMsg: string;
+
+        if (dbTemplate?.whatsappMessage) {
+          whatsappMsg = renderTemplate(dbTemplate.whatsappMessage, variables);
+        } else {
+          whatsappMsg = `Olá ${customerName}! Seu processo mudou para: ${newStage}. Equipe Enviando Meu Carro`;
+        }
 
         // In production, this would integrate with WhatsApp Business API
         // For now, we notify the owner with the WhatsApp message for manual sending
@@ -306,13 +203,6 @@ export async function notifyCustomerStageChange(
         });
 
         sent.push({ channel: "whatsapp", success });
-      } else if (!template) {
-        // No template for this stage — just log it
-        sent.push({
-          channel,
-          success: false,
-          error: `Sem template de notificação para o estágio "${newStage}"`,
-        });
       }
     } catch (err) {
       sent.push({
@@ -332,6 +222,7 @@ export async function notifyCustomerStageChange(
     changes: {
       stage: { before: null, after: newStage },
       channels: { before: null, after: channels },
+      templateSlug: { before: null, after: slug ?? "fallback" },
       results: { before: null, after: sent },
     },
   });
@@ -343,6 +234,196 @@ export async function notifyCustomerStageChange(
     sent,
     flaggedForAdmin: false,
   };
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEND NOTIFICATION FOR TRACKING CODE APPROVAL
+// ══════════════════════════════════════════════════════════════
+
+export async function notifyTrackingCodeApproved(
+  customerId: number,
+  trackingCode: string,
+  adminUserId?: number
+): Promise<NotificationResult> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await seedDefaultTemplates();
+
+  const [customerRow] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, customerId))
+    .limit(1);
+
+  if (!customerRow) throw new Error("Cliente não encontrado");
+
+  let email: string | null = null;
+  let phone: string | null = null;
+  try {
+    email = customerRow.email ? decryptSensitiveData(customerRow.email) : null;
+  } catch {}
+  try {
+    phone = customerRow.phone ? decryptSensitiveData(customerRow.phone) : null;
+  } catch {}
+
+  const customerName = customerRow.name;
+  const { channels, flagForAdmin, flagReason } = determineChannels(email, phone);
+  const sent: { channel: NotificationChannel; success: boolean; error?: string }[] = [];
+
+  if (flagForAdmin) {
+    await notifyOwner({
+      title: `⚠️ Tracking code aprovado mas sem contato: ${customerName}`,
+      content: `O código ${trackingCode} foi aprovado para ${customerName} (ID: ${customerId}) mas não foi possível notificar — sem email/telefone.`,
+    });
+    sent.push({ channel: "admin_flag", success: true });
+    return { customerId, customerName, channels, sent, flaggedForAdmin: true, flagReason };
+  }
+
+  const dbTemplate = await getActiveTemplateBySlug("tracking_code_approved");
+  const variables: Record<string, string | undefined> = {
+    name: customerName,
+    trackingCode,
+  };
+
+  for (const channel of channels) {
+    try {
+      if (channel === "email") {
+        let subject: string;
+        let emailBody: string;
+
+        if (dbTemplate) {
+          subject = renderTemplate(dbTemplate.subject, variables);
+          emailBody = renderTemplate(dbTemplate.bodyHtml, variables);
+        } else {
+          subject = `🔑 Seu código de rastreamento: ${trackingCode}`;
+          emailBody = `Olá ${customerName},\n\nSeu código de rastreamento foi aprovado: ${trackingCode}\n\nUse-o para acompanhar seu veículo.\n\nEquipe Enviando Meu Carro`;
+        }
+
+        const success = await notifyOwner({
+          title: `📧 Tracking Code para ${customerName}: ${subject}`,
+          content: `Destinatário: ${email}\n\n${emailBody}`,
+        });
+        sent.push({ channel: "email", success });
+      } else if (channel === "whatsapp") {
+        let whatsappMsg: string;
+        if (dbTemplate?.whatsappMessage) {
+          whatsappMsg = renderTemplate(dbTemplate.whatsappMessage, variables);
+        } else {
+          whatsappMsg = `Olá ${customerName}! 🔑 Seu código de rastreamento: ${trackingCode}. Use para acompanhar seu veículo.`;
+        }
+        const success = await notifyOwner({
+          title: `📱 WhatsApp Tracking para ${customerName} (${phone})`,
+          content: whatsappMsg,
+        });
+        sent.push({ channel: "whatsapp", success });
+      }
+    } catch (err) {
+      sent.push({ channel, success: false, error: (err as Error).message });
+    }
+  }
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "create",
+    entity: "notification",
+    entityId: customerId,
+    changes: {
+      event: { before: null, after: "tracking_code_approved" },
+      trackingCode: { before: null, after: trackingCode },
+      channels: { before: null, after: channels },
+    },
+  });
+
+  return { customerId, customerName, channels, sent, flaggedForAdmin: false };
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEND GENERIC NOTIFICATION USING A TEMPLATE SLUG
+// ══════════════════════════════════════════════════════════════
+
+export async function sendTemplateNotification(
+  customerId: number,
+  templateSlug: string,
+  variables: Record<string, string | undefined>,
+  adminUserId?: number
+): Promise<NotificationResult> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await seedDefaultTemplates();
+
+  const [customerRow] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, customerId))
+    .limit(1);
+
+  if (!customerRow) throw new Error("Cliente não encontrado");
+
+  let email: string | null = null;
+  let phone: string | null = null;
+  try {
+    email = customerRow.email ? decryptSensitiveData(customerRow.email) : null;
+  } catch {}
+  try {
+    phone = customerRow.phone ? decryptSensitiveData(customerRow.phone) : null;
+  } catch {}
+
+  const customerName = customerRow.name;
+  const vars = { name: customerName, ...variables };
+  const { channels, flagForAdmin, flagReason } = determineChannels(email, phone);
+  const sent: { channel: NotificationChannel; success: boolean; error?: string }[] = [];
+
+  if (flagForAdmin) {
+    await notifyOwner({
+      title: `⚠️ Notificação não enviada: ${customerName}`,
+      content: `Template "${templateSlug}" para ${customerName} (ID: ${customerId}) — sem contato.`,
+    });
+    sent.push({ channel: "admin_flag", success: true });
+    return { customerId, customerName, channels, sent, flaggedForAdmin: true, flagReason };
+  }
+
+  const dbTemplate = await getActiveTemplateBySlug(templateSlug);
+  if (!dbTemplate) {
+    throw new Error(`Template "${templateSlug}" não encontrado ou inativo.`);
+  }
+
+  for (const channel of channels) {
+    try {
+      if (channel === "email") {
+        const subject = renderTemplate(dbTemplate.subject, vars);
+        const emailBody = renderTemplate(dbTemplate.bodyHtml, vars);
+        const success = await notifyOwner({
+          title: `📧 ${subject}`,
+          content: `Destinatário: ${email}\n\n${emailBody}`,
+        });
+        sent.push({ channel: "email", success });
+      } else if (channel === "whatsapp" && dbTemplate.whatsappMessage) {
+        const whatsappMsg = renderTemplate(dbTemplate.whatsappMessage, vars);
+        const success = await notifyOwner({
+          title: `📱 WhatsApp para ${customerName} (${phone})`,
+          content: whatsappMsg,
+        });
+        sent.push({ channel: "whatsapp", success });
+      }
+    } catch (err) {
+      sent.push({ channel, success: false, error: (err as Error).message });
+    }
+  }
+
+  await logAudit({
+    userId: adminUserId ?? null,
+    action: "create",
+    entity: "notification",
+    entityId: customerId,
+    changes: {
+      templateSlug: { before: null, after: templateSlug },
+      channels: { before: null, after: channels },
+    },
+  });
+
+  return { customerId, customerName, channels, sent, flaggedForAdmin: false };
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -358,12 +439,7 @@ export async function findCustomersMissingContact(): Promise<
   const rows = await db
     .select()
     .from(customers)
-    .where(
-      and(
-        isNull(customers.deletedAt),
-        // At least one contact field is null
-      )
-    );
+    .where(eq(customers.deletedAt, null as any));
 
   const results: { id: number; name: string; hasEmail: boolean; hasPhone: boolean }[] = [];
 
@@ -382,12 +458,4 @@ export async function findCustomersMissingContact(): Promise<
   }
 
   return results;
-}
-
-// ══════════════════════════════════════════════════════════════
-// GET AVAILABLE TEMPLATES (for admin UI)
-// ══════════════════════════════════════════════════════════════
-
-export function getNotificationTemplates(): StageNotificationTemplate[] {
-  return Object.values(STAGE_TEMPLATES);
 }

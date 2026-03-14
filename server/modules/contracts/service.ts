@@ -26,7 +26,7 @@ import {
   findVehicleByVin,
   createVehicle,
 } from "../vehicles/repository";
-import { isValidCpf, isValidVin } from "../../shared/security";
+import { isValidCpf, isValidCnpj, isValidVin } from "../../shared/security";
 import crypto from "crypto";
 
 // ══════════════════════════════════════════════════════════════
@@ -38,6 +38,10 @@ export interface ExtractedContractData {
   name: string | null;
   /** CPF (digits only or formatted) */
   cpf: string | null;
+  /** CNPJ (digits only or formatted) — for corporate imports */
+  cnpj: string | null;
+  /** Document type detected */
+  documentType: "cpf" | "cnpj" | null;
   /** Email address */
   email: string | null;
   /** Phone number */
@@ -112,8 +116,10 @@ export async function extractContractData(
         role: "system",
         content: `Você é um assistente especializado em extrair dados de contratos de importação/exportação de veículos.
 Analise o PDF do contrato e extraia as seguintes informações:
-- Nome completo do signatário/cliente
-- CPF (apenas dígitos, sem pontos ou traços)
+- Nome completo do signatário/cliente (ou razão social se pessoa jurídica)
+- CPF (apenas dígitos, sem pontos ou traços) — para pessoa física
+- CNPJ (apenas dígitos, sem pontos, barras ou traços) — para pessoa jurídica
+- Tipo de documento: "cpf" se encontrou CPF, "cnpj" se encontrou CNPJ
 - Email
 - Telefone
 - VIN (Vehicle Identification Number) de cada veículo mencionado (17 caracteres alfanuméricos, sem I, O, Q)
@@ -122,6 +128,8 @@ Analise o PDF do contrato e extraia as seguintes informações:
 
 IMPORTANTE:
 - CPF brasileiro tem 11 dígitos
+- CNPJ brasileiro tem 14 dígitos
+- Contratos de importação/exportação podem ter CPF (pessoa física) ou CNPJ (pessoa jurídica)
 - VIN padrão tem 17 caracteres (pode haver VINs curtos para veículos antigos/militares)
 - Se não encontrar algum campo, retorne null
 - Se encontrar múltiplos VINs, liste todos
@@ -159,7 +167,16 @@ IMPORTANTE:
             },
             cpf: {
               type: ["string", "null"],
-              description: "CPF digits only (11 digits)",
+              description: "CPF digits only (11 digits) — for individuals",
+            },
+            cnpj: {
+              type: ["string", "null"],
+              description: "CNPJ digits only (14 digits) — for companies",
+            },
+            documentType: {
+              type: ["string", "null"],
+              enum: ["cpf", "cnpj", null],
+              description: "Type of document found: cpf or cnpj",
             },
             email: {
               type: ["string", "null"],
@@ -210,6 +227,8 @@ IMPORTANTE:
           required: [
             "name",
             "cpf",
+            "cnpj",
+            "documentType",
             "email",
             "phone",
             "vins",
@@ -230,6 +249,8 @@ IMPORTANTE:
     return {
       name: null,
       cpf: null,
+      cnpj: null,
+      documentType: null,
       email: null,
       phone: null,
       vins: [],
@@ -260,6 +281,25 @@ IMPORTANTE:
       }
     }
 
+    // Validate CNPJ
+    if (parsed.cnpj) {
+      const cnpjDigits = parsed.cnpj.replace(/\D/g, "");
+      if (cnpjDigits.length === 14) {
+        parsed.cnpj = cnpjDigits;
+        if (!isValidCnpj(cnpjDigits)) {
+          warnings.push("CNPJ extraído não passou na validação de dígitos verificadores");
+        }
+      } else {
+        warnings.push(`CNPJ extraído tem ${cnpjDigits.length} dígitos (esperado 14)`);
+      }
+    }
+
+    // Auto-detect documentType if not set
+    if (!parsed.documentType) {
+      if (parsed.cnpj) parsed.documentType = "cnpj";
+      else if (parsed.cpf) parsed.documentType = "cpf";
+    }
+
     // Validate VINs
     const validVins: string[] = [];
     for (const vin of parsed.vins ?? []) {
@@ -280,6 +320,8 @@ IMPORTANTE:
     return {
       name: null,
       cpf: null,
+      cnpj: null,
+      documentType: null,
       email: null,
       phone: null,
       vins: [],
@@ -339,7 +381,9 @@ export async function confirmContract(
   contractId: number,
   confirmedData: {
     name: string;
-    cpf: string;
+    cpf?: string | null;
+    cnpj?: string | null;
+    documentType?: "cpf" | "cnpj" | null;
     email?: string | null;
     phone?: string | null;
     vins: {
@@ -356,17 +400,28 @@ export async function confirmContract(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // 1. Find or create customer
+  // 1. Find or create customer (supports CPF or CNPJ)
   let customerId: number;
   let isNewCustomer = false;
 
-  const existingCustomer = await findCustomerByCpf(confirmedData.cpf);
+  // Try to find existing customer by CPF or CNPJ
+  let existingCustomer = null;
+  if (confirmedData.cpf) {
+    existingCustomer = await findCustomerByCpf(confirmedData.cpf);
+  }
+  if (!existingCustomer && confirmedData.cnpj) {
+    const { findCustomerByCnpj } = await import("../customers/repository");
+    existingCustomer = await findCustomerByCnpj(confirmedData.cnpj);
+  }
+
   if (existingCustomer) {
     customerId = existingCustomer.id;
   } else {
     const newCustomer = await createCustomer({
       fullName: confirmedData.name,
-      cpf: confirmedData.cpf,
+      cpf: confirmedData.cpf ?? "",
+      cnpj: confirmedData.cnpj ?? null,
+      documentType: confirmedData.documentType ?? (confirmedData.cnpj ? "cnpj" : "cpf"),
       email: confirmedData.email ?? null,
       phone: confirmedData.phone ?? null,
       status: "aguardando_embarque",

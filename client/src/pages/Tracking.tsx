@@ -489,6 +489,35 @@ function TrackingResult({
         />
       </div>
 
+      {/* Detailed Vehicle Info (from bl_vehicles — no personal data) */}
+      {data.vehicles && data.vehicles.length > 0 && (
+        <div className="rounded-xl bg-card border border-white/10 p-5 md:p-6 mb-6">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+            Veículos no Embarque
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {data.vehicles.map((v: { make: string | null; model: string | null; year: number | null; color: string | null }, idx: number) => (
+              <div
+                key={idx}
+                className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-white/5"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Truck className="w-5 h-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate">
+                    {[v.make, v.model].filter(Boolean).join(" ") || "Veículo"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {[v.year, v.color].filter(Boolean).join(" • ") || "—"}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Timeline */}
       {data.timeline && data.timeline.length > 0 && (
         <div className="rounded-xl bg-card border border-white/10 p-5 md:p-6">
