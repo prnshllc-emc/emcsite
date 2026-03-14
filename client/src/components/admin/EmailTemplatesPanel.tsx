@@ -3,7 +3,7 @@
  * Supports create, edit, delete, preview, and toggle active/inactive.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,9 @@ import {
   FileText,
   Copy,
   Check,
+  Monitor,
+  Tablet,
+  Smartphone,
 } from "lucide-react";
 
 // ══════════════════════════════════════════════════════════════
@@ -771,7 +774,19 @@ function EditTemplateDialog({
 }
 
 // ══════════════════════════════════════════════════════════════
-// PREVIEW DIALOG
+// DEVICE PREVIEW CONSTANTS
+// ══════════════════════════════════════════════════════════════
+
+type DeviceType = "desktop" | "tablet" | "mobile";
+
+const DEVICE_CONFIG: Record<DeviceType, { width: number; label: string; icon: typeof Monitor }> = {
+  desktop: { width: 680, label: "Desktop", icon: Monitor },
+  tablet: { width: 480, label: "Tablet", icon: Tablet },
+  mobile: { width: 320, label: "Mobile", icon: Smartphone },
+};
+
+// ══════════════════════════════════════════════════════════════
+// PREVIEW DIALOG — with responsive device preview
 // ══════════════════════════════════════════════════════════════
 
 function PreviewTemplateDialog({
@@ -784,6 +799,9 @@ function PreviewTemplateDialog({
   onClose: () => void;
 }) {
   const [activeTab, setActiveTab] = useState("email");
+  const [device, setDevice] = useState<DeviceType>("desktop");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = useState(400);
 
   // Parse available variables and create sample values
   const sampleVars: Record<string, string> = useMemo(() => {
@@ -808,12 +826,10 @@ function PreviewTemplateDialog({
   // Render the HTML with sample variables
   const renderedHtml = useMemo(() => {
     let html = template.bodyHtml;
-    // Handle conditional blocks
     for (const [key, value] of Object.entries(sampleVars)) {
       const conditionalRegex = new RegExp(`\\{\\{#${key}\\}\\}([\\s\\S]*?)\\{\\{/${key}\\}\\}`, "g");
       html = html.replace(conditionalRegex, "$1");
     }
-    // Replace simple variables
     for (const [key, value] of Object.entries(sampleVars)) {
       html = html.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
     }
@@ -829,6 +845,50 @@ function PreviewTemplateDialog({
     return msg;
   }, [template.whatsappMessage, sampleVars]);
 
+  // Full HTML document for iframe rendering (isolated styles)
+  const iframeDoc = useMemo(() => {
+    return `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; background: #f5f5f5; padding: 16px; }
+  img { max-width: 100%; height: auto; }
+  a { color: #2563eb; }
+</style>
+</head><body>${renderedHtml}</body></html>`;
+  }, [renderedHtml]);
+
+  // Auto-resize iframe to content height
+  const updateIframeHeight = useCallback(() => {
+    try {
+      const iframe = iframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        const h = iframe.contentDocument.body.scrollHeight;
+        setIframeHeight(Math.max(200, Math.min(h + 32, 600)));
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const handleLoad = () => {
+      updateIframeHeight();
+      // Also observe resize inside iframe
+      try {
+        const observer = new ResizeObserver(() => updateIframeHeight());
+        if (iframe.contentDocument?.body) {
+          observer.observe(iframe.contentDocument.body);
+        }
+        return () => observer.disconnect();
+      } catch {}
+    };
+    iframe.addEventListener("load", handleLoad);
+    return () => iframe.removeEventListener("load", handleLoad);
+  }, [updateIframeHeight, iframeDoc, device]);
+
   const [copied, setCopied] = useState(false);
   const handleCopyHtml = () => {
     navigator.clipboard.writeText(template.bodyHtml);
@@ -836,16 +896,24 @@ function PreviewTemplateDialog({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const renderedSubject = template.subject.replace(
+    /\{\{(\w+)\}\}/g,
+    (_, k) => sampleVars[k] ?? `{{${k}}}`
+  );
+
+  const deviceCfg = DEVICE_CONFIG[device];
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
             <Eye className="h-5 w-5" />
             Preview: {template.name}
           </DialogTitle>
           <DialogDescription>
-            Visualização com dados de exemplo. Slug: <code className="text-xs bg-muted px-1 py-0.5 rounded">{template.slug}</code>
+            Visualização com dados de exemplo. Slug:{" "}
+            <code className="text-xs bg-muted px-1 py-0.5 rounded">{template.slug}</code>
           </DialogDescription>
         </DialogHeader>
 
@@ -874,22 +942,104 @@ function PreviewTemplateDialog({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="email" className="mt-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="font-mono text-xs">
-                  Assunto: {template.subject.replace(/\{\{(\w+)\}\}/g, (_, k) => sampleVars[k] ?? `{{${k}}}`)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+          {/* ── EMAIL TAB with device preview ── */}
+          <TabsContent value="email" className="mt-4 space-y-4">
+            {/* Device selector toolbar */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground font-mono">
+                Assunto: {renderedSubject}
+              </p>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                {(Object.entries(DEVICE_CONFIG) as [DeviceType, typeof deviceCfg][]).map(
+                  ([key, cfg]) => {
+                    const Icon = cfg.icon;
+                    const isActive = device === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setDevice(key)}
+                        title={cfg.label}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          isActive
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{cfg.label}</span>
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+
+            {/* Device frame */}
+            <div className="flex justify-center">
+              <div
+                className="relative transition-all duration-300 ease-in-out"
+                style={{ width: Math.min(deviceCfg.width, 680) }}
+              >
+                {/* Device chrome / bezel */}
                 <div
-                  className="border rounded-lg p-4 bg-white"
-                  dangerouslySetInnerHTML={{ __html: renderedHtml }}
-                />
-              </CardContent>
-            </Card>
+                  className={`rounded-2xl border-2 overflow-hidden shadow-xl transition-all duration-300 ${
+                    device === "mobile"
+                      ? "border-gray-700 bg-gray-800 p-2 pt-6 pb-6"
+                      : device === "tablet"
+                      ? "border-gray-600 bg-gray-700 p-2 pt-4 pb-4"
+                      : "border-gray-300 bg-gray-200 p-1 pt-6 pb-1"
+                  }`}
+                >
+                  {/* Top bar / notch */}
+                  {device === "mobile" && (
+                    <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full" />
+                  )}
+                  {device === "tablet" && (
+                    <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-500 rounded-full" />
+                  )}
+                  {device === "desktop" && (
+                    <div className="absolute top-0 left-0 right-0 h-5 bg-gray-300 rounded-t-2xl flex items-center px-3 gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-red-400" />
+                      <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                      <div className="w-2 h-2 rounded-full bg-green-400" />
+                      <div className="flex-1 mx-4">
+                        <div className="bg-white/60 rounded-sm h-2.5 max-w-[200px] mx-auto" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Iframe with email content */}
+                  <iframe
+                    ref={iframeRef}
+                    srcDoc={iframeDoc}
+                    title="Email Preview"
+                    className="w-full bg-white rounded-sm"
+                    style={{
+                      height: iframeHeight,
+                      border: "none",
+                      display: "block",
+                    }}
+                    sandbox="allow-same-origin"
+                  />
+
+                  {/* Bottom bar for mobile */}
+                  {device === "mobile" && (
+                    <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full" />
+                  )}
+                  {device === "tablet" && (
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-8 border-2 border-gray-500 rounded-full" />
+                  )}
+                </div>
+
+                {/* Device label */}
+                <p className="text-center text-xs text-muted-foreground mt-3">
+                  {deviceCfg.label} — {deviceCfg.width}px
+                </p>
+              </div>
+            </div>
           </TabsContent>
 
+          {/* ── HTML SOURCE TAB ── */}
           <TabsContent value="code" className="mt-4">
             <div className="relative">
               <Button
@@ -898,7 +1048,11 @@ function PreviewTemplateDialog({
                 className="absolute top-2 right-2 z-10"
                 onClick={handleCopyHtml}
               >
-                {copied ? <Check className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 mr-1" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 mr-1" />
+                )}
                 {copied ? "Copiado!" : "Copiar"}
               </Button>
               <pre className="bg-muted p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-[400px] overflow-y-auto whitespace-pre-wrap">
@@ -907,18 +1061,67 @@ function PreviewTemplateDialog({
             </div>
           </TabsContent>
 
+          {/* ── WHATSAPP TAB ── */}
           <TabsContent value="whatsapp" className="mt-4">
             {renderedWhatsApp && (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="bg-[#dcf8c6] rounded-lg p-4 max-w-md mx-auto shadow-sm">
-                    <pre className="whitespace-pre-wrap text-sm font-sans text-gray-800">
-                      {renderedWhatsApp}
-                    </pre>
-                    <p className="text-xs text-gray-500 text-right mt-2">10:30 AM ✓✓</p>
+              <div className="flex justify-center">
+                {/* WhatsApp phone frame */}
+                <div
+                  className="relative"
+                  style={{ width: 320 }}
+                >
+                  <div className="rounded-2xl border-2 border-gray-700 bg-gray-800 p-2 pt-6 pb-6 shadow-xl">
+                    {/* Notch */}
+                    <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full" />
+
+                    {/* WhatsApp header */}
+                    <div className="bg-[#075e54] rounded-t-sm px-3 py-2 flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center">
+                        <MessageCircle className="h-4 w-4 text-[#075e54]" />
+                      </div>
+                      <div>
+                        <p className="text-white text-xs font-semibold">Enviando Meu Carro</p>
+                        <p className="text-green-200 text-[10px]">online</p>
+                      </div>
+                    </div>
+
+                    {/* Chat area */}
+                    <div
+                      className="bg-[#ece5dd] px-3 py-4 min-h-[200px] max-h-[400px] overflow-y-auto"
+                      style={{
+                        backgroundImage:
+                          "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4cfc6' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+                      }}
+                    >
+                      <div className="bg-[#dcf8c6] rounded-lg p-3 shadow-sm max-w-[260px] ml-auto relative">
+                        <pre className="whitespace-pre-wrap text-[13px] font-sans text-gray-800 leading-relaxed">
+                          {renderedWhatsApp}
+                        </pre>
+                        <p className="text-[10px] text-gray-500 text-right mt-1">10:30 AM ✓✓</p>
+                        {/* Message tail */}
+                        <div className="absolute top-0 right-[-6px] w-0 h-0 border-l-[6px] border-l-[#dcf8c6] border-t-[6px] border-t-transparent" />
+                      </div>
+                    </div>
+
+                    {/* Input bar */}
+                    <div className="bg-[#f0f0f0] rounded-b-sm px-2 py-2 flex items-center gap-2">
+                      <div className="flex-1 bg-white rounded-full px-3 py-1.5">
+                        <p className="text-gray-400 text-xs">Mensagem</p>
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-[#075e54] flex items-center justify-center">
+                        <Mail className="h-3.5 w-3.5 text-white" />
+                      </div>
+                    </div>
+
+                    {/* Bottom bar */}
+                    <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full" />
                   </div>
-                </CardContent>
-              </Card>
+
+                  <p className="text-center text-xs text-muted-foreground mt-3">
+                    WhatsApp — Mobile 320px
+                  </p>
+                </div>
+              </div>
             )}
           </TabsContent>
         </Tabs>
@@ -927,7 +1130,7 @@ function PreviewTemplateDialog({
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
-          <Button onClick={() => { onClose(); /* Could open edit dialog */ }}>
+          <Button onClick={() => { onClose(); }}>
             <Pencil className="mr-2 h-4 w-4" />
             Editar Template
           </Button>

@@ -685,3 +685,9 @@
 - [x] Tests for CNPJ PDF extraction (4 tests)
 - [x] Tests for email template slug conventions (2 tests)
 - [x] Tests for notification service template integration (2 tests)
+
+## Responsive Email Template Preview
+- [x] Add device toggle (Desktop / Tablet / Mobile) to email template preview
+- [x] Render preview in iframe with device-appropriate width
+- [x] Show device frame/chrome around the preview for realism
+- [x] Ensure preview works for both HTML body and WhatsApp message
