@@ -52,6 +52,8 @@ export const customersRouter = router({
       return service.createCustomer(
         {
           cpf: input.cpf,
+          cnpj: input.cnpj ?? undefined,
+          documentType: input.documentType ?? "cpf",
           fullName: input.fullName,
           email: input.email ?? undefined,
           phone: input.phone ?? undefined,
@@ -79,6 +81,8 @@ export const customersRouter = router({
           email: input.data.email ?? undefined,
           phone: input.data.phone ?? undefined,
           cpf: input.data.cpf ?? undefined,
+          cnpj: input.data.cnpj,
+          documentType: input.data.documentType ?? undefined,
           status: input.data.status ?? undefined,
           tipoOperacao: input.data.tipoOperacao ?? undefined,
         },

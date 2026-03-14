@@ -1,6 +1,7 @@
 /**
  * Customers Service — Business logic for customer management.
  * Handles validation, deduplication, audit logging, and manual override protection.
+ * Supports both CPF (pessoa física) and CNPJ (pessoa jurídica).
  *
  * Manual Override Logic:
  * - When an admin edits a field in the UI, that field name is added to `manualOverrides[]`
@@ -10,12 +11,14 @@
 import * as repo from "./repository";
 import { logAudit } from "../../shared/audit";
 import type { PaginatedQuery, PaginatedResult } from "../../shared/pagination";
-import type { CustomerStatus, TipoOperacao, DataSource } from "../../../shared/schemas";
+import type { CustomerStatus, TipoOperacao, DataSource, DocumentType } from "../../../shared/schemas";
 
 // ── Create ───────────────────────────────────────────────────
 export async function createCustomer(
   data: {
     cpf: string;
+    cnpj?: string | null;
+    documentType?: DocumentType;
     fullName: string;
     email?: string | null;
     phone?: string | null;
@@ -31,8 +34,18 @@ export async function createCustomer(
     throw new Error("Já existe um cliente cadastrado com este CPF.");
   }
 
+  // Check for duplicate CNPJ if provided
+  if (data.cnpj) {
+    const existingCnpj = await repo.findCustomerByCnpj(data.cnpj);
+    if (existingCnpj) {
+      throw new Error("Já existe um cliente cadastrado com este CNPJ.");
+    }
+  }
+
   const customer = await repo.createCustomer({
     cpf: data.cpf,
+    cnpj: data.cnpj ?? undefined,
+    documentType: data.documentType ?? "cpf",
     fullName: data.fullName,
     email: data.email ?? undefined,
     phone: data.phone ?? undefined,
@@ -66,6 +79,13 @@ export async function getCustomerByCpf(
   return repo.findCustomerByCpf(cpf);
 }
 
+// ── Get by CNPJ ──────────────────────────────────────────────
+export async function getCustomerByCnpj(
+  cnpj: string
+): Promise<repo.CustomerRecord | null> {
+  return repo.findCustomerByCnpj(cnpj);
+}
+
 // ── List ─────────────────────────────────────────────────────
 export async function listCustomers(
   query: PaginatedQuery & { statusFilter?: CustomerStatus }
@@ -87,6 +107,8 @@ export async function updateCustomer(
     email?: string | null;
     phone?: string | null;
     cpf?: string;
+    cnpj?: string | null;
+    documentType?: DocumentType;
     status?: CustomerStatus;
     tipoOperacao?: TipoOperacao | null;
   },
@@ -110,6 +132,13 @@ export async function updateCustomer(
   if (data.phone !== undefined && data.phone !== before.phone) {
     newOverrides.add("phone");
     changes.phone = { before: "[encrypted]", after: "[encrypted]" };
+  }
+  if (data.cnpj !== undefined && data.cnpj !== before.cnpj) {
+    newOverrides.add("cnpj");
+    changes.cnpj = { before: "[encrypted]", after: "[encrypted]" };
+  }
+  if (data.documentType !== undefined && data.documentType !== before.documentType) {
+    changes.documentType = { before: before.documentType, after: data.documentType };
   }
   if (data.status !== undefined && data.status !== before.status) {
     changes.status = { before: before.status, after: data.status };

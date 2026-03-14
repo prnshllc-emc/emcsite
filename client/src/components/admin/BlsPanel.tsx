@@ -1,6 +1,7 @@
 /**
  * BLs Panel — Admin panel for managing Bills of Lading.
- * Supports listing, creating, editing, status transitions, and tracking management.
+ * Supports listing, creating, editing, status transitions, tracking management,
+ * manual linking (Customer ↔ Vehicle ↔ BL), and quick-add customer.
  */
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
@@ -33,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import {
   Ship,
   Plus,
@@ -40,7 +42,6 @@ import {
   Trash2,
   Loader2,
   Search,
-  Eye,
   ChevronLeft,
   ChevronRight,
   Package,
@@ -49,6 +50,12 @@ import {
   Truck,
   CheckCircle2,
   FileText,
+  Link2,
+  Unlink,
+  UserPlus,
+  Car,
+  Users,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -417,13 +424,36 @@ function CreateBlDialog({ open, onClose }: { open: boolean; onClose: () => void 
   );
 }
 
-// ── Edit BL Dialog ──────────────────────────────────────────
+// ── Edit BL Dialog (with Manual Linking + Quick-Add Customer) ──
 function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; onClose: () => void }) {
   const utils = trpc.useUtils();
   const { data: bl, isLoading } = trpc.bls.getById.useQuery({ id: blId });
 
+  // Linked vehicles (N:N junction)
+  const { data: blVehicles, isLoading: loadingVehicles } = trpc.bls.getVehicles.useQuery({ blId });
+
+  // All customers and vehicles for linking dropdowns
+  const { data: allCustomers } = trpc.customers.listAll.useQuery();
+  const { data: allVehicles } = trpc.vehicles.listAll.useQuery();
+
   const [form, setForm] = useState<Record<string, string>>({});
   const [initialized, setInitialized] = useState(false);
+
+  // Linking state
+  const [linkVehicleId, setLinkVehicleId] = useState<string>("");
+  const [linkCustomerId, setLinkCustomerId] = useState<string>("");
+
+  // Quick-add customer state
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [quickAddForm, setQuickAddForm] = useState({
+    fullName: "",
+    cpf: "",
+    cnpj: "",
+    documentType: "cpf" as "cpf" | "cnpj",
+    email: "",
+    phone: "",
+    tipoOperacao: "importacao" as "importacao" | "exportacao",
+  });
 
   // Initialize form when data loads
   if (bl && !initialized) {
@@ -462,6 +492,61 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
     onError: (err) => toast.error(err.message),
   });
 
+  // ── Linking mutations ──────────────────────────────────────
+  const addVehicleMutation = trpc.bls.addVehicle.useMutation({
+    onSuccess: () => {
+      utils.bls.getVehicles.invalidate({ blId });
+      utils.bls.getById.invalidate({ id: blId });
+      setLinkVehicleId("");
+      setLinkCustomerId("");
+      toast.success("Veículo vinculado ao BL!");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const removeVehicleMutation = trpc.bls.removeVehicle.useMutation({
+    onSuccess: () => {
+      utils.bls.getVehicles.invalidate({ blId });
+      utils.bls.getById.invalidate({ id: blId });
+      toast.success("Veículo desvinculado do BL.");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  // ── Update main customer on BL ─────────────────────────────
+  const linkBlCustomerMutation = trpc.bls.update.useMutation({
+    onSuccess: () => {
+      utils.bls.getById.invalidate({ id: blId });
+      utils.bls.list.invalidate();
+      toast.success("Cliente vinculado ao BL!");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  // ── Quick-add customer mutation ────────────────────────────
+  const createCustomerMutation = trpc.customers.create.useMutation({
+    onSuccess: (newCustomer) => {
+      utils.customers.listAll.invalidate();
+      // Auto-link the new customer to this BL
+      linkBlCustomerMutation.mutate({
+        id: blId,
+        data: { customerId: newCustomer.id },
+      });
+      setShowQuickAdd(false);
+      setQuickAddForm({
+        fullName: "",
+        cpf: "",
+        cnpj: "",
+        documentType: "cpf",
+        email: "",
+        phone: "",
+        tipoOperacao: "importacao",
+      });
+      toast.success(`Cliente "${newCustomer.fullName}" criado e vinculado!`);
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     updateMutation.mutate({
@@ -478,13 +563,55 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
     });
   }
 
+  function handleAddVehicle() {
+    if (!linkVehicleId) {
+      toast.error("Selecione um veículo para vincular.");
+      return;
+    }
+    addVehicleMutation.mutate({
+      blId,
+      vehicleId: parseInt(linkVehicleId),
+      customerId: linkCustomerId ? parseInt(linkCustomerId) : undefined,
+    });
+  }
+
+  function handleQuickAddCustomer(e: React.FormEvent) {
+    e.preventDefault();
+    if (!quickAddForm.fullName.trim() || !quickAddForm.cpf.trim()) {
+      toast.error("Nome e CPF são obrigatórios.");
+      return;
+    }
+    createCustomerMutation.mutate({
+      fullName: quickAddForm.fullName.trim(),
+      cpf: quickAddForm.cpf.trim(),
+      cnpj: quickAddForm.documentType === "cnpj" && quickAddForm.cnpj.trim()
+        ? quickAddForm.cnpj.trim()
+        : undefined,
+      documentType: quickAddForm.documentType,
+      email: quickAddForm.email.trim() || undefined,
+      phone: quickAddForm.phone.trim() || undefined,
+      tipoOperacao: quickAddForm.tipoOperacao,
+      dataSource: "manual",
+      status: "aguardando_embarque",
+    });
+  }
+
   // All available statuses for force-update (admin can go to any status)
   const ALL_STATUSES = ["draft", "final", "in_transit", "arrived", "customs", "delivered"];
   const otherStatuses = bl ? ALL_STATUSES.filter((s) => s !== bl.status) : [];
 
+  // Find linked customer/vehicle names for display
+  const linkedCustomer = bl?.customerId && allCustomers
+    ? allCustomers.find((c: any) => c.id === bl.customerId)
+    : null;
+
+  // Filter out already-linked vehicles from dropdown
+  const linkedVehicleIds = new Set((blVehicles ?? []).map((bv: any) => bv.vehicleId));
+  const availableVehicles = (allVehicles ?? []).filter((v: any) => !linkedVehicleIds.has(v.id));
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display">Editar BL</DialogTitle>
           <DialogDescription className="font-body">
@@ -498,7 +625,7 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Status Section — Force Update (admin override) */}
+            {/* ═══ Status Section — Force Update ═══ */}
             <div className="p-4 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center justify-between mb-3">
                 <Label className="font-display text-sm">Status Atual</Label>
@@ -506,7 +633,7 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
               </div>
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground">
-                  Altere o status manualmente para qualquer etapa (avançar ou retroceder):
+                  Altere o status manualmente para qualquer etapa:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {otherStatuses.map((s) => {
@@ -538,7 +665,7 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                         disabled={statusMutation.isPending}
                       >
                         <Icon className="w-3.5 h-3.5" />
-                        {isForward ? "\u25B6" : "\u25C0"} {config?.label ?? s}
+                        {isForward ? "▶" : "◀"} {config?.label ?? s}
                       </Button>
                     );
                   })}
@@ -552,11 +679,331 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
               </div>
             </div>
 
-            {/* Edit Form */}
+            {/* ═══ Manual Linking Section — Customer ═══ */}
+            <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary" />
+                <Label className="font-display text-sm">Cliente Vinculado</Label>
+              </div>
+
+              {linkedCustomer ? (
+                <div className="flex items-center justify-between p-3 rounded-md bg-background border border-border">
+                  <div>
+                    <p className="font-body text-sm font-medium">{linkedCustomer.fullName}</p>
+                    <p className="text-xs text-muted-foreground font-mono">
+                      {linkedCustomer.documentType === "cnpj" && linkedCustomer.cnpj
+                        ? `CNPJ: ${linkedCustomer.cnpj}`
+                        : `CPF: ${linkedCustomer.cpf}`}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => {
+                      if (confirm("Desvincular este cliente do BL?")) {
+                        linkBlCustomerMutation.mutate({
+                          id: blId,
+                          data: { customerId: null },
+                        });
+                      }
+                    }}
+                    disabled={linkBlCustomerMutation.isPending}
+                  >
+                    <Unlink className="w-4 h-4 mr-1" />
+                    Desvincular
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Nenhum cliente vinculado. Selecione um existente ou crie um novo:
+                  </p>
+                  <div className="flex gap-2">
+                    <Select
+                      value={linkCustomerId || "none"}
+                      onValueChange={(v) => setLinkCustomerId(v === "none" ? "" : v)}
+                    >
+                      <SelectTrigger className="flex-1 font-body">
+                        <SelectValue placeholder="Selecionar cliente..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Selecionar cliente...</SelectItem>
+                        {(allCustomers ?? []).map((c: any) => (
+                          <SelectItem key={c.id} value={String(c.id)}>
+                            {c.fullName} ({c.documentType === "cnpj" ? "CNPJ" : "CPF"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      disabled={!linkCustomerId || linkBlCustomerMutation.isPending}
+                      onClick={() => {
+                        if (linkCustomerId) {
+                          linkBlCustomerMutation.mutate({
+                            id: blId,
+                            data: { customerId: parseInt(linkCustomerId) },
+                          });
+                          setLinkCustomerId("");
+                        }
+                      }}
+                    >
+                      {linkBlCustomerMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Link2 className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Quick-Add Customer Toggle */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => setShowQuickAdd(!showQuickAdd)}
+                  >
+                    <UserPlus className="w-3.5 h-3.5 mr-1" />
+                    {showQuickAdd ? "Cancelar Cadastro Rápido" : "Cadastrar Novo Cliente"}
+                  </Button>
+
+                  {/* Quick-Add Customer Form */}
+                  {showQuickAdd && (
+                    <form onSubmit={handleQuickAddCustomer} className="space-y-3 p-3 rounded-md bg-background border border-border">
+                      <p className="text-xs font-display font-semibold text-primary">
+                        Cadastro Rápido de Cliente
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="col-span-2">
+                          <Label className="text-xs font-body">Nome Completo *</Label>
+                          <Input
+                            value={quickAddForm.fullName}
+                            onChange={(e) => setQuickAddForm({ ...quickAddForm, fullName: e.target.value })}
+                            placeholder="João da Silva"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs font-body">Tipo Documento</Label>
+                          <Select
+                            value={quickAddForm.documentType}
+                            onValueChange={(v: "cpf" | "cnpj") => setQuickAddForm({ ...quickAddForm, documentType: v })}
+                          >
+                            <SelectTrigger className="h-8 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="cpf">CPF (Pessoa Física)</SelectItem>
+                              <SelectItem value="cnpj">CNPJ (Pessoa Jurídica)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-xs font-body">CPF *</Label>
+                          <Input
+                            value={quickAddForm.cpf}
+                            onChange={(e) => setQuickAddForm({ ...quickAddForm, cpf: e.target.value })}
+                            placeholder="000.000.000-00"
+                            className="h-8 text-sm font-mono"
+                          />
+                        </div>
+                        {quickAddForm.documentType === "cnpj" && (
+                          <div className="col-span-2">
+                            <Label className="text-xs font-body">CNPJ</Label>
+                            <Input
+                              value={quickAddForm.cnpj}
+                              onChange={(e) => setQuickAddForm({ ...quickAddForm, cnpj: e.target.value })}
+                              placeholder="00.000.000/0000-00"
+                              className="h-8 text-sm font-mono"
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <Label className="text-xs font-body">Email</Label>
+                          <Input
+                            type="email"
+                            value={quickAddForm.email}
+                            onChange={(e) => setQuickAddForm({ ...quickAddForm, email: e.target.value })}
+                            placeholder="email@exemplo.com"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs font-body">Telefone</Label>
+                          <Input
+                            value={quickAddForm.phone}
+                            onChange={(e) => setQuickAddForm({ ...quickAddForm, phone: e.target.value })}
+                            placeholder="(11) 99999-9999"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs font-body">Operação</Label>
+                          <Select
+                            value={quickAddForm.tipoOperacao}
+                            onValueChange={(v: "importacao" | "exportacao") => setQuickAddForm({ ...quickAddForm, tipoOperacao: v })}
+                          >
+                            <SelectTrigger className="h-8 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="importacao">Importação</SelectItem>
+                              <SelectItem value="exportacao">Exportação</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <Button
+                        type="submit"
+                        size="sm"
+                        className="w-full"
+                        disabled={createCustomerMutation.isPending}
+                      >
+                        {createCustomerMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                        ) : (
+                          <UserPlus className="w-4 h-4 mr-1" />
+                        )}
+                        Criar e Vincular
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ═══ Manual Linking Section — Vehicles (N:N) ═══ */}
+            <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-4">
+              <div className="flex items-center gap-2">
+                <Car className="w-4 h-4 text-primary" />
+                <Label className="font-display text-sm">Veículos Vinculados</Label>
+                <Badge variant="outline" className="text-xs ml-auto">
+                  {blVehicles?.length ?? 0}
+                </Badge>
+              </div>
+
+              {/* Current linked vehicles */}
+              {loadingVehicles ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : (blVehicles ?? []).length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  Nenhum veículo vinculado a este BL.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {(blVehicles ?? []).map((bv: any) => {
+                    const vehicle = (allVehicles ?? []).find((v: any) => v.id === bv.vehicleId);
+                    const customer = bv.customerId
+                      ? (allCustomers ?? []).find((c: any) => c.id === bv.customerId)
+                      : null;
+                    return (
+                      <div
+                        key={bv.id}
+                        className="flex items-center justify-between p-2.5 rounded-md bg-background border border-border"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-mono text-xs font-medium truncate">
+                            {vehicle ? `${vehicle.make ?? ""} ${vehicle.model ?? ""} — ${vehicle.vin}` : `Veículo #${bv.vehicleId}`}
+                          </p>
+                          {customer && (
+                            <p className="text-xs text-muted-foreground truncate">
+                              Cliente: {customer.fullName}
+                            </p>
+                          )}
+                          {bv.notes && (
+                            <p className="text-xs text-muted-foreground italic truncate">
+                              {bv.notes}
+                            </p>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive shrink-0"
+                          onClick={() => {
+                            if (confirm("Desvincular este veículo do BL?")) {
+                              removeVehicleMutation.mutate({ blId, vehicleId: bv.vehicleId });
+                            }
+                          }}
+                          disabled={removeVehicleMutation.isPending}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Add vehicle form */}
+              <Separator />
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">Vincular novo veículo:</p>
+                <div className="flex gap-2">
+                  <Select
+                    value={linkVehicleId || "none"}
+                    onValueChange={(v) => setLinkVehicleId(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger className="flex-1 font-body text-sm">
+                      <SelectValue placeholder="Selecionar veículo..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Selecionar veículo...</SelectItem>
+                      {availableVehicles.map((v: any) => (
+                        <SelectItem key={v.id} value={String(v.id)}>
+                          {v.make ?? ""} {v.model ?? ""} — {v.vin}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    disabled={!linkVehicleId || addVehicleMutation.isPending}
+                    onClick={handleAddVehicle}
+                  >
+                    {addVehicleMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                {linkVehicleId && (
+                  <div>
+                    <Label className="text-xs font-body text-muted-foreground">
+                      Cliente dono deste veículo (opcional):
+                    </Label>
+                    <Select
+                      value={linkCustomerId || "none"}
+                      onValueChange={(v) => setLinkCustomerId(v === "none" ? "" : v)}
+                    >
+                      <SelectTrigger className="font-body text-sm mt-1">
+                        <SelectValue placeholder="Nenhum (sem cliente)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum (sem cliente)</SelectItem>
+                        {(allCustomers ?? []).map((c: any) => (
+                          <SelectItem key={c.id} value={String(c.id)}>
+                            {c.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ═══ Edit Form ═══ */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              <Separator />
+              <Label className="font-display text-sm">Dados do BL</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <Label className="font-body">Número do BL</Label>
+                  <Label className="font-body text-xs">Número do BL</Label>
                   <Input
                     value={form.blNumber ?? ""}
                     onChange={(e) => setForm({ ...form, blNumber: e.target.value })}
@@ -564,21 +1011,21 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                   />
                 </div>
                 <div>
-                  <Label className="font-body">Porto de Origem</Label>
+                  <Label className="font-body text-xs">Porto de Origem</Label>
                   <Input
                     value={form.originPort ?? ""}
                     onChange={(e) => setForm({ ...form, originPort: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label className="font-body">Porto de Destino</Label>
+                  <Label className="font-body text-xs">Porto de Destino</Label>
                   <Input
                     value={form.destinationPort ?? ""}
                     onChange={(e) => setForm({ ...form, destinationPort: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label className="font-body">Container</Label>
+                  <Label className="font-body text-xs">Container</Label>
                   <Input
                     value={form.containerNumber ?? ""}
                     onChange={(e) => setForm({ ...form, containerNumber: e.target.value })}
@@ -586,14 +1033,14 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                   />
                 </div>
                 <div>
-                  <Label className="font-body">Veículo</Label>
+                  <Label className="font-body text-xs">Veículo</Label>
                   <Input
                     value={form.vehicleDescription ?? ""}
                     onChange={(e) => setForm({ ...form, vehicleDescription: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label className="font-body">ETD</Label>
+                  <Label className="font-body text-xs">ETD</Label>
                   <Input
                     type="date"
                     value={form.estimatedDeparture ?? ""}
@@ -601,7 +1048,7 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                   />
                 </div>
                 <div>
-                  <Label className="font-body">ETA</Label>
+                  <Label className="font-body text-xs">ETA</Label>
                   <Input
                     type="date"
                     value={form.estimatedArrival ?? ""}

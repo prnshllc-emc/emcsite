@@ -10,6 +10,25 @@ export const CpfSchema = z
   .refine((v) => v.length === 11, "CPF deve ter 11 dígitos")
   .refine((v) => !/^(\d)\1{10}$/.test(v), "CPF inválido");
 
+// ── CNPJ Validation ──────────────────────────────────────────
+export const CnpjSchema = z
+  .string()
+  .transform((v) => v.replace(/\D/g, ""))
+  .refine((v) => v.length === 14, "CNPJ deve ter 14 dígitos")
+  .refine((v) => !/^(\d)\1{13}$/.test(v), "CNPJ inválido");
+
+// ── Document Type (CPF or CNPJ) ─────────────────────────────
+export const DocumentTypeEnum = z.enum(["cpf", "cnpj"]);
+
+// ── CPF or CNPJ (flexible document) ─────────────────────────
+export const DocumentSchema = z
+  .string()
+  .transform((v) => v.replace(/\D/g, ""))
+  .refine(
+    (v) => v.length === 11 || v.length === 14,
+    "Documento deve ter 11 (CPF) ou 14 (CNPJ) dígitos"
+  );
+
 // ── VIN Validation ───────────────────────────────────────────
 // Standard 17-char VIN (post-1981)
 export const VinSchema = z
@@ -56,6 +75,8 @@ export const DataSourceEnum = z.enum(["manual", "clicksign", "agent"]);
 export const CustomerCreateSchema = z.object({
   fullName: z.string().min(2, "Nome deve ter ao menos 2 caracteres").max(200),
   cpf: CpfSchema,
+  cnpj: CnpjSchema.optional().nullable(),
+  documentType: DocumentTypeEnum.default("cpf"),
   email: z.string().email("Email inválido").optional().nullable(),
   phone: z.string().optional().nullable(),
   status: CustomerStatusEnum.default("aguardando_embarque"),
@@ -66,6 +87,8 @@ export const CustomerCreateSchema = z.object({
 export const CustomerUpdateSchema = z.object({
   fullName: z.string().min(2).max(200).optional(),
   cpf: CpfSchema.optional(),
+  cnpj: CnpjSchema.optional().nullable(),
+  documentType: DocumentTypeEnum.optional(),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   status: CustomerStatusEnum.optional(),
@@ -180,3 +203,4 @@ export type TrackingCodeGenerate = z.infer<typeof TrackingCodeGenerateSchema>;
 export type CustomerStatus = z.infer<typeof CustomerStatusEnum>;
 export type TipoOperacao = z.infer<typeof TipoOperacaoEnum>;
 export type DataSource = z.infer<typeof DataSourceEnum>;
+export type DocumentType = z.infer<typeof DocumentTypeEnum>;

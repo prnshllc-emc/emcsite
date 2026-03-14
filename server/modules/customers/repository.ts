@@ -1,8 +1,9 @@
 /**
  * Customers Repository — Data access layer with PII encryption.
  * CPF is stored encrypted (AES-256-GCM) + hashed (HMAC-SHA256) for search.
+ * CNPJ is stored encrypted (AES-256-GCM) + hashed (HMAC-SHA256) for search.
  * Name is stored plaintext; email/phone encrypted.
- * Supports status, tipoOperacao, dataSource, and manualOverrides fields.
+ * Supports status, tipoOperacao, dataSource, documentType, and manualOverrides fields.
  */
 import { getDb } from "../../db";
 import { customers } from "../../../drizzle/schema";
@@ -11,6 +12,7 @@ import {
   encryptSensitiveData,
   decryptSensitiveData,
   hashCpfForSearch,
+  hashCnpjForSearch,
 } from "../../shared/security";
 import {
   calcOffset,
@@ -18,13 +20,15 @@ import {
   type PaginatedQuery,
   type PaginatedResult,
 } from "../../shared/pagination";
-import type { CustomerCreate, CustomerUpdate, CustomerStatus, TipoOperacao, DataSource } from "../../../shared/schemas";
+import type { CustomerCreate, CustomerUpdate, CustomerStatus, TipoOperacao, DataSource, DocumentType } from "../../../shared/schemas";
 
 // ── Types ────────────────────────────────────────────────────
 export interface CustomerRecord {
   id: number;
   fullName: string;
   cpf: string;
+  cnpj: string | null;
+  documentType: DocumentType;
   email: string | null;
   phone: string | null;
   status: CustomerStatus;
@@ -46,6 +50,13 @@ function decryptCustomer(row: typeof customers.$inferSelect): CustomerRecord {
     cpfDecrypted = "[encrypted]";
   }
 
+  let cnpjDecrypted: string | null = null;
+  try {
+    cnpjDecrypted = row.cnpj ? decryptSensitiveData(row.cnpj) : null;
+  } catch {
+    cnpjDecrypted = null;
+  }
+
   let emailDecrypted: string | null = null;
   try {
     emailDecrypted = row.email ? decryptSensitiveData(row.email) : null;
@@ -64,6 +75,8 @@ function decryptCustomer(row: typeof customers.$inferSelect): CustomerRecord {
     id: row.id,
     fullName: row.name,
     cpf: cpfDecrypted,
+    cnpj: cnpjDecrypted,
+    documentType: (row.documentType as DocumentType) ?? "cpf",
     email: emailDecrypted,
     phone: phoneDecrypted,
     status: (row.status as CustomerStatus) ?? "aguardando_embarque",
@@ -82,6 +95,8 @@ export async function createCustomer(
   data: {
     fullName: string;
     cpf: string;
+    cnpj?: string | null;
+    documentType?: DocumentType;
     email?: string | null;
     phone?: string | null;
     status?: CustomerStatus;
@@ -93,11 +108,15 @@ export async function createCustomer(
   if (!db) throw new Error("Database not available");
 
   const cpfDigits = data.cpf.replace(/\D/g, "");
+  const cnpjDigits = data.cnpj ? data.cnpj.replace(/\D/g, "") : null;
 
   const [result] = await db.insert(customers).values({
     name: data.fullName,
     cpf: encryptSensitiveData(cpfDigits),
     cpfHash: hashCpfForSearch(cpfDigits),
+    cnpj: cnpjDigits ? encryptSensitiveData(cnpjDigits) : null,
+    cnpjHash: cnpjDigits ? hashCnpjForSearch(cnpjDigits) : null,
+    documentType: data.documentType ?? "cpf",
     email: data.email ? encryptSensitiveData(data.email) : null,
     phone: data.phone ? encryptSensitiveData(data.phone) : null,
     status: data.status ?? "aguardando_embarque",
@@ -110,6 +129,8 @@ export async function createCustomer(
     id: result.id,
     fullName: data.fullName,
     cpf: cpfDigits,
+    cnpj: cnpjDigits,
+    documentType: data.documentType ?? "cpf",
     email: data.email ?? null,
     phone: data.phone ?? null,
     status: data.status ?? "aguardando_embarque",
@@ -159,6 +180,25 @@ export async function findCustomerByCpf(
   return decryptCustomer(row);
 }
 
+// ── Find by CNPJ Hash ────────────────────────────────────────
+export async function findCustomerByCnpj(
+  cnpj: string
+): Promise<CustomerRecord | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const cnpjDigits = cnpj.replace(/\D/g, "");
+  const hash = hashCnpjForSearch(cnpjDigits);
+  const [row] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.cnpjHash!, hash))
+    .limit(1);
+
+  if (!row) return null;
+  return decryptCustomer(row);
+}
+
 // ── List with pagination (active only) ───────────────────────
 export async function listCustomers(
   query: PaginatedQuery & { statusFilter?: CustomerStatus }
@@ -198,6 +238,7 @@ export async function listCustomers(
       (c) =>
         c.fullName.toLowerCase().includes(searchLower) ||
         c.cpf.includes(searchLower) ||
+        (c.cnpj && c.cnpj.includes(searchLower)) ||
         (c.email && c.email.toLowerCase().includes(searchLower)) ||
         (c.phone && c.phone.includes(searchLower))
     );
@@ -226,6 +267,8 @@ export async function updateCustomer(
   data: {
     fullName?: string;
     cpf?: string;
+    cnpj?: string | null;
+    documentType?: DocumentType;
     email?: string | null;
     phone?: string | null;
     status?: CustomerStatus;
@@ -245,6 +288,19 @@ export async function updateCustomer(
     const cpfDigits = data.cpf.replace(/\D/g, "");
     updateValues.cpf = encryptSensitiveData(cpfDigits);
     updateValues.cpfHash = hashCpfForSearch(cpfDigits);
+  }
+  if (data.cnpj !== undefined) {
+    if (data.cnpj) {
+      const cnpjDigits = data.cnpj.replace(/\D/g, "");
+      updateValues.cnpj = encryptSensitiveData(cnpjDigits);
+      updateValues.cnpjHash = hashCnpjForSearch(cnpjDigits);
+    } else {
+      updateValues.cnpj = null;
+      updateValues.cnpjHash = null;
+    }
+  }
+  if (data.documentType !== undefined) {
+    updateValues.documentType = data.documentType;
   }
   if (data.email !== undefined) {
     updateValues.email = data.email

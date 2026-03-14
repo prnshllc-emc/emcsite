@@ -64,7 +64,12 @@ export async function listVehicles(
   return repo.listVehicles(query);
 }
 
-// ── Get vehicles by customer ─────────────────────────────────
+// ── List all active (no pagination) ────────────────────
+export async function listAllActiveVehicles(): Promise<repo.VehicleRecord[]> {
+  return repo.listAllActiveVehicles();
+}
+
+// ── Get vehicles by customer ─────────────────────────
 export async function getVehiclesByCustomerId(
   customerId: number
 ): Promise<repo.VehicleRecord[]> {

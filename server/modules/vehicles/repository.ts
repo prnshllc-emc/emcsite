@@ -151,7 +151,21 @@ export async function listVehicles(
   return paginatedResponse(records, totalResult?.count ?? 0, query);
 }
 
-// ── Update ───────────────────────────────────────────────────
+// ── List all active (no pagination) ────────────────────
+export async function listAllActiveVehicles(): Promise<VehicleRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(vehicles)
+    .where(isNull(vehicles.deletedAt))
+    .orderBy(desc(vehicles.createdAt));
+
+  return rows.map(toRecord);
+}
+
+// ── Update ─────────────────────────────────────────────────────
 export async function updateVehicle(
   id: number,
   data: VehicleUpdate

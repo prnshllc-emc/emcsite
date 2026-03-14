@@ -19,6 +19,11 @@ export const vehiclesRouter = router({
       return service.listVehicles(input);
     }),
 
+  // ── List all active (no pagination, for dropdowns) ──────────
+  listAll: adminProcedure.query(async () => {
+    return service.listAllActiveVehicles();
+  }),
+
   // ── Get vehicle by ID ───────────────────────────────────────
   getById: adminProcedure
     .input(z.object({ id: z.number().int().positive() }))

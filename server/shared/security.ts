@@ -244,7 +244,51 @@ export function isValidCpf(cpf: string): boolean {
   return true;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// CNPJ Utilities
+// ─────────────────────────────────────────────────────────────────
+export function formatCnpj(cnpj: string): string {
+  const digits = cnpj.replace(/\D/g, "");
+  if (digits.length !== 14) return cnpj;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+}
+
+export function isValidCnpj(cnpj: string): boolean {
+  const digits = cnpj.replace(/\D/g, "");
+  if (digits.length !== 14) return false;
+  if (/^(\d)\1{13}$/.test(digits)) return false;
+
+  // Validate first check digit
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += parseInt(digits[i]) * weights1[i];
+  let remainder = sum % 11;
+  const check1 = remainder < 2 ? 0 : 11 - remainder;
+  if (parseInt(digits[12]) !== check1) return false;
+
+  // Validate second check digit
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  sum = 0;
+  for (let i = 0; i < 13; i++) sum += parseInt(digits[i]) * weights2[i];
+  remainder = sum % 11;
+  const check2 = remainder < 2 ? 0 : 11 - remainder;
+  if (parseInt(digits[13]) !== check2) return false;
+
+  return true;
+}
+
+export function hashCnpjForSearch(cnpj: string): string {
+  if (!ENV.dataEncryptionKey) {
+    throw new Error("DATA_ENCRYPTION_KEY is not configured");
+  }
+  const normalized = cnpj.replace(/[.\-\/]/g, "");
+  return crypto
+    .createHmac("sha256", ENV.dataEncryptionKey)
+    .update(normalized)
+    .digest("hex");
+}
+
+// ─────────────────────────────────────────────────────────────────
 // VIN Validation
 // ─────────────────────────────────────────────────────────────
 export function isValidVin(vin: string): boolean {

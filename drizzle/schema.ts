@@ -80,6 +80,9 @@ export const customers = mysqlTable(
     id: int("id").autoincrement().primaryKey(),
     cpf: varchar("cpf", { length: 255 }).notNull(), // AES-256-GCM encrypted → salt:iv:tag:ciphertext
     cpfHash: varchar("cpf_hash", { length: 64 }).notNull().unique(), // HMAC-SHA256 for search
+    cnpj: varchar("cnpj", { length: 255 }), // AES-256-GCM encrypted (nullable — only for PJ)
+    cnpjHash: varchar("cnpj_hash", { length: 64 }).unique(), // HMAC-SHA256 for search
+    documentType: mysqlEnum("document_type", ["cpf", "cnpj"]).default("cpf").notNull(), // cpf = pessoa física, cnpj = pessoa jurídica
     name: varchar("name", { length: 255 }).notNull(), // plaintext
     email: varchar("email", { length: 500 }), // AES-256-GCM encrypted
     phone: varchar("phone", { length: 255 }), // AES-256-GCM encrypted

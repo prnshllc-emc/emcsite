@@ -487,7 +487,7 @@ export default function CustomersPanel() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-display">Nome</TableHead>
-                  <TableHead className="font-display">CPF</TableHead>
+                  <TableHead className="font-display">Documento</TableHead>
                   <TableHead className="font-display">Status</TableHead>
                   <TableHead className="font-display hidden md:table-cell">Operação</TableHead>
                   <TableHead className="font-display hidden lg:table-cell">Fonte</TableHead>
@@ -502,7 +502,17 @@ export default function CustomersPanel() {
                       {c.fullName}
                     </TableCell>
                     <TableCell className="font-mono text-muted-foreground text-xs">
-                      {maskCpf(c.cpf)}
+                      {c.documentType === "cnpj" && c.cnpj ? (
+                        <span title={`CPF: ${maskCpf(c.cpf)}`}>
+                          <Badge variant="outline" className="text-[10px] mr-1 px-1 py-0">CNPJ</Badge>
+                          {c.cnpj}
+                        </span>
+                      ) : (
+                        <span>
+                          <Badge variant="outline" className="text-[10px] mr-1 px-1 py-0">CPF</Badge>
+                          {maskCpf(c.cpf)}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <CustomerStatusBadge status={c.status} />
@@ -655,6 +665,8 @@ function CreateCustomerDialog({
   const [form, setForm] = useState({
     fullName: "",
     cpf: "",
+    cnpj: "",
+    documentType: "cpf" as "cpf" | "cnpj",
     email: "",
     phone: "",
     status: "aguardando_embarque",
@@ -678,6 +690,8 @@ function CreateCustomerDialog({
     createMutation.mutate({
       fullName: form.fullName.trim(),
       cpf: form.cpf.replace(/\D/g, ""),
+      cnpj: form.documentType === "cnpj" && form.cnpj.trim() ? form.cnpj.trim() : undefined,
+      documentType: form.documentType,
       email: form.email.trim() || undefined,
       phone: form.phone.trim() || undefined,
       status: form.status as any,
@@ -711,14 +725,40 @@ function CreateCustomerDialog({
               />
             </div>
             <div>
+              <Label className="font-display text-xs">Tipo Documento</Label>
+              <Select
+                value={form.documentType}
+                onValueChange={(v: "cpf" | "cnpj") => setForm({ ...form, documentType: v })}
+              >
+                <SelectTrigger className="font-body">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cpf">CPF (Pessoa Física)</SelectItem>
+                  <SelectItem value="cnpj">CNPJ (Pessoa Jurídica)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label className="font-display text-xs">CPF *</Label>
               <Input
                 value={form.cpf}
                 onChange={(e) => setForm({ ...form, cpf: e.target.value })}
                 placeholder="000.000.000-00"
-                className="font-body"
+                className="font-mono"
               />
             </div>
+            {form.documentType === "cnpj" && (
+              <div className="col-span-2">
+                <Label className="font-display text-xs">CNPJ</Label>
+                <Input
+                  value={form.cnpj}
+                  onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
+                  placeholder="00.000.000/0000-00"
+                  className="font-mono"
+                />
+              </div>
+            )}
             <div>
               <Label className="font-display text-xs">Telefone</Label>
               <Input
@@ -815,6 +855,8 @@ function EditCustomerDialog({
   const [form, setForm] = useState<{
     fullName: string;
     cpf: string;
+    cnpj: string;
+    documentType: string;
     email: string;
     phone: string;
     status: string;
@@ -826,6 +868,8 @@ function EditCustomerDialog({
     setForm({
       fullName: customer.fullName,
       cpf: customer.cpf,
+      cnpj: customer.cnpj ?? "",
+      documentType: customer.documentType ?? "cpf",
       email: customer.email ?? "",
       phone: customer.phone ?? "",
       status: customer.status,
@@ -856,6 +900,10 @@ function EditCustomerDialog({
       data.email = form.email.trim() || null;
     if (form.phone !== (customer?.phone ?? ""))
       data.phone = form.phone.trim() || null;
+    if (form.cnpj !== (customer?.cnpj ?? ""))
+      data.cnpj = form.cnpj.trim() || null;
+    if (form.documentType !== (customer?.documentType ?? "cpf"))
+      data.documentType = form.documentType;
     if (form.status !== customer?.status) data.status = form.status;
     if (form.tipoOperacao !== (customer?.tipoOperacao ?? ""))
       data.tipoOperacao = form.tipoOperacao || null;
@@ -918,6 +966,21 @@ function EditCustomerDialog({
               />
             </div>
             <div>
+              <Label className="font-display text-xs">Tipo Documento</Label>
+              <Select
+                value={form.documentType}
+                onValueChange={(v) => setForm({ ...form, documentType: v })}
+              >
+                <SelectTrigger className="font-body">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cpf">CPF (Pessoa Física)</SelectItem>
+                  <SelectItem value="cnpj">CNPJ (Pessoa Jurídica)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label className="font-display text-xs">CPF</Label>
               <Input
                 value={maskCpf(form.cpf)}
@@ -926,6 +989,17 @@ function EditCustomerDialog({
                 title="CPF não pode ser alterado"
               />
             </div>
+            {form.documentType === "cnpj" && (
+              <div className="col-span-2">
+                <Label className="font-display text-xs">CNPJ</Label>
+                <Input
+                  value={form.cnpj}
+                  onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
+                  placeholder="00.000.000/0000-00"
+                  className="font-mono"
+                />
+              </div>
+            )}
             <div>
               <Label className="font-display text-xs">Telefone</Label>
               <Input

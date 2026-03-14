@@ -590,3 +590,53 @@
 
 ## Phase 48: Footer Email Fix (all pages)
 - [x] Ensure footer email is info@enviandomeucarro.com everywhere (code + database + seed file)
+
+## Phase 49: Batch Operational Features
+
+### 49a: Admin UI — Manual Customer↔Vehicle↔BL Linking
+- [x] Add "Vincular" actions in BlsPanel to link/unlink customers and vehicles to a BL
+- [x] Add vehicle selector (search by VIN) when linking vehicle to BL
+- [x] Add customer selector (search by name/CPF) when linking customer to BL
+- [x] Show linked customers and vehicles inline in BL detail/row
+- [ ] Auto-trigger tracking code generation when customer is linked to BL
+
+### 49b: Quick-Add Customer to BL (Export Operations)
+- [x] Add "Adicionar Cliente Rápido" button on BL row for BLs without customer
+- [x] Inline form: name, email, phone, CPF/CNPJ (minimal fields)
+- [ ] On save: create customer → link to BL → trigger reconciliation
+
+### 49c: Real Email Sending
+- [ ] Create email sending service using built-in notification/forge API
+- [ ] Wire email sending into stage notification service (replace placeholder)
+- [ ] Send real emails on tracking code approval (to customer)
+- [ ] Send real emails on stage changes (to customer)
+- [ ] Admin notification email when new pending actions exist
+
+### 49d: Clicksign Webhook Endpoint
+- [ ] Create POST /api/webhooks/clicksign endpoint
+- [ ] Validate webhook signature/token
+- [ ] Handle document_signed event → update customer status
+- [ ] Handle document_canceled event → update customer status
+- [ ] Store clicksign_envelope_id on customer records
+- [ ] Write tests for webhook handler
+
+### 49e: CNPJ Support
+- [x] Add CNPJ field to customers schema (nullable, alongside CPF)
+- [x] Update customer validation to accept CPF or CNPJ
+- [x] Update CustomersPanel UI to show/edit CNPJ
+- [ ] Update PDF extraction to detect CNPJ in addition to CPF
+
+### 49f: Auto-Link Existing Data
+- [ ] Script to cross-reference BL vehicle_description VINs with vehicles table
+- [ ] Auto-populate bl_vehicles junction for matches
+- [ ] Auto-link customers via vehicle.customer_id → bl_vehicles
+
+### 49g: Public Tracking — Per-Vehicle Info
+- [ ] Update tracking result page to show vehicle details (make, model, year, VIN)
+- [ ] Show multiple vehicles if BL has multiple linked vehicles for the customer
+
+### 49h: Tests
+- [x] Tests for linking endpoints (37 tests in cnpj-linking.test.ts)
+- [ ] Tests for email sending service
+- [ ] Tests for Clicksign webhook
+- [x] Tests for CNPJ validation (included in cnpj-linking.test.ts)
