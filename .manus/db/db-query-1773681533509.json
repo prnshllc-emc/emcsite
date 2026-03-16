@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, bl_number, status, estimated_arrival, container_number, origin_port, destination_port FROM bills_of_lading WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL ORDER BY estimated_arrival ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, bl_number, status, estimated_arrival, container_number, origin_port, destination_port FROM bills_of_lading WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL ORDER BY estimated_arrival ASC;",
+  "rows": [
+    {
+      "id": "2",
+      "bl_number": "MAEU266742227",
+      "status": "arrived",
+      "estimated_arrival": "2026-03-17 07:00:00",
+      "container_number": "MRSU5584618",
+      "origin_port": "Porto de Santos, SP, Brasil",
+      "destination_port": "Port Newark, NJ, USA"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbl_number\tstatus\testimated_arrival\tcontainer_number\torigin_port\tdestination_port\n2\tMAEU266742227\tarrived\t2026-03-17 07:00:00\tMRSU5584618\tPorto de Santos, SP, Brasil\tPort Newark, NJ, USA\n",
+  "stderr": "",
+  "execution_time_ms": 564
+}

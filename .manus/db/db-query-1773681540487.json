@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, bl_number, status, estimated_arrival, container_number FROM bills_of_lading WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, bl_number, status, estimated_arrival, container_number FROM bills_of_lading WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL;",
+  "rows": [
+    {
+      "id": "2",
+      "bl_number": "MAEU266742227",
+      "status": "arrived",
+      "estimated_arrival": "2026-03-17 07:00:00",
+      "container_number": "MRSU5584618"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbl_number\tstatus\testimated_arrival\tcontainer_number\n2\tMAEU266742227\tarrived\t2026-03-17 07:00:00\tMRSU5584618\n",
+  "stderr": "",
+  "execution_time_ms": 179
+}

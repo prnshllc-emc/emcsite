@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE bills_of_lading SET status = 'in_transit', updated_at = NOW() WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute UPDATE bills_of_lading SET status = 'in_transit', updated_at = NOW() WHERE status IN ('arrived', 'customs', 'delivered') AND estimated_arrival > NOW() AND deleted_at IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}

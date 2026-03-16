@@ -3,12 +3,15 @@
  *
  * NOTIFICATION RULES:
  * - Has email → send email
- * - Has phone → send WhatsApp/SMS
+ * - Has phone → send WhatsApp (via Meta Cloud API)
  * - Has both → send both
  * - Has neither → flag for admin to correct (NOT a blocking error)
  *
- * Now uses DB-based email templates from the emailTemplates module.
+ * Uses DB-based email templates from the emailTemplates module.
  * Falls back to hardcoded templates if DB template is not found.
+ *
+ * WhatsApp: Uses real Meta Cloud API when configured (WHATSAPP_TOKEN set).
+ * Falls back to notifyOwner for manual sending when not configured.
  */
 
 import { getDb } from "../../db";
@@ -22,6 +25,11 @@ import {
   renderTemplate,
   seedDefaultTemplates,
 } from "../emailTemplates/service";
+import {
+  isWhatsAppConfigured,
+  sendTemplateMessage,
+  sendTextMessage,
+} from "../whatsapp/service";
 import type { ProcessStage } from "../reconciliation/service";
 
 // ══════════════════════════════════════════════════════════════
@@ -51,6 +59,16 @@ const STAGE_TO_SLUG: Record<string, string> = {
   concluido: "stage_concluido",
 };
 
+// Stage → Meta-approved WhatsApp template name mapping
+// These must match the template names approved in Meta Business Manager
+const STAGE_TO_WA_TEMPLATE: Record<string, string> = {
+  aguardando_embarque: "emc_stage_aguardando_embarque",
+  em_transito: "emc_stage_em_transito",
+  fase_documental: "emc_stage_fase_documental",
+  em_desembaraco: "emc_stage_em_desembaraco",
+  concluido: "emc_stage_concluido",
+};
+
 // ══════════════════════════════════════════════════════════════
 // DETERMINE NOTIFICATION CHANNELS
 // ══════════════════════════════════════════════════════════════
@@ -78,6 +96,55 @@ export function determineChannels(
   }
 
   return { channels, flagForAdmin: false };
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEND WHATSAPP — Real API or fallback to notifyOwner
+// ══════════════════════════════════════════════════════════════
+
+async function sendWhatsApp(opts: {
+  phone: string;
+  customerName: string;
+  message: string;
+  metaTemplateName?: string;
+  customerId?: number;
+  blId?: number;
+  triggerEvent?: string;
+}): Promise<boolean> {
+  if (isWhatsAppConfigured() && opts.metaTemplateName) {
+    // Use real Meta Cloud API with template message
+    const result = await sendTemplateMessage({
+      to: opts.phone,
+      templateName: opts.metaTemplateName,
+      languageCode: "pt_BR",
+      components: [
+        {
+          type: "body",
+          parameters: [{ type: "text", text: opts.customerName }],
+        },
+      ],
+      customerId: opts.customerId,
+      blId: opts.blId,
+      triggerEvent: opts.triggerEvent,
+    });
+    return result.success;
+  } else if (isWhatsAppConfigured()) {
+    // Use real Meta Cloud API with text message (within service window)
+    const result = await sendTextMessage({
+      to: opts.phone,
+      body: opts.message,
+      customerId: opts.customerId,
+      blId: opts.blId,
+      triggerEvent: opts.triggerEvent,
+    });
+    return result.success;
+  } else {
+    // Fallback: notify owner for manual sending
+    return notifyOwner({
+      title: `📱 WhatsApp para ${opts.customerName} (${opts.phone})`,
+      content: opts.message,
+    });
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -178,8 +245,6 @@ export async function notifyCustomerStageChange(
         }
 
         // Use the built-in notification service to send email
-        // In production, this would integrate with an email service (SendGrid, SES, etc.)
-        // For now, we notify the owner with the email content for manual forwarding
         const success = await notifyOwner({
           title: `📧 Email para ${customerName}: ${subject}`,
           content: `Destinatário: ${email}\n\nAssunto: ${subject}\n\n${dbTemplate ? "[Template DB: " + dbTemplate.slug + "]\n\n" : ""}${emailBody}`,
@@ -195,11 +260,13 @@ export async function notifyCustomerStageChange(
           whatsappMsg = `Olá ${customerName}! Seu processo mudou para: ${newStage}. Equipe Enviando Meu Carro`;
         }
 
-        // In production, this would integrate with WhatsApp Business API
-        // For now, we notify the owner with the WhatsApp message for manual sending
-        const success = await notifyOwner({
-          title: `📱 WhatsApp para ${customerName} (${phone})`,
-          content: whatsappMsg,
+        const success = await sendWhatsApp({
+          phone: phone!,
+          customerName,
+          message: whatsappMsg,
+          metaTemplateName: STAGE_TO_WA_TEMPLATE[newStage],
+          customerId,
+          triggerEvent: `stage_change_${newStage}`,
         });
 
         sent.push({ channel: "whatsapp", success });
@@ -312,10 +379,16 @@ export async function notifyTrackingCodeApproved(
         } else {
           whatsappMsg = `Olá ${customerName}! 🔑 Seu código de rastreamento: ${trackingCode}. Use para acompanhar seu veículo.`;
         }
-        const success = await notifyOwner({
-          title: `📱 WhatsApp Tracking para ${customerName} (${phone})`,
-          content: whatsappMsg,
+
+        const success = await sendWhatsApp({
+          phone: phone!,
+          customerName,
+          message: whatsappMsg,
+          metaTemplateName: "emc_tracking_code_approved",
+          customerId,
+          triggerEvent: "tracking_code_approved",
         });
+
         sent.push({ channel: "whatsapp", success });
       }
     } catch (err) {
@@ -399,12 +472,23 @@ export async function sendTemplateNotification(
           content: `Destinatário: ${email}\n\n${emailBody}`,
         });
         sent.push({ channel: "email", success });
-      } else if (channel === "whatsapp" && dbTemplate.whatsappMessage) {
-        const whatsappMsg = renderTemplate(dbTemplate.whatsappMessage, vars);
-        const success = await notifyOwner({
-          title: `📱 WhatsApp para ${customerName} (${phone})`,
-          content: whatsappMsg,
+      } else if (channel === "whatsapp") {
+        let whatsappMsg: string;
+        if (dbTemplate.whatsappMessage) {
+          whatsappMsg = renderTemplate(dbTemplate.whatsappMessage, vars);
+        } else {
+          whatsappMsg = `Notificação: ${renderTemplate(dbTemplate.subject, vars)}`;
+        }
+
+        const success = await sendWhatsApp({
+          phone: phone!,
+          customerName,
+          message: whatsappMsg,
+          // For generic templates, use text message (no Meta template mapping)
+          customerId,
+          triggerEvent: `template_${templateSlug}`,
         });
+
         sent.push({ channel: "whatsapp", success });
       }
     } catch (err) {
@@ -437,25 +521,21 @@ export async function findCustomersMissingContact(): Promise<
   if (!db) return [];
 
   const rows = await db
-    .select()
+    .select({
+      id: customers.id,
+      name: customers.name,
+      email: customers.email,
+      phone: customers.phone,
+    })
     .from(customers)
-    .where(eq(customers.deletedAt, null as any));
+    .where(eq(customers.deletedAt, null as unknown as Date));
 
-  const results: { id: number; name: string; hasEmail: boolean; hasPhone: boolean }[] = [];
-
-  for (const row of rows) {
-    const hasEmail = row.email !== null && row.email.trim().length > 0;
-    const hasPhone = row.phone !== null && row.phone.trim().length > 0;
-
-    if (!hasEmail && !hasPhone) {
-      results.push({
-        id: row.id,
-        name: row.name,
-        hasEmail,
-        hasPhone,
-      });
-    }
-  }
-
-  return results;
+  return rows
+    .filter((r) => !r.email || !r.phone)
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      hasEmail: !!r.email,
+      hasPhone: !!r.phone,
+    }));
 }

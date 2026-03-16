@@ -10,6 +10,7 @@ import { serveStatic, setupVite } from "./vite";
 import { createAgentRouter } from "../modules/agent/ingestion";
 import { createCmsRouter } from "../modules/cms/api";
 import { createClicksignWebhookRouter } from "../modules/contracts/webhook";
+import whatsappWebhookRouter from "../modules/whatsapp/webhook";
 import { startReconciliationScheduler } from "../modules/reconciliation/scheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -45,6 +46,8 @@ async function startServer() {
   app.use("/api/cms", createCmsRouter());
   // Clicksign Webhook (public, no auth required)
   app.use("/api/webhooks", createClicksignWebhookRouter());
+  // WhatsApp Cloud API Webhook (public, Meta verification + events)
+  app.use("/api/webhooks/whatsapp", whatsappWebhookRouter);
   // tRPC API
   app.use(
     "/api/trpc",

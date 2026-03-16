@@ -43,6 +43,13 @@
       "when": 1773503893278,
       "tag": "0005_elite_corsair",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1773596614279,
+      "tag": "0006_supreme_skrulls",
+      "breakpoints": true
     }
   ]
 }

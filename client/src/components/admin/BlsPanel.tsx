@@ -56,6 +56,7 @@ import {
   Car,
   Users,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -189,13 +190,26 @@ export default function BlsPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bls.map((bl) => (
-                  <TableRow key={bl.id}>
+                {bls.map((bl) => {
+                  const etaFuture = bl.estimatedArrival && new Date(bl.estimatedArrival) > new Date();
+                  const statusInconsistent = etaFuture && ["arrived", "customs", "delivered"].includes(bl.status);
+                  return (
+                  <TableRow key={bl.id} className={statusInconsistent ? "bg-yellow-500/5" : ""}>
                     <TableCell className="font-mono font-medium text-sm">
-                      {bl.blNumber}
+                      <div className="flex items-center gap-1.5">
+                        {bl.blNumber}
+                        {statusInconsistent && (
+                          <span title="Status inconsistente: marcado como chegou mas ETA é futura"><AlertTriangle className="w-3.5 h-3.5 text-yellow-400" /></span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <StatusBadge status={bl.status} />
+                      <div className="flex items-center gap-1">
+                        <StatusBadge status={bl.status} />
+                        {statusInconsistent && (
+                          <span className="text-[10px] text-yellow-400 font-body">⚠ ETA futura</span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="font-body text-muted-foreground hidden md:table-cell text-sm">
                       {bl.originPort ?? "—"}
@@ -237,7 +251,8 @@ export default function BlsPanel() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
@@ -635,6 +650,15 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                 <p className="text-xs text-muted-foreground">
                   Altere o status manualmente para qualquer etapa:
                 </p>
+                {/* ETA inconsistency warning */}
+                {bl.estimatedArrival && new Date(bl.estimatedArrival) > new Date() && ["arrived", "customs", "delivered"].includes(bl.status) && (
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs mb-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      <strong>Status inconsistente:</strong> Este BL está marcado como "{STATUS_MAP[bl.status]?.label}" mas a ETA ({new Date(bl.estimatedArrival).toLocaleDateString("pt-BR")}) ainda é futura. Considere retroceder para "Em Trânsito".
+                    </span>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {otherStatuses.map((s) => {
                     const config = STATUS_MAP[s];
@@ -642,30 +666,37 @@ function EditBlDialog({ blId, open, onClose }: { blId: number; open: boolean; on
                     const currentIndex = ALL_STATUSES.indexOf(bl.status);
                     const isForward = statusIndex > currentIndex;
                     const Icon = config?.icon ?? Package;
+                    // Warn if target is arrived/customs/delivered but ETA is future
+                    const etaFutureWarning = ["arrived", "customs", "delivered"].includes(s)
+                      && bl.estimatedArrival
+                      && new Date(bl.estimatedArrival) > new Date();
                     return (
                       <Button
                         key={s}
                         variant="outline"
                         size="sm"
                         className={`text-xs gap-1.5 ${
-                          isForward
-                            ? "border-green-500/40 hover:bg-green-500/10 text-green-400"
-                            : "border-yellow-500/40 hover:bg-yellow-500/10 text-yellow-400"
+                          etaFutureWarning
+                            ? "border-red-500/40 hover:bg-red-500/10 text-red-400"
+                            : isForward
+                              ? "border-green-500/40 hover:bg-green-500/10 text-green-400"
+                              : "border-yellow-500/40 hover:bg-yellow-500/10 text-yellow-400"
                         }`}
                         onClick={() => {
                           const direction = isForward ? "avançar" : "retroceder";
-                          if (
-                            confirm(
-                              `Tem certeza que deseja ${direction} o status para "${config?.label ?? s}"?`
-                            )
-                          ) {
-                            statusMutation.mutate({ id: blId, status: s as any });
+                          let warningMsg = `Tem certeza que deseja ${direction} o status para "${config?.label ?? s}"?`;
+                          if (etaFutureWarning) {
+                            warningMsg = `⚠️ ATENÇÃO: A ETA deste BL (${new Date(bl.estimatedArrival!).toLocaleDateString("pt-BR")}) ainda é futura!\n\n${warningMsg}`;
+                          }
+                          const reason = prompt(warningMsg + "\n\nInforme o motivo da alteração:");
+                          if (reason !== null) {
+                            statusMutation.mutate({ id: blId, status: s as any, reason: reason || undefined });
                           }
                         }}
                         disabled={statusMutation.isPending}
                       >
                         <Icon className="w-3.5 h-3.5" />
-                        {isForward ? "▶" : "◀"} {config?.label ?? s}
+                        {etaFutureWarning ? "⚠" : isForward ? "▶" : "◀"} {config?.label ?? s}
                       </Button>
                     );
                   })}

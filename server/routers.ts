@@ -26,6 +26,7 @@ import { reconciliationRouter } from "./modules/reconciliation/router";
 import { contractsRouter } from "./modules/contracts/router";
 import { notificationsRouter } from "./modules/notifications/router";
 import { emailTemplatesRouter } from "./modules/emailTemplates/router";
+import { whatsappRouter } from "./modules/whatsapp/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -48,6 +49,7 @@ export const appRouter = router({
   contracts: contractsRouter,
   notifications: notificationsRouter,
   emailTemplates: emailTemplatesRouter,
+  whatsapp: whatsappRouter,
 
   // ===== Admin Dashboard Stats =====
   dashboard: router({

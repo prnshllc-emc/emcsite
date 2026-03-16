@@ -252,12 +252,24 @@ export function getStatusOrder(): repo.BlStatus[] {
 export async function forceUpdateBlStatus(
   id: number,
   newStatus: repo.BlStatus,
+  reason?: string,
   adminUserId?: number
 ): Promise<repo.BlRecord | null> {
   const bl = await repo.findBlById(id);
   if (!bl) throw new Error("BL não encontrado.");
 
   if (bl.status === newStatus) return bl;
+
+  // ⚠️ Warn if setting arrived/customs/delivered but ETA is in the future
+  if (
+    ["arrived", "customs", "delivered"].includes(newStatus) &&
+    bl.estimatedArrival &&
+    new Date(bl.estimatedArrival) > new Date()
+  ) {
+    console.warn(
+      `[BL Service] ⚠️ Force-setting BL ${bl.blNumber} to "${newStatus}" but ETA is ${bl.estimatedArrival} (future). Reason: ${reason ?? "not provided"}`
+    );
+  }
 
   const updated = await repo.updateBlStatus(id, newStatus);
 
@@ -266,7 +278,11 @@ export async function forceUpdateBlStatus(
     action: "update",
     entity: "bl",
     entityId: id,
-    changes: { status: { before: bl.status, after: newStatus }, forced: { before: false, after: true } },
+    changes: {
+      status: { before: bl.status, after: newStatus },
+      forced: { before: false, after: true },
+      reason: { before: null, after: reason ?? "Admin override (sem motivo)" },
+    },
   });
 
   return updated;

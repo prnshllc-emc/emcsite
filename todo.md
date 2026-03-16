@@ -701,3 +701,26 @@
 - [x] Support loading existing designJson into the editor on edit
 - [x] Keep HTML source tab as fallback for advanced users
 - [x] Ensure backward compatibility with existing templates (no designJson → HTML mode)
+
+## WhatsApp Cloud API (Meta) Integration
+- [x] Create whatsapp_messages log table in schema
+- [x] Create WhatsApp service module (server/modules/whatsapp/)
+- [x] Implement sendTemplateMessage() using Meta Cloud API
+- [x] Implement sendTextMessage() for customer service window replies
+- [x] Wire WhatsApp into notification pipeline (tracking code approved, stage change)
+- [x] Add template mapping: system email templates → Meta-approved WhatsApp template names
+- [x] Implement webhook endpoint for incoming WhatsApp messages/status updates
+- [x] Build admin UI: WhatsApp settings panel (connection status, phone number info)
+- [x] Build admin UI: WhatsApp message log viewer
+- [ ] Request WHATSAPP_TOKEN and WHATSAPP_PHONE_NUMBER_ID secrets from user
+- [x] Write tests for WhatsApp service (32 tests)
+- [x] Fallback: if WhatsApp fails, send via email notification
+
+## Fix: BL Status Transition Rules
+- [x] Allow admin override for status regression (arrived → in_transit, etc.) — already existed via forceUpdateStatus
+- [x] Add reason field to forceUpdateStatus for audit trail
+- [x] Verified: No BLs with inconsistent status (arrived + future ETA) currently in DB
+- [x] Add visual warning (yellow triangle + banner) for BLs with status inconsistent with ETA
+- [x] Add ETA future warning on status change buttons (red highlight + confirmation)
+- [x] Status change now prompts for reason (audit trail)
+- [x] Add audit log entry when admin overrides status (reason field in audit_logs)

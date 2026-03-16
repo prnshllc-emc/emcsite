@@ -155,10 +155,11 @@ export const blsRouter = router({
       z.object({
         id: z.number().int().positive(),
         status: BlStatusEnum,
+        reason: z.string().max(500).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      return service.forceUpdateBlStatus(input.id, input.status, ctx.user.id);
+      return service.forceUpdateBlStatus(input.id, input.status, input.reason, ctx.user.id);
     }),
 
   // ── Get status order (for UI dropdown) ──────────────────────

@@ -60,6 +60,7 @@ import CustomersPanel from "@/components/admin/CustomersPanel";
 import PipelinePanel from "@/components/admin/PipelinePanel";
 import ContractsPanel from "@/components/admin/ContractsPanel";
 import EmailTemplatesPanel from "@/components/admin/EmailTemplatesPanel";
+import WhatsAppPanel from "@/components/admin/WhatsAppPanel";
 
 // ============================================================
 // TYPES
@@ -250,7 +251,7 @@ export default function Admin() {
             </h2>
           </div>
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-6xl grid-cols-9">
+            <TabsList className="grid w-full max-w-6xl grid-cols-10">
               <TabsTrigger value="dashboard" className="font-display text-xs">
                 <LayoutDashboard className="mr-1.5 h-4 w-4" />
                 Dashboard
@@ -282,6 +283,10 @@ export default function Admin() {
               <TabsTrigger value="templates" className="font-display text-xs">
                 <Mail className="mr-1.5 h-4 w-4" />
                 Templates
+              </TabsTrigger>
+              <TabsTrigger value="whatsapp" className="font-display text-xs">
+                <MessageCircle className="mr-1.5 h-4 w-4" />
+                WhatsApp
               </TabsTrigger>
               <TabsTrigger value="settings" className="font-display text-xs">
                 <Settings className="mr-1.5 h-4 w-4" />
@@ -319,6 +324,10 @@ export default function Admin() {
 
             <TabsContent value="templates">
               <EmailTemplatesPanel />
+            </TabsContent>
+
+            <TabsContent value="whatsapp">
+              <WhatsAppPanel />
             </TabsContent>
 
             <TabsContent value="settings">

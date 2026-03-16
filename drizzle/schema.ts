@@ -671,3 +671,64 @@ export const emailTemplates = mysqlTable(
 
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// WHATSAPP MESSAGES — Log of all WhatsApp messages sent/received
+// ─────────────────────────────────────────────────────────────
+export const whatsappMessages = mysqlTable(
+  "whatsapp_messages",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Direction: outbound (we sent) or inbound (customer replied)
+    direction: mysqlEnum("direction", ["outbound", "inbound"])
+      .notNull()
+      .default("outbound"),
+    // Message type: template (pre-approved) or text (free-form within service window)
+    messageType: mysqlEnum("message_type", ["template", "text", "image", "document"])
+      .notNull()
+      .default("template"),
+    // Meta WhatsApp message ID (wamid.xxx)
+    waMessageId: varchar("wa_message_id", { length: 255 }),
+    // Recipient/sender phone number (E.164 format, e.g. +5511999999999)
+    phoneNumber: varchar("phone_number", { length: 32 }).notNull(),
+    // Template name (for outbound template messages, matches Meta-approved template)
+    templateName: varchar("template_name", { length: 255 }),
+    // Template language (e.g. "pt_BR")
+    templateLanguage: varchar("template_language", { length: 10 }),
+    // Message body (for text messages or template body preview)
+    body: text("body"),
+    // Delivery status from Meta webhook
+    status: mysqlEnum("status", [
+      "pending",    // Queued for sending
+      "sent",       // Sent to Meta API
+      "delivered",  // Delivered to device
+      "read",       // Read by recipient
+      "failed",     // Failed to send
+    ])
+      .notNull()
+      .default("pending"),
+    // Error details if failed
+    errorCode: varchar("error_code", { length: 32 }),
+    errorMessage: text("error_message"),
+    // Link to customer (nullable for unknown inbound)
+    customerId: int("customer_id"),
+    // Link to BL (optional context)
+    blId: int("bl_id"),
+    // Event that triggered this message (e.g. "stage_change", "tracking_approved")
+    triggerEvent: varchar("trigger_event", { length: 128 }),
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+    deliveredAt: timestamp("delivered_at"),
+    readAt: timestamp("read_at"),
+  },
+  (table) => [
+    index("idx_wamsg_phone").on(table.phoneNumber),
+    index("idx_wamsg_customer").on(table.customerId),
+    index("idx_wamsg_status").on(table.status),
+    index("idx_wamsg_wa_id").on(table.waMessageId),
+  ]
+);
+
+export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
+export type InsertWhatsappMessage = typeof whatsappMessages.$inferInsert;
