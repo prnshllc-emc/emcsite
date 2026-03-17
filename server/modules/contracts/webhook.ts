@@ -8,15 +8,19 @@
  * - envelope.created: New envelope created
  *
  * This handler:
- * 1. Validates the webhook payload
+ * 1. Validates the webhook token (Clicksign doesn't support HMAC natively)
  * 2. Creates/updates the contract record in our DB
  * 3. Extracts signer data (name, CPF, email) from the payload — encrypted at rest
  * 4. Triggers contract processing if envelope is fully signed
  *
- * SECURITY: All PII fields (name, CPF, email, phone) and the raw payload
- * are encrypted with AES-256-GCM before storage (LGPD compliance).
+ * SECURITY:
+ * - Webhook authentication via shared secret token (query param or header)
+ *   Configure in Clicksign: https://your-domain/api/webhooks/clicksign?token=YOUR_SECRET
+ * - All PII fields (name, CPF, email, phone) and the raw payload
+ *   are encrypted with AES-256-GCM before storage (LGPD compliance).
  */
 
+import crypto from "crypto";
 import { Router, type Request, type Response } from "express";
 import { getDb } from "../../db";
 import { clicksignContracts } from "../../../drizzle/schema";
@@ -57,6 +61,56 @@ interface ClicksignWebhookEvent {
 }
 
 // ══════════════════════════════════════════════════════════════
+// WEBHOOK TOKEN VALIDATION
+// Clicksign API v3 does not support native HMAC signing.
+// We use a shared secret token approach:
+//   - Token is passed as ?token=xxx query param in the webhook URL
+//   - Also accepts X-Webhook-Token header as fallback
+//   - Uses timing-safe comparison to prevent timing attacks
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Validates the webhook token from query param or header.
+ * Uses timing-safe comparison to prevent timing attacks.
+ */
+function validateWebhookToken(req: Request): boolean {
+  const expectedToken = process.env.CLICKSIGN_WEBHOOK_SECRET;
+
+  if (!expectedToken) {
+    console.warn(
+      "[Clicksign Webhook] CLICKSIGN_WEBHOOK_SECRET not configured — " +
+      "token validation skipped. Set this secret to enable webhook authentication."
+    );
+    return true; // Allow through but warn — enables gradual rollout
+  }
+
+  // Check query param first (primary method for Clicksign)
+  const queryToken = req.query.token as string | undefined;
+  // Also check header as fallback
+  const headerToken = req.headers["x-webhook-token"] as string | undefined;
+
+  const receivedToken = queryToken || headerToken;
+
+  if (!receivedToken) {
+    return false;
+  }
+
+  // Timing-safe comparison to prevent timing attacks
+  try {
+    const expected = Buffer.from(expectedToken, "utf-8");
+    const received = Buffer.from(receivedToken, "utf-8");
+
+    if (expected.length !== received.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(expected, received);
+  } catch {
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // ENCRYPTION HELPERS — Encrypt PII before storage
 // ══════════════════════════════════════════════════════════════
 
@@ -87,6 +141,22 @@ export function decryptIfPresent(value: string | null | undefined): string | nul
 // ══════════════════════════════════════════════════════════════
 
 async function handleClicksignWebhook(req: Request, res: Response) {
+  // ── Token Validation ───────────────────────────────────────
+  if (!validateWebhookToken(req)) {
+    console.warn("[Clicksign Webhook] Token validation failed — rejecting request");
+    await logAudit({
+      userId: null,
+      action: "create",
+      entity: "clicksign_webhook_auth_failure",
+      entityId: 0,
+      changes: {
+        ip: { before: null, after: req.ip ?? "unknown" },
+        reason: { before: null, after: "invalid_token" },
+      },
+    });
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const payload = req.body as ClicksignWebhookEvent;
 
@@ -242,7 +312,7 @@ function mapClicksignStatus(envelopeStatus: string, eventName: string): "pending
 export function createClicksignWebhookRouter(): Router {
   const webhookRouter = Router();
 
-  // POST /api/webhooks/clicksign
+  // POST /api/webhooks/clicksign — accepts ?token=xxx for authentication
   webhookRouter.post("/clicksign", handleClicksignWebhook);
 
   // GET /api/webhooks/clicksign — health check for Clicksign to verify endpoint
@@ -252,3 +322,6 @@ export function createClicksignWebhookRouter(): Router {
 
   return webhookRouter;
 }
+
+// Export for testing
+export { validateWebhookToken };

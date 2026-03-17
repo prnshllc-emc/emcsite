@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -35,6 +36,50 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // ── Security Headers (Helmet) ────────────────────────────────
+  app.use(
+    helmet({
+      // Content Security Policy — allow inline scripts/styles for Vite HMR in dev,
+      // and common CDNs (Google Fonts, analytics, etc.) in production
+      contentSecurityPolicy: process.env.NODE_ENV === "development" ? false : {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https://www.googletagmanager.com",
+            "https://www.google-analytics.com",
+            "https://connect.facebook.net",
+            "https://www.googleadservices.com",
+          ],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          fontSrc: ["'self'", "https://fonts.gstatic.com"],
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: [
+            "'self'",
+            "https://www.google-analytics.com",
+            "https://analytics.google.com",
+            "https://www.facebook.com",
+            "https://region1.google-analytics.com",
+          ],
+          frameSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
+      },
+      // Cross-Origin settings
+      crossOriginEmbedderPolicy: false, // Allow loading external images/fonts
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      // HSTS — enforce HTTPS (1 year, include subdomains)
+      strictTransportSecurity: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+    })
+  );
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

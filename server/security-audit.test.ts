@@ -291,6 +291,94 @@ describe("V-011: Axios version updated", () => {
   });
 });
 
+// ── V-012: Helmet security headers ──────────────────────────
+describe("V-012: Helmet security headers", () => {
+  it("server/_core/index.ts imports and uses helmet", async () => {
+    const fs = await import("fs");
+    const serverSource = fs.readFileSync("server/_core/index.ts", "utf-8");
+    expect(serverSource).toContain('import helmet from "helmet"');
+    expect(serverSource).toContain("helmet({");
+    // Should have CSP and other security directives
+    expect(serverSource).toContain("contentSecurityPolicy");
+    expect(serverSource).toContain("crossOriginEmbedderPolicy");
+  });
+
+  it("helmet is installed as a dependency", async () => {
+    const fs = await import("fs");
+    const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+    expect(pkg.dependencies?.helmet || pkg.devDependencies?.helmet).toBeTruthy();
+  });
+});
+
+// ── V-013: WhatsApp webhook HMAC X-Hub-Signature-256 ────────
+describe("V-013: WhatsApp webhook HMAC validation", () => {
+  it("WhatsApp webhook validates X-Hub-Signature-256 header", async () => {
+    const fs = await import("fs");
+    const webhookSource = fs.readFileSync(
+      "server/modules/whatsapp/webhook.ts",
+      "utf-8"
+    );
+    expect(webhookSource).toContain("x-hub-signature-256");
+    expect(webhookSource).toContain("WHATSAPP_APP_SECRET");
+    expect(webhookSource).toContain("createHmac");
+    expect(webhookSource).toContain("timingSafeEqual");
+    expect(webhookSource).toContain("validateSignature");
+  });
+
+  it("validateSignature correctly validates HMAC-SHA256", async () => {
+    const crypto = await import("crypto");
+    const { validateSignature } = await import(
+      "./modules/whatsapp/webhook"
+    );
+
+    const secret = "test_app_secret_12345";
+    const body = Buffer.from(JSON.stringify({ test: "payload" }));
+    const validSig =
+      "sha256=" +
+      crypto.createHmac("sha256", secret).update(body).digest("hex");
+
+    // Valid signature should pass
+    expect(validateSignature(body, validSig, secret)).toBe(true);
+
+    // Invalid signature should fail
+    expect(validateSignature(body, "sha256=invalid", secret)).toBe(false);
+
+    // Missing signature should fail
+    expect(validateSignature(body, undefined, secret)).toBe(false);
+
+    // Wrong prefix should fail
+    expect(validateSignature(body, "md5=abc123", secret)).toBe(false);
+  });
+});
+
+// ── V-014: Clicksign webhook token-based authentication ─────
+describe("V-014: Clicksign webhook token validation", () => {
+  it("Clicksign webhook validates token from query param", async () => {
+    const fs = await import("fs");
+    const webhookSource = fs.readFileSync(
+      "server/modules/contracts/webhook.ts",
+      "utf-8"
+    );
+    expect(webhookSource).toContain("CLICKSIGN_WEBHOOK_SECRET");
+    expect(webhookSource).toContain("validateWebhookToken");
+    expect(webhookSource).toContain("timingSafeEqual");
+    expect(webhookSource).toContain("req.query.token");
+    expect(webhookSource).toContain("x-webhook-token");
+    // Should return 401 on invalid token
+    expect(webhookSource).toContain('res.status(401)');
+  });
+
+  it("Clicksign webhook logs auth failures to audit", async () => {
+    const fs = await import("fs");
+    const webhookSource = fs.readFileSync(
+      "server/modules/contracts/webhook.ts",
+      "utf-8"
+    );
+    expect(webhookSource).toContain("clicksign_webhook_auth_failure");
+    expect(webhookSource).toContain("logAudit");
+  });
+});
+
 // ── General: No hardcoded secrets in codebase ──────────────
 describe("General: No hardcoded secrets", () => {
   it("No .env files committed", async () => {

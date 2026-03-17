@@ -5,11 +5,16 @@
  * 1. GET /api/webhooks/whatsapp — Webhook verification (Meta challenge)
  * 2. POST /api/webhooks/whatsapp — Status updates + incoming messages
  *
+ * Security:
+ * - GET: Validates hub.verify_token against WHATSAPP_WEBHOOK_VERIFY_TOKEN
+ * - POST: Validates X-Hub-Signature-256 HMAC-SHA256 against WHATSAPP_APP_SECRET
+ *
  * Meta sends webhook events for:
  * - Message status changes (sent, delivered, read, failed)
  * - Incoming messages from customers
  */
 
+import crypto from "crypto";
 import { Router, type Request, type Response } from "express";
 import {
   processStatusUpdate,
@@ -17,6 +22,61 @@ import {
 } from "./service";
 
 const whatsappWebhookRouter = Router();
+
+// ══════════════════════════════════════════════════════════════
+// HMAC SIGNATURE VALIDATION
+// Meta signs every POST with X-Hub-Signature-256 using the App Secret
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Validates the X-Hub-Signature-256 header from Meta.
+ * Uses timing-safe comparison to prevent timing attacks.
+ */
+function validateSignature(
+  rawBody: Buffer,
+  signatureHeader: string | undefined,
+  appSecret: string
+): boolean {
+  if (!signatureHeader) return false;
+
+  // Header format: "sha256=<hex_digest>"
+  const expectedPrefix = "sha256=";
+  if (!signatureHeader.startsWith(expectedPrefix)) return false;
+
+  const receivedSig = signatureHeader.slice(expectedPrefix.length);
+  const computedSig = crypto
+    .createHmac("sha256", appSecret)
+    .update(rawBody)
+    .digest("hex");
+
+  // Timing-safe comparison
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedSig, "hex"),
+      Buffer.from(computedSig, "hex")
+    );
+  } catch {
+    // If lengths differ, timingSafeEqual throws
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RAW BODY CAPTURE MIDDLEWARE
+// We need the raw body bytes for HMAC validation before JSON parsing
+// ══════════════════════════════════════════════════════════════
+
+import express from "express";
+
+whatsappWebhookRouter.use(
+  express.json({
+    limit: "5mb",
+    verify: (req: any, _res, buf) => {
+      // Store raw body buffer on the request for HMAC validation
+      req.rawBody = buf;
+    },
+  })
+);
 
 // ══════════════════════════════════════════════════════════════
 // WEBHOOK VERIFICATION (GET)
@@ -50,6 +110,26 @@ whatsappWebhookRouter.get("/", (req: Request, res: Response) => {
 // ══════════════════════════════════════════════════════════════
 
 whatsappWebhookRouter.post("/", async (req: Request, res: Response) => {
+  // ── HMAC Signature Validation ──────────────────────────────
+  const appSecret = process.env.WHATSAPP_APP_SECRET;
+
+  if (appSecret) {
+    const signatureHeader = req.headers["x-hub-signature-256"] as string | undefined;
+    const rawBody = (req as any).rawBody as Buffer | undefined;
+
+    if (!rawBody || !validateSignature(rawBody, signatureHeader, appSecret)) {
+      console.warn("[WhatsApp Webhook] HMAC signature validation failed");
+      res.status(401).send("Invalid signature");
+      return;
+    }
+  } else {
+    // Log warning but don't block — allows gradual rollout
+    console.warn(
+      "[WhatsApp Webhook] WHATSAPP_APP_SECRET not configured — " +
+      "signature validation skipped. Set this secret to enable HMAC verification."
+    );
+  }
+
   // Always respond 200 quickly to avoid Meta retries
   res.status(200).send("OK");
 
@@ -177,4 +257,6 @@ interface WebhookPayload {
   }>;
 }
 
+// Export validateSignature for testing
+export { validateSignature };
 export default whatsappWebhookRouter;

@@ -747,3 +747,9 @@
 - [x] Apply rate limiters (cpfRateLimiter, generalRateLimiter) to public tracking endpoints
 - [x] Create and run migration script to encrypt legacy Clicksign PII data
 - [x] Update axios to >=1.13.5 to fix DoS vulnerability (updated to 1.13.6)
+
+## Final Security Hardening (March 2026)
+- [x] Install Helmet middleware for automatic security headers
+- [x] Implement HMAC X-Hub-Signature-256 validation on WhatsApp webhook
+- [x] Implement token-based authentication on Clicksign webhook (Clicksign API v3 doesn't support HMAC)
+- [x] Write tests for webhook HMAC validation and Helmet (V-012, V-013, V-014)
