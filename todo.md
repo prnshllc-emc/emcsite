@@ -753,3 +753,6 @@
 - [x] Implement HMAC X-Hub-Signature-256 validation on WhatsApp webhook
 - [x] Implement token-based authentication on Clicksign webhook (Clicksign API v3 doesn't support HMAC)
 - [x] Write tests for webhook HMAC validation and Helmet (V-012, V-013, V-014)
+
+## Scheduler Adjustment (March 2026)
+- [x] Change reconciliation scheduler from every 6h to daily at 00:01 BRT (UTC-3)

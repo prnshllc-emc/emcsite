@@ -1,7 +1,9 @@
 /**
- * Reconciliation Scheduler — Runs auto-reconciliation at fixed intervals.
+ * Reconciliation Scheduler — Runs auto-reconciliation daily at 00:01 BRT (Brasília).
  *
- * Default: every 6 hours (configurable via RECONCILIATION_INTERVAL_MS env).
+ * Uses a cron-style approach: checks every minute if it's time to run.
+ * Schedule: 00:01 BRT = 03:01 UTC (UTC-3).
+ *
  * Also supports manual trigger via exported function.
  *
  * The scheduler:
@@ -13,10 +15,14 @@
 import { runReconciliation } from "./service";
 import { notifyOwner } from "../../_core/notification";
 
-const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+const CHECK_INTERVAL_MS = 60_000; // Check every 60 seconds
+const TARGET_HOUR_UTC = 3; // 00:01 BRT = 03:01 UTC
+const TARGET_MINUTE = 1;
+
 let intervalHandle: ReturnType<typeof setInterval> | null = null;
 let isRunning = false;
 let lastRunAt: Date | null = null;
+let lastRunDate: string | null = null; // "YYYY-MM-DD" to prevent double runs
 let lastRunResult: {
   total: number;
   updated: number;
@@ -24,6 +30,23 @@ let lastRunResult: {
   skippedManualOverride: number;
   orphanBls: number;
 } | null = null;
+
+// ══════════════════════════════════════════════════════════════
+// CRON CHECK — Is it time to run?
+// ══════════════════════════════════════════════════════════════
+
+function shouldRunNow(): boolean {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcMinute = now.getUTCMinutes();
+  const todayStr = now.toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+  // Only run at 03:01 UTC (00:01 BRT) and only once per day
+  if (utcHour === TARGET_HOUR_UTC && utcMinute === TARGET_MINUTE && lastRunDate !== todayStr) {
+    return true;
+  }
+  return false;
+}
 
 // ══════════════════════════════════════════════════════════════
 // RUN ONCE
@@ -44,6 +67,7 @@ export async function runScheduledReconciliation(): Promise<typeof lastRunResult
     const result = await runReconciliation();
 
     lastRunAt = new Date();
+    lastRunDate = lastRunAt.toISOString().slice(0, 10);
     lastRunResult = {
       total: result.total,
       updated: result.updated,
@@ -114,24 +138,17 @@ export function startReconciliationScheduler(): void {
     stopReconciliationScheduler();
   }
 
-  const intervalMs = parseInt(
-    process.env.RECONCILIATION_INTERVAL_MS ?? String(SIX_HOURS_MS),
-    10
-  );
-
   console.log(
-    `[Scheduler] Starting reconciliation scheduler (every ${(intervalMs / 3600000).toFixed(1)}h)`
+    `[Scheduler] Starting reconciliation scheduler (daily at 00:01 BRT / 03:01 UTC)`
   );
 
-  // Run once on startup (after a short delay to let DB connect)
-  setTimeout(() => {
-    runScheduledReconciliation().catch(console.error);
-  }, 10_000);
-
-  // Then run at interval
+  // Check every minute if it's time to run
   intervalHandle = setInterval(() => {
-    runScheduledReconciliation().catch(console.error);
-  }, intervalMs);
+    if (shouldRunNow()) {
+      console.log("[Scheduler] Cron trigger: 00:01 BRT — starting reconciliation");
+      runScheduledReconciliation().catch(console.error);
+    }
+  }, CHECK_INTERVAL_MS);
 }
 
 export function stopReconciliationScheduler(): void {
@@ -151,11 +168,23 @@ export function getSchedulerStatus(): {
   lastRunAt: Date | null;
   lastRunResult: typeof lastRunResult;
   isReconciling: boolean;
+  schedule: string;
+  nextRunEstimate: string;
 } {
+  // Calculate next run time
+  const now = new Date();
+  const nextRun = new Date(now);
+  nextRun.setUTCHours(TARGET_HOUR_UTC, TARGET_MINUTE, 0, 0);
+  if (nextRun <= now) {
+    nextRun.setUTCDate(nextRun.getUTCDate() + 1);
+  }
+
   return {
     running: intervalHandle !== null,
     lastRunAt,
     lastRunResult,
     isReconciling: isRunning,
+    schedule: "Daily at 00:01 BRT (03:01 UTC)",
+    nextRunEstimate: nextRun.toISOString(),
   };
 }
