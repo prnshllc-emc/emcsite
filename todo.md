@@ -742,3 +742,8 @@
 - [ ] Recommendation: Install Helmet for security headers
 - [ ] Recommendation: Update axios to >=1.13.5
 - [ ] Recommendation: Migrate legacy Clicksign PII data to encrypted format
+
+## Security Recommendations Implementation (March 2026)
+- [x] Apply rate limiters (cpfRateLimiter, generalRateLimiter) to public tracking endpoints
+- [x] Create and run migration script to encrypt legacy Clicksign PII data
+- [x] Update axios to >=1.13.5 to fix DoS vulnerability (updated to 1.13.6)

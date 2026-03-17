@@ -250,16 +250,16 @@ As seguintes melhorias são recomendadas para evolução contínua da segurança
 
 1. **Validação HMAC para webhooks:** Implementar verificação de assinatura `X-Hub-Signature-256` no webhook WhatsApp e HMAC no webhook Clicksign (quando disponível pela API).
 
-2. **Aplicação de rate limiters:** Aplicar `cpfRateLimiter` no endpoint `tracking.lookupByCpf` e `generalRateLimiter` no endpoint `tracking.lookup` para proteção contra brute-force em endpoints públicos.
+2. ~~**Aplicação de rate limiters:**~~ **IMPLEMENTADO** — `cpfRateLimiter` (5 req/5min) aplicado no endpoint `tracking.lookupByCpf` e `generalRateLimiter` (60 req/min) aplicado no endpoint `tracking.lookup`. Middlewares tRPC criados em `server/_core/trpc.ts` com extração de IP via `x-forwarded-for`.
 
 3. **Instalação do Helmet:** Adicionar o middleware `helmet` ao Express para configurar automaticamente headers de segurança como `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, etc.
 
-4. **Atualização do axios:** Atualizar para `>=1.13.5` para corrigir a vulnerabilidade de DoS via `__proto__` key.
+4. ~~**Atualização do axios:**~~ **IMPLEMENTADO** — Atualizado de `1.12.2` para `1.13.6`, corrigindo a vulnerabilidade de DoS via `__proto__` key. Verificado via `pnpm audit` que axios não aparece mais nos resultados.
 
-5. **Migração de dados legados:** Executar um script de migração para criptografar os dados PII existentes na tabela `clicksign_contracts` que foram armazenados antes desta correção. O código atual trata graciosamente dados não criptografados (fallback), mas a migração completa é recomendada.
+5. ~~**Migração de dados legados:**~~ **IMPLEMENTADO** — Script de migração criado em `server/migrations/encrypt-clicksign-pii.mjs`. Executado com sucesso (tabela estava vazia, 0 registros para migrar). O script detecta automaticamente dados já criptografados e pode ser re-executado com segurança (idempotente).
 
 ---
 
 ## 12. Conclusão
 
-A plataforma EMC demonstra **maturidade significativa em segurança e compliance**, com uma arquitetura que prioriza a proteção de dados pessoais desde o design. A criptografia AES-256-GCM com PBKDF2, o sistema de auditoria com diff de mudanças, a separação rigorosa de permissões, e a validação de entrada via Zod em todas as camadas formam uma base sólida. As 8 vulnerabilidades identificadas nesta auditoria foram **todas corrigidas e validadas**, elevando a nota geral de **7.5/10 para 8.4/10**. As recomendações pendentes são melhorias incrementais que não comprometem a segurança atual da plataforma.
+A plataforma EMC demonstra **maturidade significativa em segurança e compliance**, com uma arquitetura que prioriza a proteção de dados pessoais desde o design. A criptografia AES-256-GCM com PBKDF2, o sistema de auditoria com diff de mudanças, a separação rigorosa de permissões, e a validação de entrada via Zod em todas as camadas formam uma base sólida. As 8 vulnerabilidades identificadas na auditoria inicial foram **todas corrigidas e validadas**, e 3 das 5 recomendações de melhoria foram **implementadas** (rate limiters, atualização do axios, migração de dados legados), elevando a nota geral de **7.5/10 para 8.8/10**. As 2 recomendações pendentes (HMAC para webhooks e Helmet) são melhorias incrementais que não comprometem a segurança atual da plataforma.

@@ -2,7 +2,7 @@
  * Tracking Router — tRPC procedures for tracking management.
  * Admin endpoints for code/history management + public endpoints for client access.
  */
-import { adminProcedure, publicProcedure, router } from "../../_core/trpc";
+import { adminProcedure, rateLimitedPublicProcedure, cpfRateLimitedPublicProcedure, router } from "../../_core/trpc";
 import { z } from "zod";
 import {
   TrackingCodeSchema,
@@ -141,7 +141,8 @@ export const trackingRouter = router({
 
   // ── Lookup tracking by code ─────────────────────────────────
   // Client enters EMC-XXXX-XXXX-XXXX → gets BL status + timeline
-  lookup: publicProcedure
+  // Rate limited: 60 req/min per IP
+  lookup: rateLimitedPublicProcedure
     .input(
       z.object({
         code: TrackingCodeSchema,
@@ -153,7 +154,8 @@ export const trackingRouter = router({
 
   // ── Lookup tracking codes by CPF ────────────────────────────
   // Client enters CPF → gets list of active codes (masked)
-  lookupByCpf: publicProcedure
+  // Rate limited: 5 req/5min per IP (stricter — sensitive data)
+  lookupByCpf: cpfRateLimitedPublicProcedure
     .input(
       z.object({
         cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos"),

@@ -211,6 +211,86 @@ describe("V-008: Soft-delete filters on findById functions", () => {
   });
 });
 
+// ── V-009: Rate limiters on public tracking endpoints ──────
+describe("V-009: Rate limiters on public tracking endpoints", () => {
+  it("tracking router uses rateLimitedPublicProcedure for lookup", async () => {
+    const fs = await import("fs");
+    const routerSource = fs.readFileSync(
+      "server/modules/tracking/router.ts",
+      "utf-8"
+    );
+    expect(routerSource).toContain("rateLimitedPublicProcedure");
+    expect(routerSource).toContain("cpfRateLimitedPublicProcedure");
+    // Should NOT use plain publicProcedure for public endpoints
+    expect(routerSource).not.toMatch(/lookup:\s*publicProcedure/);
+    expect(routerSource).not.toMatch(/lookupByCpf:\s*publicProcedure/);
+  });
+
+  it("trpc.ts exports rate-limited procedures", async () => {
+    const fs = await import("fs");
+    const trpcSource = fs.readFileSync("server/_core/trpc.ts", "utf-8");
+    expect(trpcSource).toContain("export const rateLimitedPublicProcedure");
+    expect(trpcSource).toContain("export const cpfRateLimitedPublicProcedure");
+    expect(trpcSource).toContain("cpfRateLimiter");
+    expect(trpcSource).toContain("generalRateLimiter");
+    expect(trpcSource).toContain("TOO_MANY_REQUESTS");
+  });
+
+  it("rate limiter blocks after exceeding limit", async () => {
+    const { RateLimiter } = await import("./shared/security");
+    const limiter = new RateLimiter(3, 60_000);
+    const ip = "test-ip-" + Date.now();
+
+    // First 3 requests should be allowed
+    expect(limiter.check(ip).allowed).toBe(true);
+    expect(limiter.check(ip).allowed).toBe(true);
+    expect(limiter.check(ip).allowed).toBe(true);
+
+    // 4th request should be blocked
+    const result = limiter.check(ip);
+    expect(result.allowed).toBe(false);
+    expect(result.remaining).toBe(0);
+  });
+});
+
+// ── V-010: Clicksign PII migration script exists ──────────
+describe("V-010: Clicksign PII migration script", () => {
+  it("migration script exists and has proper structure", async () => {
+    const fs = await import("fs");
+    const scriptPath = "server/migrations/encrypt-clicksign-pii.mjs";
+    expect(fs.existsSync(scriptPath)).toBe(true);
+
+    const content = fs.readFileSync(scriptPath, "utf-8");
+    // Should check for DATA_ENCRYPTION_KEY
+    expect(content).toContain("DATA_ENCRYPTION_KEY");
+    expect(content).toContain("DATABASE_URL");
+    // Should have encryption logic
+    expect(content).toContain("encryptSensitiveData");
+    expect(content).toContain("aes-256-gcm");
+    // Should detect already-encrypted data
+    expect(content).toContain("isAlreadyEncrypted");
+    // Should update the correct table
+    expect(content).toContain("clicksign_contracts");
+    // Should handle all PII fields
+    expect(content).toContain("signer_name");
+    expect(content).toContain("signer_cpf");
+    expect(content).toContain("signer_email");
+    expect(content).toContain("signer_phone");
+    expect(content).toContain("raw_payload");
+  });
+});
+
+// ── V-011: Axios updated to fix DoS vulnerability ─────────
+describe("V-011: Axios version updated", () => {
+  it("axios is at version >=1.13.5", async () => {
+    const fs = await import("fs");
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+    const axiosVersion = packageJson.dependencies?.axios || "";
+    // Should be 1.13.5 or higher
+    expect(axiosVersion).toMatch(/^[\^~]?1\.1[3-9]\.[5-9]|^[\^~]?1\.1[3-9]\.\d{2,}|^[\^~]?1\.[2-9]\d/);
+  });
+});
+
 // ── General: No hardcoded secrets in codebase ──────────────
 describe("General: No hardcoded secrets", () => {
   it("No .env files committed", async () => {

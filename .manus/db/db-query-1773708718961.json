@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, LENGTH(signer_cpf) as cpf_len, LENGTH(signer_email) as email_len, LENGTH(signer_name) as name_len, LENGTH(raw_payload) as payload_len, LEFT(COALESCE(signer_cpf, ''), 5) as cpf_prefix, LEFT(COALESCE(raw_payload, ''), 3) as payload_prefix FROM clicksign_contracts LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT id, LENGTH(signer_cpf) as cpf_len, LENGTH(signer_email) as email_len, LENGTH(signer_name) as name_len, LENGTH(raw_payload) as payload_len, LEFT(COALESCE(signer_cpf, ''), 5) as cpf_prefix, LEFT(COALESCE(raw_payload, ''), 3) as payload_prefix FROM clicksign_contracts LIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}

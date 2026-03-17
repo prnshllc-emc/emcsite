@@ -1,0 +1,17 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(CASE WHEN signer_cpf IS NOT NULL AND signer_cpf != '' AND LENGTH(signer_cpf) < 50 THEN 1 ELSE 0 END) as unencrypted_cpf, SUM(CASE WHEN signer_email IS NOT NULL AND signer_email != '' AND LENGTH(signer_email) < 100 THEN 1 ELSE 0 END) as unencrypted_email, SUM(CASE WHEN signer_name IS NOT NULL AND signer_name != '' AND LENGTH(signer_name) < 100 THEN 1 ELSE 0 END) as unencrypted_name, SUM(CASE WHEN raw_payload IS NOT NULL AND raw_payload != '' AND LEFT(raw_payload, 1) = '{' THEN 1 ELSE 0 END) as unencrypted_payload FROM clicksign_contracts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZFt7SKQu8xeVW.035f96cf6ffd --database mdqtoTdxUgyafXfA49s4Hx --execute SELECT COUNT(*) as total, SUM(CASE WHEN signer_cpf IS NOT NULL AND signer_cpf != '' AND LENGTH(signer_cpf) < 50 THEN 1 ELSE 0 END) as unencrypted_cpf, SUM(CASE WHEN signer_email IS NOT NULL AND signer_email != '' AND LENGTH(signer_email) < 100 THEN 1 ELSE 0 END) as unencrypted_email, SUM(CASE WHEN signer_name IS NOT NULL AND signer_name != '' AND LENGTH(signer_name) < 100 THEN 1 ELSE 0 END) as unencrypted_name, SUM(CASE WHEN raw_payload IS NOT NULL AND raw_payload != '' AND LEFT(raw_payload, 1) = '{' THEN 1 ELSE 0 END) as unencrypted_payload FROM clicksign_contracts;",
+  "rows": [
+    {
+      "total": "0",
+      "unencrypted_cpf": "NULL",
+      "unencrypted_email": "NULL",
+      "unencrypted_name": "NULL",
+      "unencrypted_payload": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tunencrypted_cpf\tunencrypted_email\tunencrypted_name\tunencrypted_payload\n0\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 130
+}
