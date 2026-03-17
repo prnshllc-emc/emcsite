@@ -4,6 +4,7 @@
  * Uses HubSpot REST API v3 with a Private App Access Token.
  */
 import { ENV } from "./_core/env";
+import { secureLogger } from "./shared/security";
 
 const HUBSPOT_API_BASE = "https://api.hubapi.com";
 
@@ -221,7 +222,7 @@ export async function syncLeadToHubSpot(lead: LeadData): Promise<string | null> 
       const { email, ...updateProps } = cleanProperties;
       const success = await updateContact(existingId, updateProps);
       if (success) {
-        console.log(`[HubSpot] Updated contact ${existingId} for ${lead.email}`);
+        secureLogger.info(`[HubSpot] Updated contact ${existingId} for ${lead.email}`);
         return existingId;
       }
       return null;
@@ -230,7 +231,7 @@ export async function syncLeadToHubSpot(lead: LeadData): Promise<string | null> 
     // Create new contact
     const newId = await createContact(cleanProperties);
     if (newId) {
-      console.log(`[HubSpot] Created contact ${newId} for ${lead.email}`);
+      secureLogger.info(`[HubSpot] Created contact ${newId} for ${lead.email}`);
       return newId;
     }
 
@@ -239,13 +240,13 @@ export async function syncLeadToHubSpot(lead: LeadData): Promise<string | null> 
     if (retryId) {
       const { email, ...updateProps } = cleanProperties;
       await updateContact(retryId, updateProps);
-      console.log(`[HubSpot] Updated contact ${retryId} for ${lead.email} (after create conflict)`);
+      secureLogger.info(`[HubSpot] Updated contact ${retryId} for ${lead.email} (after create conflict)`);
       return retryId;
     }
 
     return null;
   } catch (error) {
-    console.error(`[HubSpot] Sync failed for ${lead.email}:`, error);
+    secureLogger.error(`[HubSpot] Sync failed for ${lead.email}:`, error);
     return null;
   }
 }

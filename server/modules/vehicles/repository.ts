@@ -75,7 +75,7 @@ export async function findVehicleById(id: number): Promise<VehicleRecord | null>
   const [row] = await db
     .select()
     .from(vehicles)
-    .where(eq(vehicles.id, id))
+    .where(and(eq(vehicles.id, id), isNull(vehicles.deletedAt)))
     .limit(1);
 
   if (!row) return null;
@@ -90,7 +90,7 @@ export async function findVehicleByVin(vin: string): Promise<VehicleRecord | nul
   const [row] = await db
     .select()
     .from(vehicles)
-    .where(eq(vehicles.vin, vin.toUpperCase()))
+    .where(and(eq(vehicles.vin, vin.toUpperCase()), isNull(vehicles.deletedAt)))
     .limit(1);
 
   if (!row) return null;

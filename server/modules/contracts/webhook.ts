@@ -10,8 +10,11 @@
  * This handler:
  * 1. Validates the webhook payload
  * 2. Creates/updates the contract record in our DB
- * 3. Extracts signer data (name, CPF, email) from the payload
+ * 3. Extracts signer data (name, CPF, email) from the payload — encrypted at rest
  * 4. Triggers contract processing if envelope is fully signed
+ *
+ * SECURITY: All PII fields (name, CPF, email, phone) and the raw payload
+ * are encrypted with AES-256-GCM before storage (LGPD compliance).
  */
 
 import { Router, type Request, type Response } from "express";
@@ -20,6 +23,7 @@ import { clicksignContracts } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { logAudit } from "../../shared/audit";
 import { notifyOwner } from "../../_core/notification";
+import { encryptSensitiveData, decryptSensitiveData } from "../../shared/security";
 
 // ══════════════════════════════════════════════════════════════
 // TYPES — Clicksign Webhook Payload
@@ -53,6 +57,32 @@ interface ClicksignWebhookEvent {
 }
 
 // ══════════════════════════════════════════════════════════════
+// ENCRYPTION HELPERS — Encrypt PII before storage
+// ══════════════════════════════════════════════════════════════
+
+/** Encrypt a value if non-null, return null otherwise */
+function encryptIfPresent(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    return encryptSensitiveData(value);
+  } catch {
+    console.error("[Clicksign Webhook] Encryption failed for PII field");
+    return null;
+  }
+}
+
+/** Decrypt a value if non-null, return null otherwise */
+export function decryptIfPresent(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    return decryptSensitiveData(value);
+  } catch {
+    // May be legacy unencrypted data — return as-is
+    return value;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // WEBHOOK HANDLER
 // ══════════════════════════════════════════════════════════════
 
@@ -62,7 +92,7 @@ async function handleClicksignWebhook(req: Request, res: Response) {
 
     // Basic validation
     if (!payload?.event?.name || !payload?.envelope?.id) {
-      console.warn("[Clicksign Webhook] Invalid payload received:", JSON.stringify(req.body).slice(0, 500));
+      console.warn("[Clicksign Webhook] Invalid payload received (truncated for security)");
       return res.status(400).json({ error: "Invalid webhook payload" });
     }
 
@@ -79,12 +109,21 @@ async function handleClicksignWebhook(req: Request, res: Response) {
       return res.status(500).json({ error: "Database not available" });
     }
 
-    // Extract signer data from payload
+    // Extract signer data from payload (plaintext for notifications only, not stored)
     const firstSigner = payload.signers?.[0];
-    const signerName = firstSigner?.name ?? null;
-    const signerCpf = firstSigner?.cpf ?? null;
-    const signerEmail = firstSigner?.email ?? null;
-    const signerPhone = firstSigner?.phone ?? null;
+    const signerNamePlain = firstSigner?.name ?? null;
+    const signerCpfPlain = firstSigner?.cpf ?? null;
+    const signerEmailPlain = firstSigner?.email ?? null;
+    const signerPhonePlain = firstSigner?.phone ?? null;
+
+    // Encrypt PII before storage (LGPD compliance)
+    const signerName = encryptIfPresent(signerNamePlain);
+    const signerCpf = encryptIfPresent(signerCpfPlain);
+    const signerEmail = encryptIfPresent(signerEmailPlain);
+    const signerPhone = encryptIfPresent(signerPhonePlain);
+
+    // Encrypt the full raw payload (contains PII)
+    const encryptedPayload = encryptIfPresent(JSON.stringify(payload));
 
     // Check if we already have this envelope
     const [existing] = await db
@@ -106,7 +145,7 @@ async function handleClicksignWebhook(req: Request, res: Response) {
           signerCpf: signerCpf ?? existing.signerCpf,
           signerEmail: signerEmail ?? existing.signerEmail,
           signerPhone: signerPhone ?? existing.signerPhone,
-          rawPayload: JSON.stringify(payload),
+          rawPayload: encryptedPayload ?? existing.rawPayload,
           updatedAt: new Date(),
         })
         .where(eq(clicksignContracts.id, existing.id));
@@ -123,11 +162,14 @@ async function handleClicksignWebhook(req: Request, res: Response) {
         },
       });
 
-      // Notify admin for important events
+      // Notify admin for important events (use plaintext for notification only)
       if (eventName === "envelope.signed" || eventName === "envelope.closed") {
+        const maskedCpf = signerCpfPlain
+          ? signerCpfPlain.replace(/^(\d{3})\.\d{3}\.\d{3}(-\d{2})$/, "$1.***.***$2")
+          : "N/A";
         await notifyOwner({
-          title: `📝 Contrato ${eventName === "envelope.signed" ? "assinado" : "fechado"}: ${envelopeName}`,
-          content: `Envelope: ${envelopeId}\nSignatário: ${signerName ?? "N/A"}\nCPF: ${signerCpf ?? "N/A"}\nEmail: ${signerEmail ?? "N/A"}\n\nO contrato está pronto para revisão no painel admin.`,
+          title: `Contrato ${eventName === "envelope.signed" ? "assinado" : "fechado"}: ${envelopeName}`,
+          content: `Envelope: ${envelopeId}\nSignatário: ${signerNamePlain ?? "N/A"}\nCPF: ${maskedCpf}\n\nO contrato está pronto para revisão no painel admin.`,
         });
       }
     } else {
@@ -144,7 +186,7 @@ async function handleClicksignWebhook(req: Request, res: Response) {
           signerCpf,
           signerEmail,
           signerPhone,
-          rawPayload: JSON.stringify(payload),
+          rawPayload: encryptedPayload,
         })
         .$returningId();
 
@@ -160,10 +202,13 @@ async function handleClicksignWebhook(req: Request, res: Response) {
         },
       });
 
-      // Notify admin about new contract
+      // Notify admin about new contract (use plaintext for notification only, mask CPF)
+      const maskedCpf = signerCpfPlain
+        ? signerCpfPlain.replace(/^(\d{3})\.\d{3}\.\d{3}(-\d{2})$/, "$1.***.***$2")
+        : "N/A";
       await notifyOwner({
-        title: `📄 Novo contrato via Clicksign: ${envelopeName}`,
-        content: `Evento: ${eventName}\nEnvelope: ${envelopeId}\nSignatário: ${signerName ?? "N/A"}\nCPF: ${signerCpf ?? "N/A"}\nEmail: ${signerEmail ?? "N/A"}\n\nRevise no painel admin → Contratos.`,
+        title: `Novo contrato via Clicksign: ${envelopeName}`,
+        content: `Evento: ${eventName}\nEnvelope: ${envelopeId}\nSignatário: ${signerNamePlain ?? "N/A"}\nCPF: ${maskedCpf}\n\nRevise no painel admin → Contratos.`,
       });
     }
 

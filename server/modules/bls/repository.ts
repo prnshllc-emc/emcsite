@@ -125,7 +125,7 @@ export async function findBlById(id: number): Promise<BlRecord | null> {
   const [row] = await db
     .select()
     .from(billsOfLading)
-    .where(eq(billsOfLading.id, id))
+    .where(and(eq(billsOfLading.id, id), isNull(billsOfLading.deletedAt)))
     .limit(1);
 
   if (!row) return null;
@@ -140,7 +140,7 @@ export async function findBlByNumber(blNumber: string): Promise<BlRecord | null>
   const [row] = await db
     .select()
     .from(billsOfLading)
-    .where(eq(billsOfLading.blNumber, blNumber))
+    .where(and(eq(billsOfLading.blNumber, blNumber), isNull(billsOfLading.deletedAt)))
     .limit(1);
 
   if (!row) return null;

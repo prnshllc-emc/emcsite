@@ -9,6 +9,7 @@
  */
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
+import crypto from "crypto";
 import * as blService from "../bls/service";
 import * as blRepo from "../bls/repository";
 import * as customerService from "../customers/service";
@@ -17,6 +18,16 @@ import * as trackingService from "../tracking/service";
 import * as trackingRepo from "../tracking/repository";
 import { logAudit } from "../../shared/audit";
 import { notifyOwner } from "../../_core/notification";
+
+/** Timing-safe string comparison to prevent timing attacks on API keys */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    // Compare against self to maintain constant time even on length mismatch
+    crypto.timingSafeEqual(Buffer.from(a), Buffer.from(a));
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 // ── API Key Authentication Middleware ────────────────────────
 function requireAgentApiKey(req: Request, res: Response, next: NextFunction): void {
@@ -28,7 +39,7 @@ function requireAgentApiKey(req: Request, res: Response, next: NextFunction): vo
     return;
   }
 
-  if (!apiKey || apiKey !== expectedKey) {
+  if (!apiKey || !timingSafeEqual(String(apiKey), expectedKey)) {
     res.status(401).json({ error: "Invalid or missing API key." });
     return;
   }

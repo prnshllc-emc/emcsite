@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { openContact } from "@/lib/contact";
 import { trpc } from "@/lib/trpc";
+import DOMPurify from "dompurify";
 import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
 
 /* ── Icon map — maps DB icon name to Lucide component ──── */
@@ -332,7 +333,7 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
                   prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-300
                   prose-blockquote:border-l-primary prose-blockquote:bg-white/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
                   prose-img:rounded-lg prose-img:shadow-lg"
-                dangerouslySetInnerHTML={{ __html: article.content! }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content!, { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','a','ul','ol','li','strong','em','br','img','table','thead','tbody','tr','th','td','blockquote','pre','code','span','div','hr','figure','figcaption','sup','sub'], ALLOWED_ATTR: ['href','src','alt','title','class','target','rel','width','height'] }) }}
               />
             ) : (
               <div className="bg-card/50 border border-white/10 rounded-xl p-8 text-center">

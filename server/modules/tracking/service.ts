@@ -13,7 +13,7 @@ import * as blRepo from "../bls/repository";
 import * as customerRepo from "../customers/repository";
 import * as vehicleRepo from "../vehicles/repository";
 import { logAudit } from "../../shared/audit";
-import { hashCpfForSearch } from "../../shared/security";
+import { hashCpfForSearch, secureLogger } from "../../shared/security";
 import { InMemoryCache } from "../../shared/cache";
 import {
   dispatchEventNotifications,
@@ -157,7 +157,7 @@ export async function autoGenerateTrackingCode(
     approvalStatus: "pending",
   });
 
-  console.log(
+  secureLogger.info(
     `[Tracking Service] Auto-generated tracking code ${code.code} (pending) for BL ${bl.blNumber} / Customer ${customer.fullName}`
   );
 

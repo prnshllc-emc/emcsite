@@ -154,7 +154,7 @@ export async function findCustomerById(
   const [row] = await db
     .select()
     .from(customers)
-    .where(eq(customers.id, id))
+    .where(and(eq(customers.id, id), isNull(customers.deletedAt)))
     .limit(1);
 
   if (!row) return null;
@@ -173,7 +173,7 @@ export async function findCustomerByCpf(
   const [row] = await db
     .select()
     .from(customers)
-    .where(eq(customers.cpfHash, hash))
+    .where(and(eq(customers.cpfHash, hash), isNull(customers.deletedAt)))
     .limit(1);
 
   if (!row) return null;
@@ -192,7 +192,7 @@ export async function findCustomerByCnpj(
   const [row] = await db
     .select()
     .from(customers)
-    .where(eq(customers.cnpjHash!, hash))
+    .where(and(eq(customers.cnpjHash!, hash), isNull(customers.deletedAt)))
     .limit(1);
 
   if (!row) return null;

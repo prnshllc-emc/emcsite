@@ -724,3 +724,21 @@
 - [x] Add ETA future warning on status change buttons (red highlight + confirmation)
 - [x] Status change now prompts for reason (audit trail)
 - [x] Add audit log entry when admin overrides status (reason field in audit_logs)
+
+## Security & Compliance Audit (March 2026)
+- [x] V-001: Timing-safe API key comparison (Agent + CMS) — crypto.timingSafeEqual
+- [x] V-002: Remove hardcoded WhatsApp webhook verify token fallback
+- [x] V-003: Encrypt PII in Clicksign contracts (signerCpf, signerEmail, signerPhone, signerName)
+- [x] V-004: Encrypt rawPayload in Clicksign contracts
+- [x] V-005: Replace console.log with secureLogger for HubSpot email logging
+- [x] V-006: Replace console.log with secureLogger for tracking customer name logging
+- [x] V-007: Add DOMPurify XSS sanitization for CMS HTML content in KnowledgeCenter
+- [x] V-008: Add soft-delete (deletedAt IS NULL) filter to findBlById, findBlByNumber, findCustomerById, findCustomerByCpf, findCustomerByCnpj, findVehicleById, findVehicleByVin
+- [x] Write 18 security audit tests (server/security-audit.test.ts)
+- [x] All 423 tests passing (19 test files, 0 failures)
+- [x] Comprehensive audit report (SECURITY_AUDIT_REPORT.md)
+- [ ] Recommendation: Apply rate limiters to public tracking endpoints
+- [ ] Recommendation: Implement HMAC signature validation for Clicksign/WhatsApp webhooks
+- [ ] Recommendation: Install Helmet for security headers
+- [ ] Recommendation: Update axios to >=1.13.5
+- [ ] Recommendation: Migrate legacy Clicksign PII data to encrypted format

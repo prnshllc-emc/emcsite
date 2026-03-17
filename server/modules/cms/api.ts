@@ -23,6 +23,15 @@ import { ENV } from "../../_core/env";
 import multer from "multer";
 import crypto from "crypto";
 
+/** Timing-safe string comparison to prevent timing attacks on API keys */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    crypto.timingSafeEqual(Buffer.from(a), Buffer.from(a));
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
 // ── Helper: get db or throw ─────────────────────────────────
 async function requireDb() {
   const db = await getDb();
@@ -42,7 +51,7 @@ function requireCmsApiKey(req: Request, res: Response, next: NextFunction): void
     return;
   }
 
-  if (!apiKey || apiKey !== expectedKey) {
+  if (!apiKey || !timingSafeEqual(String(apiKey), expectedKey)) {
     res.status(401).json({ error: "Invalid or missing CMS API key." });
     return;
   }

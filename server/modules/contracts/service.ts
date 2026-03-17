@@ -26,7 +26,8 @@ import {
   findVehicleByVin,
   createVehicle,
 } from "../vehicles/repository";
-import { isValidCpf, isValidCnpj, isValidVin } from "../../shared/security";
+import { isValidCpf, isValidCnpj, isValidVin, encryptSensitiveData } from "../../shared/security";
+import { decryptIfPresent } from "./webhook";
 import crypto from "crypto";
 
 // ══════════════════════════════════════════════════════════════
@@ -353,20 +354,20 @@ export async function createContractRecord(
     .values({
       envelopeId,
       documentKey: pdfKey,
-      signerName: extracted.name,
-      signerCpf: extracted.cpf,
-      signerEmail: extracted.email,
-      signerPhone: extracted.phone,
+      signerName: extracted.name ? encryptSensitiveData(extracted.name) : null,
+      signerCpf: extracted.cpf ? encryptSensitiveData(extracted.cpf) : null,
+      signerEmail: extracted.email ? encryptSensitiveData(extracted.email) : null,
+      signerPhone: extracted.phone ? encryptSensitiveData(extracted.phone) : null,
       extractedVins: JSON.stringify(extracted.vins),
       status: "pending",
       envelopeStatus: "manual_upload",
       envelopeName: `Upload manual — ${extracted.name ?? "Sem nome"}`,
-      rawPayload: JSON.stringify({
+      rawPayload: encryptSensitiveData(JSON.stringify({
         pdfUrl,
         pdfKey,
         extracted,
         uploadedAt: new Date().toISOString(),
-      }),
+      })),
     })
     .$returningId();
 
@@ -546,16 +547,17 @@ export async function listPendingContracts(): Promise<
   return rows.map((r) => {
     let pdfUrl: string | null = null;
     try {
-      const payload = r.rawPayload ? JSON.parse(r.rawPayload) : null;
+      const decryptedPayload = decryptIfPresent(r.rawPayload);
+      const payload = decryptedPayload ? JSON.parse(decryptedPayload) : null;
       pdfUrl = payload?.pdfUrl ?? null;
     } catch {}
 
     return {
       id: r.id,
       envelopeId: r.envelopeId,
-      signerName: r.signerName,
-      signerCpf: r.signerCpf,
-      signerEmail: r.signerEmail,
+      signerName: decryptIfPresent(r.signerName),
+      signerCpf: decryptIfPresent(r.signerCpf),
+      signerEmail: decryptIfPresent(r.signerEmail),
       extractedVins: r.extractedVins ? JSON.parse(r.extractedVins) : [],
       status: r.status,
       envelopeName: r.envelopeName,
@@ -593,8 +595,8 @@ export async function listAllContracts(): Promise<
   return rows.map((r) => ({
     id: r.id,
     envelopeId: r.envelopeId,
-    signerName: r.signerName,
-    signerCpf: r.signerCpf,
+    signerName: decryptIfPresent(r.signerName),
+    signerCpf: decryptIfPresent(r.signerCpf),
     status: r.status,
     customerId: r.customerId,
     extractedVins: r.extractedVins ? JSON.parse(r.extractedVins) : [],

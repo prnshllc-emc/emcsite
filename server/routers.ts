@@ -15,6 +15,7 @@ import {
   markSubscribersAsSynced,
 } from "./db";
 import { syncLeadToHubSpot } from "./hubspotSync";
+import { secureLogger } from "./shared/security";
 
 // ── Domain module routers ───────────────────────────────────
 import { customersRouter } from "./modules/customers/router";
@@ -173,13 +174,13 @@ export const appRouter = router({
                   })
                   .where(eq(newsletterSubscribers.email, input.email));
               }
-              console.log(`[HubSpot] Lead ${input.email} synced successfully (ID: ${hubspotContactId})`);
+              secureLogger.info(`[HubSpot] Lead ${input.email} synced successfully (ID: ${hubspotContactId})`);
             } else {
-              console.warn(`[HubSpot] Lead ${input.email} sync returned no ID \u2014 will retry in nightly job`);
+              secureLogger.warn(`[HubSpot] Lead ${input.email} sync returned no ID — will retry in nightly job`);
             }
           })
           .catch((err) => {
-            console.error(`[HubSpot] Real-time sync failed for ${input.email}:`, err);
+            secureLogger.error(`[HubSpot] Real-time sync failed for ${input.email}:`, err);
             // Will be retried by the nightly 23:50 job
           });
 

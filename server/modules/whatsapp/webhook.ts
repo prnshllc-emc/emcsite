@@ -28,7 +28,13 @@ whatsappWebhookRouter.get("/", (req: Request, res: Response) => {
   const token = req.query["hub.verify_token"] as string | undefined;
   const challenge = req.query["hub.challenge"] as string | undefined;
 
-  const verifyToken = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN ?? "emc_whatsapp_verify_2024";
+  const verifyToken = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
+
+  if (!verifyToken) {
+    console.error("[WhatsApp Webhook] WHATSAPP_WEBHOOK_VERIFY_TOKEN not configured");
+    res.status(503).send("Webhook verify token not configured");
+    return;
+  }
 
   if (mode === "subscribe" && token === verifyToken) {
     console.log("[WhatsApp Webhook] Verification successful");
