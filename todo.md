@@ -756,3 +756,8 @@
 
 ## Scheduler Adjustment (March 2026)
 - [x] Change reconciliation scheduler from every 6h to daily at 00:01 BRT (UTC-3)
+
+## UTM Links Update (March 2026)
+- [x] Update Hero "SIMULE SEUS CUSTOS" button with UTM link
+- [x] Update "VC que Manda" section "SIMULAR CUSTOS DE IMPORTAÇÃO" button with UTM link
+- [x] Update Footer "Calculadora de Importação" link with UTM link

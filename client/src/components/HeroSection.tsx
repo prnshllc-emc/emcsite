@@ -20,7 +20,7 @@ export default function HeroSection() {
   function handleCalculator() {
     trackCTAClick("Simule seus Custos", "hero", "calculadora", "Simule seus Custos");
     trackCalculatorInteraction("abrir_calculadora", { origin: "hero" });
-    window.open(`${calculatorUrl}?utm_source=site&utm_medium=hero`, "_blank");
+    window.open("https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=hero-simule-custos", "_blank");
   }
 
   function handleServiceClick(label: string, anchor: string) {

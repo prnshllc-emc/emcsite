@@ -17,7 +17,7 @@ const QUICK_LINKS = [
   { label: "Depoimentos", href: "#testimonials" },
   { label: "Escritórios", href: "#offices" },
   { label: "FAQ", href: "#faq" },
-  { label: "Calculadora de Importação", href: "https://calculadora.enviandomeucarro.com", external: true },
+  { label: "Calculadora de Importação", href: "https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=footer-nav", external: true },
   { label: "Centro de Conhecimento", href: "/centro-de-conhecimento" },
 ];
 

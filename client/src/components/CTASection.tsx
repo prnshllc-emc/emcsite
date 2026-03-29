@@ -23,7 +23,7 @@ export default function CTASection({ title, description, buttonText, variant }: 
     if (isCalculator) {
       trackCTAClick(buttonText, `cta_section_${variant}`, "calculadora", buttonText);
       trackCalculatorInteraction("abrir_calculadora", { origin: "cta_section" });
-      window.open(`${calculatorUrl}?utm_source=site&utm_medium=cta_section`, "_blank");
+      window.open("https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=secao-vc-que-manda", "_blank");
     } else {
       const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
       trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
