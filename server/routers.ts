@@ -13,6 +13,12 @@ import {
   removeSubscriber,
   toggleSubscriberActive,
   markSubscribersAsSynced,
+  upsertMarketingLead,
+  logMarketingInteraction,
+  getAllMarketingLeads,
+  updateMarketingLeadStatus,
+  getInteractionsByLead,
+  markMarketingLeadSynced,
 } from "./db";
 import { syncLeadToHubSpot } from "./hubspotSync";
 import { secureLogger } from "./shared/security";
@@ -154,14 +160,39 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        // 1. Save to database
+        // 1. Save to legacy newsletter table (backward compatibility)
         await addSubscriber(input);
 
-        // 2. Sync to HubSpot in real-time (fire-and-forget, don't block the user)
+        // 2. Save to marketing_leads (new segregated marketing domain)
+        const lead = await upsertMarketingLead({
+          email: input.email,
+          name: input.name,
+          source: "newsletter",
+          utmSource: input.utmSource,
+          utmMedium: input.utmMedium,
+          utmCampaign: input.utmCampaign,
+          utmContent: input.utmContent,
+          utmTerm: input.utmTerm,
+          referrer: input.referrer,
+          landingPage: input.landingPage,
+        });
+
+        // 3. Log the interaction
+        await logMarketingInteraction({
+          leadId: lead?.id,
+          interactionType: "newsletter_signup",
+          utmSource: input.utmSource,
+          utmMedium: input.utmMedium,
+          utmCampaign: input.utmCampaign,
+          utmContent: input.utmContent,
+          pageUrl: input.landingPage,
+        });
+
+        // 4. Sync to HubSpot in real-time (fire-and-forget, don't block the user)
         syncLeadToHubSpot(input)
           .then(async (hubspotContactId) => {
             if (hubspotContactId) {
-              // Mark as synced in DB
+              // Mark as synced in both tables
               const { getDb } = await import("./db");
               const db = await getDb();
               if (db) {
@@ -173,6 +204,10 @@ export const appRouter = router({
                     hubspotContactId: hubspotContactId,
                   })
                   .where(eq(newsletterSubscribers.email, input.email));
+              }
+              // Also mark marketing lead as synced
+              if (lead?.id) {
+                await markMarketingLeadSynced(lead.id, hubspotContactId);
               }
               secureLogger.info(`[HubSpot] Lead ${input.email} synced successfully (ID: ${hubspotContactId})`);
             } else {
@@ -198,6 +233,86 @@ export const appRouter = router({
       }
       return map;
     }),
+  }),
+
+  // ===== Marketing Domain (segregated from operational) =====
+  marketing: router({
+    // Admin: list all marketing leads
+    leads: adminProcedure.query(async () => {
+      return getAllMarketingLeads();
+    }),
+
+    // Admin: update lead status
+    updateLeadStatus: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["new", "engaged", "qualified", "converted", "unsubscribed"]),
+      }))
+      .mutation(async ({ input }) => {
+        await updateMarketingLeadStatus(input.id, input.status);
+        return { success: true };
+      }),
+
+    // Admin: get interactions for a specific lead
+    interactions: adminProcedure
+      .input(z.object({ leadId: z.number() }))
+      .query(async ({ input }) => {
+        return getInteractionsByLead(input.leadId);
+      }),
+
+    // Public: log an anonymous interaction (CTA clicks, page views)
+    logInteraction: publicProcedure
+      .input(z.object({
+        interactionType: z.enum([
+          "calculator_open", "calculator_submit", "whatsapp_click",
+          "cta_click", "page_view", "tracking_lookup", "knowledge_view",
+        ]),
+        email: z.string().email().optional(),
+        utmSource: z.string().optional(),
+        utmMedium: z.string().optional(),
+        utmCampaign: z.string().optional(),
+        utmContent: z.string().optional(),
+        pageUrl: z.string().optional(),
+        servicePage: z.string().optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+        sessionFingerprint: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        let leadId: number | undefined;
+
+        // If email provided, find or create the lead
+        if (input.email) {
+          const lead = await upsertMarketingLead({
+            email: input.email,
+            source: "other",
+            utmSource: input.utmSource,
+            utmMedium: input.utmMedium,
+            utmCampaign: input.utmCampaign,
+            utmContent: input.utmContent,
+          });
+          leadId = lead?.id;
+
+          // Auto-upgrade status to "engaged" if they interact again
+          if (lead && lead.status === "new") {
+            await updateMarketingLeadStatus(lead.id, "engaged");
+          }
+        }
+
+        await logMarketingInteraction({
+          leadId,
+          interactionType: input.interactionType,
+          utmSource: input.utmSource,
+          utmMedium: input.utmMedium,
+          utmCampaign: input.utmCampaign,
+          utmContent: input.utmContent,
+          pageUrl: input.pageUrl,
+          servicePage: input.servicePage,
+          metadata: input.metadata,
+          sessionFingerprint: input.sessionFingerprint,
+        });
+
+        return { success: true };
+      }),
   }),
 });
 

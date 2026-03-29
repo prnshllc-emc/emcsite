@@ -775,3 +775,10 @@
 - [x] Add UTM campaign info to WhatsApp message on all 6 service pages via ServicePageLayout
 - [x] Add UTM campaign info to Hero WhatsApp button (hero-fale-especialista)
 - [x] Add UTM campaign info to CTA section WhatsApp button (cta-fale-especialista)
+
+## Marketing Data Segregation (March 2026)
+- [x] Audit existing newsletter/subscriber tables and lead capture flow
+- [x] Design marketing domain tables (marketing_leads, marketing_interactions)
+- [x] Migrate existing newsletter subscribers to marketing tables if needed (table was empty, no migration needed)
+- [x] Update lead capture endpoints (newsletter, UTM-tracked CTAs) to use marketing tables
+- [x] Write tests for marketing data layer (31 tests in marketing.test.ts)

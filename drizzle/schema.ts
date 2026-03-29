@@ -732,3 +732,100 @@ export const whatsappMessages = mysqlTable(
 
 export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
 export type InsertWhatsappMessage = typeof whatsappMessages.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────
+// MARKETING DOMAIN — Segregated from operational data
+// Captures leads from site CTAs, newsletter, calculadora, WhatsApp
+// ─────────────────────────────────────────────────────────────
+
+// marketing_leads: Central lead repository for all site-generated contacts
+export const marketingLeads = mysqlTable("marketing_leads", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  name: varchar("name", { length: 256 }),
+  phone: varchar("phone", { length: 32 }),
+  // Lead source: which entry point generated this lead
+  source: mysqlEnum("source", [
+    "newsletter",       // Footer newsletter signup
+    "calculadora",      // Calculator form submission
+    "whatsapp_cta",     // WhatsApp button click (tracked via message)
+    "contact_form",     // Future: contact form
+    "landing_page",     // Future: dedicated landing pages
+    "other",
+  ]).notNull().default("newsletter"),
+  // Lead status
+  status: mysqlEnum("lead_status", [
+    "new",              // Just captured
+    "engaged",          // Interacted again (e.g. opened calculator)
+    "qualified",        // Meets criteria for sales follow-up
+    "converted",        // Became an operational customer
+    "unsubscribed",     // Opted out
+  ]).notNull().default("new"),
+  // First-touch UTM attribution
+  utmSource: varchar("utm_source", { length: 256 }),
+  utmMedium: varchar("utm_medium", { length: 256 }),
+  utmCampaign: varchar("utm_campaign", { length: 256 }),
+  utmContent: varchar("utm_content", { length: 256 }),
+  utmTerm: varchar("utm_term", { length: 256 }),
+  referrer: varchar("referrer", { length: 512 }),
+  landingPage: varchar("landing_page", { length: 512 }),
+  // Newsletter subscription
+  newsletterActive: boolean("newsletter_active").default(true).notNull(),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+  // HubSpot sync
+  hubspotSyncedAt: timestamp("hubspot_synced_at"),
+  hubspotContactId: varchar("hubspot_contact_id", { length: 64 }),
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  // Link to operational customer (when converted)
+  operationalCustomerId: int("operational_customer_id"),
+}, (table) => [
+  index("idx_mktlead_source").on(table.source),
+  index("idx_mktlead_status").on(table.status),
+  index("idx_mktlead_campaign").on(table.utmCampaign),
+  index("idx_mktlead_created").on(table.createdAt),
+]);
+
+export type MarketingLead = typeof marketingLeads.$inferSelect;
+export type InsertMarketingLead = typeof marketingLeads.$inferInsert;
+
+// marketing_interactions: Event log for lead activity tracking
+export const marketingInteractions = mysqlTable("marketing_interactions", {
+  id: int("id").autoincrement().primaryKey(),
+  leadId: int("lead_id"),  // nullable: some interactions happen before lead is identified
+  // Interaction type
+  interactionType: mysqlEnum("interaction_type", [
+    "newsletter_signup",    // Subscribed to newsletter
+    "calculator_open",      // Opened the calculator
+    "calculator_submit",    // Submitted a calculation
+    "whatsapp_click",       // Clicked WhatsApp CTA
+    "cta_click",            // Clicked any other CTA
+    "page_view",            // Visited a service page
+    "tracking_lookup",      // Used public tracking lookup
+    "knowledge_view",       // Viewed a knowledge center article
+  ]).notNull(),
+  // Session UTM (may differ from first-touch on lead)
+  utmSource: varchar("utm_source", { length: 256 }),
+  utmMedium: varchar("utm_medium", { length: 256 }),
+  utmCampaign: varchar("utm_campaign", { length: 256 }),
+  utmContent: varchar("utm_content", { length: 256 }),
+  // Context
+  pageUrl: varchar("page_url", { length: 512 }),
+  servicePage: varchar("service_page", { length: 128 }),  // e.g. "importacao-de-veiculos"
+  // Additional metadata (JSON)
+  metadata: json("metadata"),  // e.g. { buttonText: "Simule seus Custos", calculatorResult: {...} }
+  // IP-based fingerprint for anonymous tracking (hashed)
+  sessionFingerprint: varchar("session_fingerprint", { length: 64 }),
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_mktint_lead").on(table.leadId),
+  index("idx_mktint_type").on(table.interactionType),
+  index("idx_mktint_campaign").on(table.utmCampaign),
+  index("idx_mktint_created").on(table.createdAt),
+  index("idx_mktint_session").on(table.sessionFingerprint),
+]);
+
+export type MarketingInteraction = typeof marketingInteractions.$inferSelect;
+export type InsertMarketingInteraction = typeof marketingInteractions.$inferInsert;

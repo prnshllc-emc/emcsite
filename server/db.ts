@@ -1,6 +1,6 @@
 import { eq, isNull, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, siteSettings, newsletterSubscribers, type InsertSiteSetting, type InsertNewsletterSubscriber } from "../drizzle/schema";
+import { InsertUser, users, siteSettings, newsletterSubscribers, marketingLeads, marketingInteractions, type InsertSiteSetting, type InsertNewsletterSubscriber, type InsertMarketingLead, type InsertMarketingInteraction } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -206,4 +206,136 @@ export async function markSubscribersAsSynced(ids: number[], hubspotContactIds: 
       })
       .where(eq(newsletterSubscribers.id, id));
   }
+}
+
+// ===== Marketing Leads =====
+
+export async function upsertMarketingLead(data: {
+  email: string;
+  name?: string;
+  phone?: string;
+  source: "newsletter" | "calculadora" | "whatsapp_cta" | "contact_form" | "landing_page" | "other";
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
+  referrer?: string;
+  landingPage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(marketingLeads).values({
+    email: data.email,
+    name: data.name ?? null,
+    phone: data.phone ?? null,
+    source: data.source,
+    utmSource: data.utmSource ?? null,
+    utmMedium: data.utmMedium ?? null,
+    utmCampaign: data.utmCampaign ?? null,
+    utmContent: data.utmContent ?? null,
+    utmTerm: data.utmTerm ?? null,
+    referrer: data.referrer ?? null,
+    landingPage: data.landingPage ?? null,
+  }).onDuplicateKeyUpdate({
+    set: {
+      // Always touch updatedAt so the upsert has at least one value to set
+      updatedAt: new Date(),
+      ...(data.name ? { name: data.name } : {}),
+      ...(data.phone ? { phone: data.phone } : {}),
+      // Don't overwrite first-touch UTM — keep original attribution
+    },
+  });
+  // Return the lead
+  const result = await db.select().from(marketingLeads)
+    .where(eq(marketingLeads.email, data.email)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function getMarketingLeadByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(marketingLeads)
+    .where(eq(marketingLeads.email, email)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function getAllMarketingLeads() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(marketingLeads).orderBy(marketingLeads.createdAt);
+}
+
+export async function updateMarketingLeadStatus(id: number, status: "new" | "engaged" | "qualified" | "converted" | "unsubscribed") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const updateData: Record<string, unknown> = { status };
+  if (status === "unsubscribed") {
+    updateData.newsletterActive = false;
+    updateData.unsubscribedAt = new Date();
+  }
+  await db.update(marketingLeads).set(updateData).where(eq(marketingLeads.id, id));
+}
+
+export async function linkLeadToCustomer(leadId: number, customerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(marketingLeads).set({
+    status: "converted",
+    operationalCustomerId: customerId,
+  }).where(eq(marketingLeads.id, leadId));
+}
+
+export async function getUnsyncedMarketingLeads() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(marketingLeads)
+    .where(isNull(marketingLeads.hubspotSyncedAt));
+}
+
+export async function markMarketingLeadSynced(id: number, hubspotContactId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(marketingLeads).set({
+    hubspotSyncedAt: new Date(),
+    hubspotContactId: hubspotContactId,
+  }).where(eq(marketingLeads.id, id));
+}
+
+// ===== Marketing Interactions =====
+
+export async function logMarketingInteraction(data: {
+  leadId?: number;
+  interactionType: "newsletter_signup" | "calculator_open" | "calculator_submit" | "whatsapp_click" | "cta_click" | "page_view" | "tracking_lookup" | "knowledge_view";
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  pageUrl?: string;
+  servicePage?: string;
+  metadata?: Record<string, unknown>;
+  sessionFingerprint?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(marketingInteractions).values({
+    leadId: data.leadId ?? null,
+    interactionType: data.interactionType,
+    utmSource: data.utmSource ?? null,
+    utmMedium: data.utmMedium ?? null,
+    utmCampaign: data.utmCampaign ?? null,
+    utmContent: data.utmContent ?? null,
+    pageUrl: data.pageUrl ?? null,
+    servicePage: data.servicePage ?? null,
+    metadata: data.metadata ?? null,
+    sessionFingerprint: data.sessionFingerprint ?? null,
+  });
+}
+
+export async function getInteractionsByLead(leadId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(marketingInteractions)
+    .where(eq(marketingInteractions.leadId, leadId))
+    .orderBy(marketingInteractions.createdAt);
 }

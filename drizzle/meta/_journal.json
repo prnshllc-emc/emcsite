@@ -50,6 +50,13 @@
       "when": 1773596614279,
       "tag": "0006_supreme_skrulls",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1774750444678,
+      "tag": "0007_wise_colossus",
+      "breakpoints": true
     }
   ]
 }
