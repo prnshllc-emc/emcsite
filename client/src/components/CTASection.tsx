@@ -25,7 +25,7 @@ export default function CTASection({ title, description, buttonText, variant }: 
       trackCalculatorInteraction("abrir_calculadora", { origin: "cta_section" });
       window.open("https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=secao-vc-que-manda", "_blank");
     } else {
-      const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}`;
+      const msg = `Olá! Vi o site e gostaria de saber mais. ${buttonText}\n\n[Origem: site_emc | Campanha: cta-fale-especialista]`;
       trackCTAClick(buttonText, `cta_section_${variant}`, "whatsapp", buttonText);
       trackWhatsAppClick(`cta_section_${variant}`, msg);
       openContactWithNumber(whatsappNumber, msg, "site", "whatsapp", `cta_section_${variant}`);

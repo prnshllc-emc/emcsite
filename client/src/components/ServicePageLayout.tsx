@@ -92,7 +92,8 @@ export default function ServicePageLayout({ data }: { data: ServicePageData }) {
   }, [data.seoTitle, data.metaDescription]);
 
   function handleWhatsApp() {
-    const msg = `Olá! Gostaria de saber mais sobre ${data.h1}.`;
+    const utmCampaign = data.calculatorUtmCampaign || `servico-${data.slug}`;
+    const msg = `Olá! Gostaria de saber mais sobre ${data.h1}.\n\n[Origem: site_emc | Serviço: ${utmCampaign}]`;
     trackCTAClick("WhatsApp CTA", `service_${data.slug}`, "whatsapp", data.h1);
     trackWhatsAppClick(`service_page_${data.slug}`, msg);
     const digits = whatsappNumber.replace(/\D/g, "");

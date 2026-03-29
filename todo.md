@@ -770,3 +770,8 @@
 - [x] Update Transporte Internacional page with UTM campaign servico-transporte-internacional
 - [x] Update Importação de Clássicos page with UTM campaign servico-importacao-classicos
 - [x] Update Admissão Temporária page with UTM campaign servico-admissao-temporaria
+
+## UTM Links — WhatsApp Service Pages (March 2026)
+- [x] Add UTM campaign info to WhatsApp message on all 6 service pages via ServicePageLayout
+- [x] Add UTM campaign info to Hero WhatsApp button (hero-fale-especialista)
+- [x] Add UTM campaign info to CTA section WhatsApp button (cta-fale-especialista)
