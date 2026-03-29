@@ -4,6 +4,7 @@ import { Car } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "importacao-de-carros-classicos",
+  calculatorUtmCampaign: "servico-importacao-classicos",
   seoTitle: "Importação de Carros Clássicos para o Brasil | Assessoria Completa | EMC",
   metaDescription: "Importe seu carro clássico para o Brasil com a assessoria completa da EMC. Cuidamos de toda a documentação, laudo ACB, frete e desembaraço.",
   h1: "Importação de Carros Clássicos para o Brasil",

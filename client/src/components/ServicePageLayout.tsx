@@ -69,6 +69,8 @@ export interface ServicePageData {
   ctaTitle: string;
   ctaDescription: string;
   relatedServices?: { label: string; href: string }[];
+  /** UTM campaign identifier for this service page's calculator links */
+  calculatorUtmCampaign?: string;
 }
 
 export default function ServicePageLayout({ data }: { data: ServicePageData }) {
@@ -100,7 +102,8 @@ export default function ServicePageLayout({ data }: { data: ServicePageData }) {
   function handleCalculator() {
     trackCTAClick("Calculadora CTA", `service_${data.slug}`, "calculadora", data.h1);
     trackCalculatorInteraction("abrir_calculadora", { origin: `service_${data.slug}` });
-    window.open(`${calculatorUrl}?utm_source=site&utm_medium=service_page&utm_content=${data.slug}`, "_blank");
+    const utmCampaign = data.calculatorUtmCampaign || `servico-${data.slug}`;
+    window.open(`https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=${utmCampaign}`, "_blank");
   }
 
   // FAQ Schema markup for SEO

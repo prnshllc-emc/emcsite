@@ -4,6 +4,7 @@ import { Globe } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "exportacao-de-veiculos",
+  calculatorUtmCampaign: "servico-exportacao-veiculos",
   seoTitle: "Exportação de Veículos do Brasil | EMC - Leve seu carro para o mundo",
   metaDescription: "Serviço completo de exportação de veículos do Brasil para qualquer lugar do mundo. Cuidamos de todo o processo, do transporte à entrega final. Consulte-nos!",
   h1: "Exportação de Veículos: Seu Carro em Qualquer Lugar do Mundo",

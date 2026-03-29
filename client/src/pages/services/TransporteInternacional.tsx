@@ -4,6 +4,7 @@ import { Truck } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "transporte-internacional-de-veiculos",
+  calculatorUtmCampaign: "servico-transporte-internacional",
   seoTitle: "Transporte Internacional de Veículos | Frete RoRo e Container | EMC",
   metaDescription: "Transporte internacional de veículos com segurança e eficiência. Frete marítimo (RoRo/Container) e aéreo com seguro All Risks. Cotação online!",
   h1: "Transporte Internacional de Veículos: Marítimo e Aéreo",

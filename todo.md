@@ -761,3 +761,12 @@
 - [x] Update Hero "SIMULE SEUS CUSTOS" button with UTM link
 - [x] Update "VC que Manda" section "SIMULAR CUSTOS DE IMPORTAÇÃO" button with UTM link
 - [x] Update Footer "Calculadora de Importação" link with UTM link
+
+## UTM Links — Service Pages (March 2026)
+- [x] Add calculatorUtmCampaign prop to ServicePageLayout
+- [x] Update Importação de Veículos page with UTM campaign servico-importacao-veiculos
+- [x] Update Exportação de Veículos page with UTM campaign servico-exportacao-veiculos
+- [x] Update Despacho Aduaneiro page with UTM campaign servico-despacho-aduaneiro
+- [x] Update Transporte Internacional page with UTM campaign servico-transporte-internacional
+- [x] Update Importação de Clássicos page with UTM campaign servico-importacao-classicos
+- [x] Update Admissão Temporária page with UTM campaign servico-admissao-temporaria

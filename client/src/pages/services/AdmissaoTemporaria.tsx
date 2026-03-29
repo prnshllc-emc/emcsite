@@ -4,6 +4,7 @@ import { Clock } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "admissao-temporaria",
+  calculatorUtmCampaign: "servico-admissao-temporaria",
   seoTitle: "Admissão Temporária de Veículos | Eventos, Corridas e Exposições | EMC",
   metaDescription: "Entenda como funciona a admissão temporária de veículos para eventos, corridas ou exposições no Brasil. Processo, custos e documentos com a EMC.",
   h1: "Admissão Temporária de Veículos: Guia Completo",

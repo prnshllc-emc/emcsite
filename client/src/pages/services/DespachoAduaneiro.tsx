@@ -4,6 +4,7 @@ import { FileCheck } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "despacho-aduaneiro",
+  calculatorUtmCampaign: "servico-despacho-aduaneiro",
   seoTitle: "Despacho Aduaneiro de Veículos | Desembaraço Completo | EMC",
   metaDescription: "Desembaraço aduaneiro completo para veículos importados. Cuidamos de DI, licenças, tributos (II, IPI, ICMS) e toda a documentação. Fale com a EMC.",
   h1: "Despacho Aduaneiro: O Guia Completo para o Desembaraço do seu Veículo no Brasil",

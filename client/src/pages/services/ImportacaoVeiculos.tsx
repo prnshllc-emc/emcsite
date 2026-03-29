@@ -4,6 +4,7 @@ import { Ship } from "lucide-react";
 
 const data: ServicePageData = {
   slug: "importacao-de-veiculos",
+  calculatorUtmCampaign: "servico-importacao-veiculos",
   seoTitle: "Importação de Veículos para o Brasil | Serviço Completo | EMC",
   metaDescription: "Importe carros clássicos, 0km, motos e mais para o Brasil com a assessoria completa da EMC. Cuidamos de tudo, do leilão à entrega porta a porta.",
   h1: "Importação de Veículos para o Brasil: Serviço Completo e Seguro",
