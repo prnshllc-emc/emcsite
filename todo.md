@@ -798,3 +798,10 @@
 - [x] Update SEO meta tags (preserved from original site, structured data intact)
 - [ ] Export to GitHub for Railway deployment (manual step)
 - [x] Test all pages and API integrations (Home, Knowledge Center, Service pages, build verified)
+
+## Manus Deployment Fix (April 2026)
+- [x] Create lightweight Express server to serve SPA static files (Manus expects node dist/index.js)
+- [x] Update package.json build script to bundle server entry point
+- [x] Add express dependency
+- [x] Test build and verify server serves SPA correctly (200 on /, /health, /importacao-de-veiculos, /assets/)
+- [ ] Save checkpoint and redeploy (pending)
