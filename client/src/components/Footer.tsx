@@ -6,7 +6,7 @@ import { LOGO_URL, CLUB_AACA_URL, CLUB_ACB_URL, openContactWithNumber } from "@/
 import { useState } from "react";
 import { toast } from "sonner";
 import { trackCTAClick, trackNavClick, trackWhatsAppClick, trackNewsletterSubscribe } from "@/lib/analytics";
-import { trpc } from "@/lib/trpc";
+import { subscribeNewsletter } from "@/lib/grandOsApi";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Link } from "wouter";
 
@@ -57,22 +57,7 @@ export default function Footer() {
     { flag: "🇧🇷", name: "Itajaí, SC (Base Op.)", addr: addressItajai },
   ];
 
-  const subscribeMutation = trpc.newsletter.subscribe.useMutation({
-    onSuccess: () => {
-      trackCTAClick("Newsletter", "footer_newsletter", "form_submit", "Inscrever-se");
-      trackNewsletterSubscribe(email);
-      toast.success("Obrigado! Você receberá nossas novidades em breve.");
-      setEmail("");
-    },
-    onError: (err) => {
-      if (err.message.includes("Duplicate")) {
-        toast.info("Este e-mail já está cadastrado na nossa newsletter!");
-      } else {
-        toast.error("Erro ao inscrever. Tente novamente.");
-      }
-      setEmail("");
-    },
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function getUtmParams() {
     const params = new URLSearchParams(window.location.search);
@@ -87,11 +72,28 @@ export default function Footer() {
     };
   }
 
-  function handleNewsletter(e: React.FormEvent) {
+  async function handleNewsletter(e: React.FormEvent) {
     e.preventDefault();
-    if (email) {
-      const tracking = getUtmParams();
-      subscribeMutation.mutate({ email, ...tracking });
+    if (!email || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const result = await subscribeNewsletter({
+        email,
+        source: "site_footer",
+      });
+      if (result.alreadySubscribed) {
+        toast.info("Este e-mail já está cadastrado na nossa newsletter!");
+      } else {
+        trackCTAClick("Newsletter", "footer_newsletter", "form_submit", "Inscrever-se");
+        trackNewsletterSubscribe(email);
+        toast.success("Obrigado! Você receberá nossas novidades em breve.");
+      }
+      setEmail("");
+    } catch {
+      toast.error("Erro ao inscrever. Tente novamente.");
+      setEmail("");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -280,10 +282,10 @@ export default function Footer() {
               />
               <Button
                 type="submit"
-                disabled={subscribeMutation.isPending}
+                disabled={isSubmitting}
                 className="w-full bg-primary hover:bg-primary/90 font-bold tracking-wider uppercase text-xs h-10"
               >
-                {subscribeMutation.isPending ? "Enviando..." : "Inscrever-se"}
+                {isSubmitting ? "Enviando..." : "Inscrever-se"}
               </Button>
             </form>
           </div>

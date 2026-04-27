@@ -9,8 +9,6 @@ import { lazy, Suspense } from "react";
 import Home from "./pages/Home";
 import CookieConsentBanner from "./components/CookieConsent";
 
-const Admin = lazy(() => import("./pages/Admin"));
-const Tracking = lazy(() => import("./pages/Tracking"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
 
@@ -35,8 +33,6 @@ function Router() {
     <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <Switch>
         <Route path={"/"} component={Home} />
-        <Route path={"/admin"} component={Admin} />
-        <Route path={"/rastrear"} component={Tracking} />
         <Route path={"/politica-de-privacidade"} component={PrivacyPolicy} />
         <Route path={"/termos-de-uso"} component={TermsOfUse} />
         {/* Service Pages */}

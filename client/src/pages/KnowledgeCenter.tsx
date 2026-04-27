@@ -1,6 +1,5 @@
 /* KnowledgeCenter — Hub de Conteúdo em Logística Automotiva
- * Now powered by CMS database via tRPC (no more hardcoded articles).
- * Falls back to a placeholder if CMS data is not yet available.
+ * Powered by Grand OS CMS API (fetch-based, no tRPC).
  */
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -20,11 +19,18 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { openContact } from "@/lib/contact";
-import { trpc } from "@/lib/trpc";
 import DOMPurify from "dompurify";
 import { trackCTAClick, trackWhatsAppClick } from "@/lib/analytics";
+import {
+  getArticles,
+  getArticle as fetchArticle,
+  getCategories,
+  incrementArticleView,
+  type CmsArticle as GrandOsArticle,
+  type CmsCategory as GrandOsCategory,
+} from "@/lib/grandOsApi";
 
 /* ── Icon map — maps DB icon name to Lucide component ──── */
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -46,7 +52,7 @@ const DEFAULT_COLORS: Record<string, string> = {
   "text-cyan-400": "text-cyan-400",
 };
 
-/* ── Types ─────────────────────────────────────────────── */
+/* ── Types (internal, adapted from Grand OS response) ──── */
 interface CmsArticle {
   id: number;
   slug: string;
@@ -64,6 +70,7 @@ interface CmsArticle {
   createdAt: Date | string | null;
   metaTitle: string | null;
   metaDescription: string | null;
+  schemaData?: Record<string, unknown>;
 }
 
 interface CmsCategory {
@@ -78,16 +85,123 @@ interface CmsCategory {
   articleCount: number;
 }
 
+/* ── Adapter: Grand OS → internal format ────────────────── */
+function adaptArticle(a: GrandOsArticle): CmsArticle {
+  return {
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    description: a.excerpt ?? a.seoDescription ?? null,
+    content: a.content ?? null,
+    author: a.author ?? null,
+    readTime: a.readTime ? `${a.readTime} min` : null,
+    tags: a.tags ?? [],
+    featuredImage: a.coverImageUrl ?? null,
+    categoryId: a.categoryId ?? null,
+    categorySlug: null, // will be resolved from categories
+    status: "published",
+    publishedAt: a.publishedAt ?? null,
+    createdAt: a.publishedAt ?? null,
+    metaTitle: a.seoTitle ?? null,
+    metaDescription: a.seoDescription ?? null,
+    schemaData: a.schemaData ?? undefined,
+  };
+}
+
+function adaptCategory(c: GrandOsCategory): CmsCategory {
+  return {
+    id: c.id,
+    slug: c.slug,
+    label: c.name,
+    description: c.description ?? null,
+    icon: c.icon ?? null,
+    color: null, // Grand OS may not have color; use default
+    sortOrder: c.sortOrder,
+    isActive: true,
+    articleCount: 0, // will be computed client-side
+  };
+}
+
+/* ── Custom hook: fetch categories (cached) ──────────────── */
+function useCategories() {
+  const [categories, setCategories] = useState<CmsCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCategories()
+      .then((cats) => {
+        if (!cancelled) setCategories(cats.map(adaptCategory));
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  return { categories, isLoading };
+}
+
+/* ── Custom hook: fetch articles ─────────────────────────── */
+function useArticles(params?: { category?: string; search?: string; limit?: number }) {
+  const [articles, setArticles] = useState<CmsArticle[]>([]);
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const categoryStr = params?.category ?? "";
+  const searchStr = params?.search ?? "";
+  const limit = params?.limit ?? 50;
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    getArticles({
+      category: categoryStr || undefined,
+      search: searchStr || undefined,
+      limit,
+    })
+      .then((data) => {
+        if (!cancelled) {
+          setArticles(data.articles.map(adaptArticle));
+          setTotal(data.total);
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [categoryStr, searchStr, limit]);
+
+  return { articles, total, isLoading };
+}
+
+/* ── Custom hook: fetch single article ───────────────────── */
+function useSingleArticle(slug: string) {
+  const [article, setArticle] = useState<CmsArticle | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    fetchArticle(slug)
+      .then((data) => {
+        if (!cancelled) {
+          setArticle(data ? adaptArticle(data) : null);
+          if (data) incrementArticleView(data.id);
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  return { article, isLoading };
+}
+
 /* ── Category Page ────────────────────────────────────────── */
 function CategoryPage({ categorySlug }: { categorySlug: string }) {
-  const { data: categories = [], isLoading: catLoading } = trpc.cms.listCategories.useQuery();
-  const { data: articlesData, isLoading: artLoading } = trpc.cms.listArticles.useQuery({
-    categorySlug,
-    limit: 50,
-  });
+  const { categories, isLoading: catLoading } = useCategories();
+  const { articles, isLoading: artLoading } = useArticles({ category: categorySlug, limit: 50 });
 
-  const category = categories.find((c: CmsCategory) => c.slug === categorySlug);
-  const articles = articlesData?.articles ?? [];
+  const category = categories.find((c) => c.slug === categorySlug);
   const isLoading = catLoading || artLoading;
 
   if (isLoading) {
@@ -154,7 +268,7 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                {articles.map((article: CmsArticle) => (
+                {articles.map((article) => (
                   <ArticleCard key={article.slug} article={article} categories={categories} />
                 ))}
               </div>
@@ -188,7 +302,7 @@ function CategoryPage({ categorySlug }: { categorySlug: string }) {
 
 /* ── Article Card Component ───────────────────────────────── */
 function ArticleCard({ article, categories }: { article: CmsArticle; categories: CmsCategory[] }) {
-  const category = categories.find((c: CmsCategory) => c.id === article.categoryId);
+  const category = categories.find((c) => c.id === article.categoryId);
   const catSlug = article.categorySlug ?? category?.slug ?? "geral";
   const colorClass = category?.color && DEFAULT_COLORS[category.color] ? DEFAULT_COLORS[category.color] : "text-primary";
   const dateStr = article.publishedAt
@@ -233,15 +347,12 @@ function ArticleCard({ article, categories }: { article: CmsArticle; categories:
 
 /* ── Article Page ─────────────────────────────────────────── */
 function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; articleSlug: string }) {
-  const { data: article, isLoading } = trpc.cms.getArticle.useQuery({ slug: articleSlug });
-  const { data: categories = [] } = trpc.cms.listCategories.useQuery();
-  const { data: relatedData } = trpc.cms.listArticles.useQuery({
-    categorySlug,
-    limit: 4,
-  });
+  const { article, isLoading } = useSingleArticle(articleSlug);
+  const { categories } = useCategories();
+  const { articles: relatedRaw } = useArticles({ category: categorySlug, limit: 4 });
 
-  const category = categories.find((c: CmsCategory) => c.slug === categorySlug);
-  const related = (relatedData?.articles ?? []).filter((a: CmsArticle) => a.slug !== articleSlug).slice(0, 3);
+  const category = categories.find((c) => c.slug === categorySlug);
+  const related = relatedRaw.filter((a) => a.slug !== articleSlug).slice(0, 3);
 
   if (isLoading) {
     return (
@@ -364,7 +475,7 @@ function ArticlePage({ categorySlug, articleSlug }: { categorySlug: string; arti
             <div className="container max-w-4xl">
               <h2 className="text-2xl font-bold text-white mb-6 font-display">Artigos Relacionados</h2>
               <div className="grid md:grid-cols-3 gap-4">
-                {related.map((a: CmsArticle) => {
+                {related.map((a) => {
                   const relCatSlug = a.categorySlug ?? categorySlug;
                   return (
                     <Link key={a.slug} href={`/centro-de-conhecimento/${relCatSlug}/${a.slug}`}>
@@ -458,14 +569,28 @@ export default function KnowledgeCenter() {
 
 function KnowledgeCenterListing() {
   const [search, setSearch] = useState("");
-  const { data: categories = [], isLoading: catLoading } = trpc.cms.listCategories.useQuery();
-  const { data: articlesData, isLoading: artLoading } = trpc.cms.listArticles.useQuery({
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { categories, isLoading: catLoading } = useCategories();
+  const { articles, isLoading: artLoading } = useArticles({
     limit: 50,
-    search: search.trim() || undefined,
+    search: debouncedSearch || undefined,
   });
 
-  const articles = articlesData?.articles ?? [];
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const isLoading = catLoading || artLoading;
+
+  // Enrich categories with article counts
+  const enrichedCategories = useMemo(() => {
+    return categories.map((cat) => ({
+      ...cat,
+      articleCount: articles.filter((a) => a.categoryId === cat.id).length,
+    }));
+  }, [categories, articles]);
 
   // Latest articles (sorted by date)
   const latestArticles = useMemo(
@@ -521,18 +646,18 @@ function KnowledgeCenterListing() {
         )}
 
         {/* Search results */}
-        {!isLoading && search.trim() && (
+        {!isLoading && debouncedSearch && (
           <section className="py-12">
             <div className="container">
               <h2 className="text-xl font-bold text-white mb-6 font-display">
-                {articles.length} resultado{articles.length !== 1 ? "s" : ""} para &ldquo;{search}&rdquo;
+                {articles.length} resultado{articles.length !== 1 ? "s" : ""} para &ldquo;{debouncedSearch}&rdquo;
               </h2>
               {articles.length === 0 ? (
                 <p className="text-gray-400 font-body">Nenhum artigo encontrado. Tente outro termo de busca.</p>
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
-                  {articles.map((article: CmsArticle) => (
-                    <ArticleCard key={article.slug} article={article} categories={categories} />
+                  {articles.map((article) => (
+                    <ArticleCard key={article.slug} article={article} categories={enrichedCategories} />
                   ))}
                 </div>
               )}
@@ -541,13 +666,13 @@ function KnowledgeCenterListing() {
         )}
 
         {/* Categories + Latest Articles */}
-        {!isLoading && !search.trim() && (
+        {!isLoading && !debouncedSearch && (
           <>
             <section className="py-12">
               <div className="container">
                 <h2 className="text-2xl font-bold text-white mb-8 font-display">Categorias</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categories.map((cat: CmsCategory) => {
+                  {enrichedCategories.map((cat) => {
                     const IconComp = ICON_MAP[cat.icon ?? ""] ?? BookOpen;
                     const colorClass = cat.color && DEFAULT_COLORS[cat.color] ? DEFAULT_COLORS[cat.color] : "text-primary";
                     return (
@@ -579,8 +704,8 @@ function KnowledgeCenterListing() {
                 <div className="container">
                   <h2 className="text-2xl font-bold text-white mb-8 font-display">Artigos Recentes</h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {latestArticles.map((article: CmsArticle) => (
-                      <ArticleCard key={article.slug} article={article} categories={categories} />
+                    {latestArticles.map((article) => (
+                      <ArticleCard key={article.slug} article={article} categories={enrichedCategories} />
                     ))}
                   </div>
                 </div>

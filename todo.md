@@ -782,3 +782,19 @@
 - [x] Migrate existing newsletter subscribers to marketing tables if needed (table was empty, no migration needed)
 - [x] Update lead capture endpoints (newsletter, UTM-tracked CTAs) to use marketing tables
 - [x] Write tests for marketing data layer (31 tests in marketing.test.ts)
+
+## Railway Migration (April 2026)
+- [x] Audit all Manus dependencies in codebase (tRPC, OAuth, DB, S3, LLM, etc.)
+- [x] Create Grand OS API client (fetch-based, replaces tRPC)
+- [x] Refactor Knowledge Center to use Grand OS CMS API
+- [x] Refactor newsletter subscribe to use Grand OS API
+- [x] Create/refactor vehicle photos API client (Grand OS API client includes vehicle photos endpoints)
+- [x] Remove Manus OAuth, tRPC, DB, and all server-side backend modules
+- [x] Remove backend modules (tracking, contracts, customers, vehicles, BLs, reconciliation, marketing, etc.)
+- [x] Configure standalone Vite SPA build for Railway
+- [x] Create Dockerfile and nginx config for Railway deployment
+- [x] Create railway.json config
+- [x] Add sitemap.xml proxy via nginx (proxies to Grand OS)
+- [x] Update SEO meta tags (preserved from original site, structured data intact)
+- [ ] Export to GitHub for Railway deployment (manual step)
+- [x] Test all pages and API integrations (Home, Knowledge Center, Service pages, build verified)

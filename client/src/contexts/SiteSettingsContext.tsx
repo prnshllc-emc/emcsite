@@ -1,9 +1,9 @@
 import { createContext, useContext, useMemo } from "react";
-import { trpc } from "@/lib/trpc";
 
 /**
- * Default (fallback) values used when DB settings are not yet loaded.
- * These match the seeded values so the site works even before the first fetch.
+ * Site settings — hardcoded defaults.
+ * Previously fetched from DB via tRPC; now static since the site is a pure frontend.
+ * To update, edit the DEFAULTS object below and redeploy.
  */
 const DEFAULTS: Record<string, string> = {
   phone_primary: "+55 11 99244-8920",
@@ -33,23 +33,15 @@ interface SiteSettingsContextType {
 const SiteSettingsContext = createContext<SiteSettingsContextType>({
   settings: DEFAULTS,
   get: (key: string) => DEFAULTS[key] ?? "",
-  isLoading: true,
+  isLoading: false,
 });
 
 export function SiteSettingsProvider({ children }: { children: React.ReactNode }) {
-  const { data, isLoading } = trpc.publicSettings.get.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000, // cache for 5 minutes
-    refetchOnWindowFocus: false,
-  });
-
-  const value = useMemo(() => {
-    const merged = { ...DEFAULTS, ...(data ?? {}) };
-    return {
-      settings: merged,
-      get: (key: string) => merged[key] ?? "",
-      isLoading,
-    };
-  }, [data, isLoading]);
+  const value = useMemo(() => ({
+    settings: DEFAULTS,
+    get: (key: string) => DEFAULTS[key] ?? "",
+    isLoading: false,
+  }), []);
 
   return (
     <SiteSettingsContext.Provider value={value}>

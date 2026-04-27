@@ -1,7 +1,0 @@
-Screenshot observations:
-- Header shows "RASTREAR" button in top-right with a truck icon and pill-style border
-- The button looks clean and professional, matching the EMC brand
-- The "Breve" / "Coming Soon" badge has been removed
-- Button has primary color border and subtle background
-- All nav items visible: INÍCIO, SOBRE NÓS, SERVIÇOS, DEPOIMENTOS, ESCRITÓRIOS, FAQ, RASTREAR
-- No TypeScript or build errors
