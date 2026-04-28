@@ -1,6 +1,6 @@
 /* Header — SEO-optimized with semantic nav, tracking events, and accessibility */
 import { useState, useEffect } from "react";
-import { Menu, Truck, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { LOGO_URL } from "@/lib/contact";
 import { trackNavClick, trackCTAClick } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
@@ -128,18 +128,16 @@ export default function Header() {
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Navegação principal">
           {NAV_ITEMS.map((item) => renderNavItem(item))}
 
-          {/* Tracking Button — External link to tracking subdomain */}
-          <a
-            href="https://rastreamento.enviandomeucarro.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* Minha Área — Client portal */}
+          <Link
+            href="/minha-area"
             className="whitespace-nowrap ml-2 text-[12px] xl:text-[13px] font-semibold text-white uppercase tracking-wider flex items-center gap-1.5 border border-primary/40 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 hover:border-primary/60 transition-all"
-            aria-label="Rastrear veículo"
-            onClick={() => trackCTAClick("Rastrear", "header_desktop", "https://rastreamento.enviandomeucarro.com", "Rastrear")}
+            aria-label="Minha Área"
+            onClick={() => trackCTAClick("Minha Área", "header_desktop", "/minha-area", "Minha Área")}
           >
-            <Truck className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
-            <span>Rastrear</span>
-          </a>
+            <User className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+            <span>Minha Área</span>
+          </Link>
         </nav>
 
         {/* Mobile Hamburger */}
@@ -158,17 +156,18 @@ export default function Header() {
         <div className="lg:hidden bg-background/98 backdrop-blur-lg border-t border-white/10 absolute top-[4.5rem] left-0 right-0 z-40 shadow-xl shadow-black/30">
           <nav className="container py-4 flex flex-col gap-1" aria-label="Navegação mobile">
             {NAV_ITEMS.map((item) => renderNavItem(item, true))}
-            <a
-              href="https://rastreamento.enviandomeucarro.com"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/minha-area"
               className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2 border border-primary/40 px-4 py-2.5 rounded-full bg-primary/10 hover:bg-primary/20 w-fit mt-2"
-              aria-label="Rastrear veículo"
-              onClick={() => trackCTAClick("Rastrear", "header_mobile", "https://rastreamento.enviandomeucarro.com", "Rastrear")}
+              aria-label="Minha Área"
+              onClick={() => {
+                trackCTAClick("Minha Área", "header_mobile", "/minha-area", "Minha Área");
+                setMobileOpen(false);
+              }}
             >
-              <Truck className="w-4 h-4" aria-hidden="true" />
-              <span>Rastrear</span>
-            </a>
+              <User className="w-4 h-4" aria-hidden="true" />
+              <span>Minha Área</span>
+            </Link>
           </nav>
         </div>
       )}

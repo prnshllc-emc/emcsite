@@ -20,7 +20,7 @@ const DEFAULTS: Record<string, string> = {
   youtube_url: "https://www.youtube.com/@enviandomeucarro",
   tiktok_url: "",
   calculator_url: "https://calculadora.enviandomeucarro.com",
-  tracking_url: "https://rastreamento.enviandomeucarro.com",
+  tracking_url: "/minha-area",
   google_reviews_url: "https://g.page/r/CfOy3RBqPbMVEBM/review",
 };
 

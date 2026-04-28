@@ -21,6 +21,10 @@ const ImportacaoClassicos = lazy(() => import("./pages/services/ImportacaoClassi
 const AdmissaoTemporaria = lazy(() => import("./pages/services/AdmissaoTemporaria"));
 const KnowledgeCenter = lazy(() => import("./pages/KnowledgeCenter"));
 
+/* Client Portal */
+const MinhaArea = lazy(() => import("./pages/MinhaArea"));
+const VehiclePhotos = lazy(() => import("./pages/VehiclePhotos"));
+
 /* Route & Cost Pages — high-intent SEO */
 const BrasilEUA = lazy(() => import("./pages/routes/BrasilEUA"));
 const BrasilEuropa = lazy(() => import("./pages/routes/BrasilEuropa"));
@@ -53,6 +57,9 @@ function Router() {
         <Route path={"/centro-de-conhecimento/:category/:article"} component={KnowledgeCenter} />
         <Route path={"/centro-de-conhecimento/:category"} component={KnowledgeCenter} />
         <Route path={"/centro-de-conhecimento"} component={KnowledgeCenter} />
+        {/* Client Portal */}
+        <Route path={"/minha-area"} component={MinhaArea} />
+        <Route path={"/fotos/:token"} component={VehiclePhotos} />
         <Route path={"/404"} component={NotFound} />
         {/* Final fallback route */}
         <Route component={NotFound} />
