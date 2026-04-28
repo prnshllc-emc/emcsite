@@ -796,7 +796,7 @@
 - [x] Create railway.json config
 - [x] Add sitemap.xml proxy via nginx (proxies to Grand OS)
 - [x] Update SEO meta tags (preserved from original site, structured data intact)
-- [ ] Export to GitHub for Railway deployment (manual step)
+- [x] Export to GitHub for Railway deployment (pushed to prnshllc-emc/emcsite)
 - [x] Test all pages and API integrations (Home, Knowledge Center, Service pages, build verified)
 
 ## Manus Deployment Fix (April 2026)
@@ -804,4 +804,4 @@
 - [x] Update package.json build script to bundle server entry point
 - [x] Add express dependency
 - [x] Test build and verify server serves SPA correctly (200 on /, /health, /importacao-de-veiculos, /assets/)
-- [ ] Save checkpoint and redeploy (pending)
+- [x] Save checkpoint and redeploy (deployed successfully on Manus)

@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development vite --host",
-    "build": "vite build && cp -r dist client-dist-tmp && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && mv client-dist-tmp dist/client-dist",
+    "build": "vite build",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
     "format": "prettier --write ."
