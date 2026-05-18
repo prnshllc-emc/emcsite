@@ -4,7 +4,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://enviandomeucarro.com/</loc>
-    <lastmod>2026-03-11</lastmod>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/" />
@@ -138,13 +138,13 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- Tracking -->
+  <!-- Client Portal -->
   <url>
-    <loc>https://enviandomeucarro.com/rastrear</loc>
-    <lastmod>2026-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/rastrear" />
+    <loc>https://enviandomeucarro.com/minha-area</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://enviandomeucarro.com/minha-area" />
   </url>
 
   <!-- Legal -->

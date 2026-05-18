@@ -6,6 +6,8 @@ Allow: /
 Disallow: /api/
 Disallow: /admin
 Disallow: /404
+Disallow: /f/
+Disallow: /novo-orcamento
 
 # Sitemaps
 Sitemap: https://enviandomeucarro.com/sitemap.xml

@@ -805,3 +805,12 @@
 - [x] Add express dependency
 - [x] Test build and verify server serves SPA correctly (200 on /, /health, /importacao-de-veiculos, /assets/)
 - [x] Save checkpoint and redeploy (deployed successfully on Manus)
+
+## Google Search Console Soft 404 Fix
+- [ ] Create Worker script (src/index.ts) with route validation and 404/301 handling
+- [ ] Update wrangler.jsonc to use Worker script with ASSETS binding
+- [ ] Add 301 redirects for legacy routes (/novo-orcamento → /, /rastrear → /minha-area)
+- [ ] Return 410 Gone for removed /f/* article routes
+- [ ] Return 404 for malformed asset URLs
+- [ ] Update sitemap.xml (remove /rastrear, add /minha-area)
+- [ ] Push to GitHub for auto-deploy
