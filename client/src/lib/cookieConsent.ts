@@ -28,7 +28,6 @@ const CONSENT_VERSION = "1.0";
 declare global {
   interface Window {
     gtag: (...args: unknown[]) => void;
-    dataLayer: unknown[];
     fbq: (...args: unknown[]) => void;
   }
 }
