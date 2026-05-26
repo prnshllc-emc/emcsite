@@ -1,13 +1,17 @@
 /**
  * EMC — Cookie Consent Management (LGPD Compliant)
+ * 
+ * Uses Google Consent Mode v2:
+ * - gtag.js and Meta Pixel are loaded in index.html with consent DENIED by default
+ * - When user grants consent, we call gtag('consent', 'update', {...}) to unlock tracking
+ * - This approach is recommended by Google and fully LGPD compliant
  *
- * Manages user consent for different cookie categories:
+ * Consent categories:
  * - necessary: Always active (session, security, basic functionality)
  * - analytics: Google Analytics, scroll tracking, section engagement
  * - marketing: Meta Pixel, Google Ads conversions, remarketing
  *
  * Consent is stored in localStorage under "emc_cookie_consent".
- * Scripts are only loaded/activated after explicit user consent.
  */
 
 export interface CookieConsent {
@@ -20,6 +24,14 @@ export interface CookieConsent {
 
 const STORAGE_KEY = "emc_cookie_consent";
 const CONSENT_VERSION = "1.0";
+
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
+    fbq: (...args: unknown[]) => void;
+  }
+}
 
 /**
  * Get the current consent state from localStorage.
@@ -96,91 +108,65 @@ export function revokeConsent(): void {
 }
 
 /**
- * Load Google Tag Manager / gtag.js scripts dynamically.
- * Only called when analytics consent is given.
+ * Update Google Consent Mode based on user preferences.
+ * This is the key function — it tells gtag to unlock tracking.
+ * gtag.js is already loaded in index.html with consent denied by default.
  */
-export function loadAnalyticsScripts(): void {
-  if (typeof window === "undefined") return;
-  // Check if already loaded
-  if (document.querySelector('script[src*="googletagmanager.com/gtag"]')) return;
+function updateGoogleConsent(analytics: boolean, marketing: boolean): void {
+  if (typeof window === "undefined" || !window.gtag) return;
 
-  // Load gtag.js
-  const gtagScript = document.createElement("script");
-  gtagScript.async = true;
-  gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-K5GHBLZBTQ";
-  document.head.appendChild(gtagScript);
-
-  // Initialize gtag
-  gtagScript.onload = () => {
-    window.dataLayer = window.dataLayer || [];
-    function gtag(...args: unknown[]) {
-      window.dataLayer.push(args as unknown as { event: string });
-    }
-    window.gtag = gtag as typeof window.gtag;
-
-    gtag("js", new Date());
-    gtag("config", "G-K5GHBLZBTQ", {
-      send_page_view: true,
-      cookie_flags: "SameSite=None;Secure",
-      link_attribution: true,
-    });
-    gtag("config", "GT-5RMBD99G");
-    gtag("config", "GT-WPDP3HDS");
-
-    // Only load Google Ads if marketing is also consented
-    if (hasConsent("marketing")) {
-      gtag("config", "AW-17154661982");
-    }
-  };
+  window.gtag('consent', 'update', {
+    'analytics_storage': analytics ? 'granted' : 'denied',
+    'ad_storage': marketing ? 'granted' : 'denied',
+    'ad_user_data': marketing ? 'granted' : 'denied',
+    'ad_personalization': marketing ? 'granted' : 'denied',
+    'personalization_storage': marketing ? 'granted' : 'denied',
+  });
 }
 
 /**
- * Load Meta Pixel script dynamically.
- * Only called when marketing consent is given.
+ * Update Meta Pixel consent state.
+ * fbq is already loaded in index.html with consent revoked.
  */
-export function loadMarketingScripts(): void {
-  if (typeof window === "undefined") return;
-  // Check if already loaded
-  if (typeof window.fbq === "function") return;
+function updateMetaConsent(marketing: boolean): void {
+  if (typeof window === "undefined" || !window.fbq) return;
 
-  // Meta Pixel
-  (function (f: Window, b: Document, e: string, v: string) {
-    const n: any = (f as any).fbq = function () {
-      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
-    };
-    if (!(f as any)._fbq) (f as any)._fbq = n;
-    n.push = n;
-    n.loaded = true;
-    n.version = "2.0";
-    n.queue = [];
-    const t = b.createElement(e) as HTMLScriptElement;
-    t.async = true;
-    t.src = v;
-    const s = b.getElementsByTagName(e)[0];
-    s.parentNode?.insertBefore(t, s);
-  })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
-
-  (window as any).fbq("init", "1460384848838281");
-  (window as any).fbq("track", "PageView");
-
-  // Also load Google Ads if not already loaded
-  if (hasConsent("analytics") && window.gtag) {
-    window.gtag("config", "AW-17154661982");
+  if (marketing) {
+    window.fbq('consent', 'grant');
   }
+  // If not granted, it stays in revoked state (set in index.html)
 }
 
 /**
- * Apply consent: load scripts based on current consent state.
+ * Apply consent: update Google and Meta consent states based on stored preferences.
  * Should be called after consent is given or on page load if consent exists.
+ * 
+ * NOTE: This no longer loads scripts dynamically — scripts are already in index.html.
+ * It only updates the consent state so tracking can begin collecting data.
  */
 export function applyConsent(): void {
   const consent = getConsent();
   if (!consent) return;
 
-  if (consent.analytics) {
-    loadAnalyticsScripts();
-  }
+  // Update Google Consent Mode v2
+  updateGoogleConsent(consent.analytics, consent.marketing);
+
+  // Update Meta Pixel consent
   if (consent.marketing) {
-    loadMarketingScripts();
+    updateMetaConsent(true);
   }
+}
+
+// Legacy exports for backward compatibility (no longer needed but kept to avoid breaking imports)
+export function loadAnalyticsScripts(): void {
+  // No-op: gtag.js is now loaded in index.html
+  // Consent is managed via Consent Mode v2
+  updateGoogleConsent(true, hasConsent("marketing"));
+}
+
+export function loadMarketingScripts(): void {
+  // No-op: Meta Pixel is now loaded in index.html
+  // Consent is managed via fbq('consent', 'grant')
+  updateMetaConsent(true);
+  updateGoogleConsent(hasConsent("analytics"), true);
 }
