@@ -73,11 +73,64 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-    <!-- Google Tag & Meta Pixel — Loaded dynamically after LGPD cookie consent -->
-    <!-- Scripts are injected by client/src/lib/cookieConsent.ts based on user preferences -->
+    <!-- Google Consent Mode v2 + gtag.js — LGPD Compliant -->
+    <!-- Tags are loaded immediately but with consent DENIED by default.
+         No cookies are set and no personal data is collected until user grants consent.
+         This allows Google Tag Assistant to detect the tags while respecting LGPD. -->
     <script>
-      // Initialize dataLayer for GTM compatibility (no tracking until consent)
+      // 1. Initialize dataLayer and gtag function
       window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+
+      // 2. Set DEFAULT consent state — all denied (LGPD compliant)
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+
+      // 3. Set region-specific defaults (Brazil = strict)
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'region': ['BR']
+      });
+    </script>
+
+    <!-- 4. Load gtag.js immediately (will respect consent state above) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5GHBLZBTQ"></script>
+    <script>
+      // 5. Configure all Google tags (they will operate in cookieless mode until consent is granted)
+      gtag('js', new Date());
+      gtag('config', 'G-K5GHBLZBTQ', {
+        'send_page_view': true,
+        'link_attribution': true
+      });
+      gtag('config', 'GT-5RMBD99G');
+      gtag('config', 'GT-WPDP3HDS');
+      gtag('config', 'AW-17154661982');
+    </script>
+
+    <!-- Meta Pixel — Also loaded immediately with limited mode until consent -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('consent', 'revoke');
+      fbq('init', '1460384848838281');
+      fbq('track', 'PageView');
     </script>
 
     <!-- Structured Data: Organization -->
