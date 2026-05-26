@@ -3,6 +3,31 @@
 
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Google Consent Mode v2 (MUST be before GTM) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+    </script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PJR8RDDB');</script>
+    <!-- End Google Tag Manager -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="theme-color" content="#0c0c0e" />
@@ -73,52 +98,9 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-    <!-- Google Consent Mode v2 + gtag.js — LGPD Compliant -->
-    <!-- Tags are loaded immediately but with consent DENIED by default.
-         No cookies are set and no personal data is collected until user grants consent.
-         This allows Google Tag Assistant to detect the tags while respecting LGPD. -->
-    <script>
-      // 1. Initialize dataLayer and gtag function
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+    <!-- Consent Mode is set above, before GTM -->
 
-      // 2. Set DEFAULT consent state — all denied (LGPD compliant)
-      gtag('consent', 'default', {
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'analytics_storage': 'denied',
-        'functionality_storage': 'granted',
-        'personalization_storage': 'denied',
-        'security_storage': 'granted',
-        'wait_for_update': 500
-      });
-
-      // 3. Set region-specific defaults (Brazil = strict)
-      gtag('consent', 'default', {
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'analytics_storage': 'denied',
-        'region': ['BR']
-      });
-    </script>
-
-    <!-- 4. Load gtag.js immediately (will respect consent state above) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5GHBLZBTQ"></script>
-    <script>
-      // 5. Configure all Google tags (they will operate in cookieless mode until consent is granted)
-      gtag('js', new Date());
-      gtag('config', 'G-K5GHBLZBTQ', {
-        'send_page_view': true,
-        'link_attribution': true
-      });
-      gtag('config', 'GT-5RMBD99G');
-      gtag('config', 'GT-WPDP3HDS');
-      gtag('config', 'AW-17154661982');
-    </script>
-
-    <!-- Meta Pixel — Also loaded immediately with limited mode until consent -->
+    <!-- Meta Pixel — loaded with consent revoked until user grants -->
     <script>
       !function(f,b,e,v,n,t,s)
       {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -524,6 +506,11 @@
   </head>
 
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PJR8RDDB"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
     <!-- Skip to main content (Accessibility) -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded focus:font-bold">Pular para o conteúdo principal</a>
     <!-- Meta Pixel noscript fallback -->
