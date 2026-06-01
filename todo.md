@@ -814,3 +814,11 @@
 - [ ] Return 404 for malformed asset URLs
 - [ ] Update sitemap.xml (remove /rastrear, add /minha-area)
 - [ ] Push to GitHub for auto-deploy
+
+## Google Search Console 404 Indexation Fix - Round 2 (Jun 2026)
+- [ ] Add 301 redirects in Worker for /blog/* URLs → /centro-de-conhecimento
+- [ ] Add 301 redirects for /custos/* variants → existing cost pages
+- [ ] Add 301 redirect for /rotas/enviar-carro-brasil-portugal → /rotas/enviar-carro-brasil-europa
+- [ ] Add 301 redirects for /seguro-maritimo-veiculos-cobertura, /lcvm-licenca-importacao → relevant pages
+- [ ] Add 301 redirect for /loja → /
+- [ ] Push to GitHub and verify in production

@@ -42,10 +42,32 @@ const VALID_DYNAMIC_PREFIXES = [
   '/fotos/',                   // /fotos/:token
 ];
 
-// 301 Permanent Redirects for legacy routes
+// 301 Permanent Redirects for legacy routes and GSC 404 URLs
 const REDIRECTS: Record<string, string> = {
+  // Legacy routes
   '/novo-orcamento': '/',
   '/rastrear': '/minha-area',
+  '/loja': '/',
+
+  // Blog articles → Centro de Conhecimento (articles moved)
+  '/blog/guia-completo-importacao-veiculos-brasil': '/centro-de-conhecimento/importacao',
+  '/blog/admissao-temporaria-veiculos-regras': '/centro-de-conhecimento/regulamentacoes',
+  '/blog/portos-brasileiros-importacao-exportacao-veiculos': '/centro-de-conhecimento/transporte-de-veiculos',
+  '/blog/regras-ibama-importacao-veiculos': '/centro-de-conhecimento/regulamentacoes',
+  '/blog/importar-carro-japao-brasil-guia': '/centro-de-conhecimento/importacao',
+  '/blog/como-exportar-veiculo-do-brasil': '/centro-de-conhecimento/exportacao',
+
+  // Standalone content pages → relevant service/knowledge pages
+  '/seguro-maritimo-veiculos-cobertura': '/centro-de-conhecimento/transporte-de-veiculos',
+  '/lcvm-licenca-importacao': '/centro-de-conhecimento/regulamentacoes',
+
+  // Cost page variants → existing cost pages
+  '/custos/quanto-custa-importar-carro-classico': '/custos/quanto-custa-importar-veiculo',
+  '/custos/quanto-custa-trazer-carro-portugal': '/custos/quanto-custa-importar-veiculo',
+  '/custos/quanto-custa-importar-carro-eua': '/custos/quanto-custa-importar-veiculo',
+
+  // Route variants → existing route pages
+  '/rotas/enviar-carro-brasil-portugal': '/rotas/enviar-carro-brasil-europa',
 };
 
 // Check if a pathname is a valid SPA route
