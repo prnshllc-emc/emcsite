@@ -7,7 +7,7 @@
  * Base URL: https://os.enviandomeucarro.com  (runtime C desde o corte de 01/09/2026)
  * CORS: * (open)
  * Rate limits: 60 req/min (CMS), 30 req/min (photos)
- * Fonte unica: este arquivo. A variavel de build VITE_GRAND_OS_API_URL foi removida do painel em 02/09/2026.
+ * Fonte unica: este arquivo. A variavel de build VITE_GRAND_OS_API_URL foi removida do painel em 02/09/2026. Ver PR #1.
  */
 
 const API_BASE =
