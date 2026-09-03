@@ -4,14 +4,15 @@
  * Replaces tRPC calls with direct fetch to the Grand OS REST API.
  * The Grand OS is the backend that provides CMS, newsletter, and vehicle photos.
  *
- * Base URL: https://emc-grand-os-production.up.railway.app
+ * Base URL: https://os.enviandomeucarro.com  (runtime C desde o corte de 01/09/2026)
  * CORS: * (open)
  * Rate limits: 60 req/min (CMS), 30 req/min (photos)
+ * Fonte unica: este arquivo. A variavel de build VITE_GRAND_OS_API_URL foi removida do painel em 02/09/2026. Ver PR #1.
  */
 
 const API_BASE =
   import.meta.env.VITE_GRAND_OS_API_URL ||
-  "https://emc-grand-os-production.up.railway.app";
+  "https://os.enviandomeucarro.com";
 
 /* ─── Types ─────────────────────────────────────────────── */
 
