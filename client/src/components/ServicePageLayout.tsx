@@ -1,11 +1,12 @@
 /* ServicePageLayout — Reusable layout for deep SEO service pages */
 import Header from "@/components/Header";
+import { calculadoraUrl } from "@/lib/firstTouch";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { ArrowLeft, MessageCircle, Calculator, CheckCircle2, Clock, FileText, DollarSign, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { openContact } from "@/lib/contact";
+import { openContactWithNumber } from "@/lib/contact";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { trackCTAClick, trackWhatsAppClick, trackCalculatorInteraction } from "@/lib/analytics";
 import {
@@ -93,18 +94,18 @@ export default function ServicePageLayout({ data }: { data: ServicePageData }) {
 
   function handleWhatsApp() {
     const utmCampaign = data.calculatorUtmCampaign || `servico-${data.slug}`;
-    const msg = `Olá! Gostaria de saber mais sobre ${data.h1}.\n\n[Origem: site_emc | Serviço: ${utmCampaign}]`;
+    const msg = `Olá! Gostaria de saber mais sobre ${data.h1}.`;
     trackCTAClick("WhatsApp CTA", `service_${data.slug}`, "whatsapp", data.h1);
     trackWhatsAppClick(`service_page_${data.slug}`, msg);
-    const digits = whatsappNumber.replace(/\D/g, "");
-    window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
+    // mesma tag [Ref: …] dos outros botões: origem = primeiro toque, cta = serviço
+    openContactWithNumber(whatsappNumber, msg, "site", "whatsapp", `servico_${utmCampaign}`);
   }
 
   function handleCalculator() {
     trackCTAClick("Calculadora CTA", `service_${data.slug}`, "calculadora", data.h1);
     trackCalculatorInteraction("abrir_calculadora", { origin: `service_${data.slug}` });
     const utmCampaign = data.calculatorUtmCampaign || `servico-${data.slug}`;
-    window.open(`https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=${utmCampaign}`, "_blank");
+    window.open(calculadoraUrl(utmCampaign), "_blank");
   }
 
   // FAQ Schema markup for SEO

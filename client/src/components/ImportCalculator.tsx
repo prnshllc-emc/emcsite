@@ -1,5 +1,6 @@
 /* ImportCalculator — Card with glow effect, vehicle type selection buttons linking to external calculator */
 import { Car, Bike, Calculator, Share2, ArrowRight } from "lucide-react";
+import { calculadoraUrl } from "@/lib/firstTouch";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { trackCTAClick, trackCalculatorInteraction, trackOutboundLink } from "@/lib/analytics";
@@ -27,7 +28,7 @@ const VEHICLE_TYPES = [
 
 export default function ImportCalculator() {
   function openCalculator(utm: string, label: string) {
-    const url = `https://calculadora.enviandomeucarro.com?utm_source=site&utm_medium=calculator&utm_campaign=${utm}`;
+    const url = calculadoraUrl(`calculator-${utm}`);
     trackCTAClick(`Calculadora - ${label}`, "import_calculator_card", url, label);
     trackCalculatorInteraction("selecionar_tipo_veiculo", { vehicle_type: utm, origin: "calculator_card" });
     trackOutboundLink(url, `Calculadora ${label}`);
