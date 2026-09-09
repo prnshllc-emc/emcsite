@@ -3,26 +3,29 @@
  * Components should use useSiteSettings() + openContactWithNumber() for dynamic behavior.
  * The legacy openContact() still works as a fallback with the default number.
  *
- * UTM parameters are automatically appended to WhatsApp URLs for CRM tracking.
+ * A tag `[Ref: …]` embutida no texto do WhatsApp carrega a ORIGEM do visitante
+ * (primeiro toque: utm/gclid/fbclid/referrer/landing — ver firstTouch.ts) e o
+ * LUGAR do clique (`cta=`). Antes carregava só o lugar, disfarçado de origem.
  */
+import { getFirstTouch, buildRefTag } from "./firstTouch";
 
 const DEFAULT_WHATSAPP = "5511992448920";
 
 /**
- * Build a WhatsApp URL with UTM tracking parameters.
- * UTM params are embedded in the message text so they appear in HubSpot CRM.
+ * Build a WhatsApp URL with the origin tag embedded in the message text
+ * (the OS webhook parses `[Ref: …]` and stamps the contact).
+ * `utmSource`/`utmMedium` are kept for API compatibility; the origin comes from
+ * the first touch, and `utmCampaign` (the click location) travels as `cta=`.
  */
-function buildWhatsAppUrl(
+export function buildWhatsAppUrl(
   digits: string,
   message: string,
-  utmSource: string,
-  utmMedium: string,
+  _utmSource: string,
+  _utmMedium: string,
   utmCampaign: string
 ): string {
-  // Append UTM tracking tag to the message for CRM attribution
-  const utmTag = `\n\n[Ref: ${utmSource}/${utmMedium}/${utmCampaign}]`;
-  const fullMessage = message + utmTag;
-  const text = encodeURIComponent(fullMessage);
+  const tag = `\n\n${buildRefTag(getFirstTouch(), utmCampaign)}`;
+  const text = encodeURIComponent(message + tag);
   return `https://wa.me/${digits}?text=${text}`;
 }
 
@@ -62,14 +65,18 @@ export function openContactWithNumber(
     });
   }
 
-  // Push UTM data to dataLayer for GTM
+  // Push origin + click location to dataLayer for GTM
   if (typeof window !== "undefined") {
+    const ft = getFirstTouch();
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: "whatsapp_open",
-      utm_source: utmSource,
-      utm_medium: utmMedium,
-      utm_campaign: utmCampaign,
+      utm_source: ft?.src ?? utmSource,
+      utm_medium: ft?.med ?? utmMedium,
+      utm_campaign: ft?.camp ?? utmCampaign,
+      cta: utmCampaign,
+      has_gclid: !!ft?.gclid,
+      has_fbclid: !!ft?.fbclid,
       whatsapp_number: whatsappNumber,
     } as any);
   }
