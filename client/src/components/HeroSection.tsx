@@ -1,5 +1,6 @@
 /* HeroSection — SEO-optimized hero with dynamic settings, improved layout */
 import { CheckCircle2, MessageCircle, Calculator } from "lucide-react";
+import { calculadoraUrl } from "@/lib/firstTouch";
 import { Button } from "@/components/ui/button";
 import { HERO_BG_URL, openContactWithNumber } from "@/lib/contact";
 import { trackCTAClick, trackWhatsAppClick, trackCalculatorInteraction, trackNavClick } from "@/lib/analytics";
@@ -11,7 +12,7 @@ export default function HeroSection() {
   const calculatorUrl = get("calculator_url");
 
   function handleWhatsApp() {
-    const msg = "Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro.\n\n[Origem: site_emc | Campanha: hero-fale-especialista]";
+    const msg = "Olá! Gostaria de saber mais sobre os serviços da Enviando Meu Carro."; // origem vai na tag [Ref] (firstTouch)
     trackCTAClick("Fale com Especialista", "hero", "whatsapp", "Fale com um Especialista");
     trackWhatsAppClick("hero_cta_principal", msg);
     openContactWithNumber(whatsappNumber, msg, "site", "whatsapp", "hero_cta_principal");
@@ -20,7 +21,7 @@ export default function HeroSection() {
   function handleCalculator() {
     trackCTAClick("Simule seus Custos", "hero", "calculadora", "Simule seus Custos");
     trackCalculatorInteraction("abrir_calculadora", { origin: "hero" });
-    window.open("https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=hero-simule-custos", "_blank");
+    window.open(calculadoraUrl("hero-simule-custos"), "_blank");
   }
 
   function handleServiceClick(label: string, anchor: string) {
