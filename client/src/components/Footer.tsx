@@ -1,5 +1,6 @@
 /* Footer — SEO-optimized with consistent design, dynamic settings from DB */
 import { Instagram, Facebook, MapPin, Phone, Mail, Heart } from "lucide-react";
+import { calculadoraUrl } from "@/lib/firstTouch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LOGO_URL, CLUB_AACA_URL, CLUB_ACB_URL, openContactWithNumber } from "@/lib/contact";
@@ -17,7 +18,8 @@ const QUICK_LINKS = [
   { label: "Depoimentos", href: "#testimonials" },
   { label: "Escritórios", href: "#offices" },
   { label: "FAQ", href: "#faq" },
-  { label: "Calculadora de Importação", href: "https://calculadora.enviandomeucarro.com?utm_source=site_emc&utm_medium=referral&utm_campaign=footer-nav", external: true },
+  // href resolvido no render (get calculadoraUrl) para carregar o primeiro toque, capturado depois deste módulo carregar
+  { label: "Calculadora de Importação", get href() { return calculadoraUrl("footer-nav"); }, external: true },
   { label: "Centro de Conhecimento", href: "/centro-de-conhecimento" },
 ];
 
